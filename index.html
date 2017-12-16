@@ -11,7 +11,7 @@
         <link rel="apple-touch-icon" href="icon.png">
         <!-- Place favicon.ico in the root directory -->
 
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/ratchet/2.0.2/css/ratchet.css" rel="stylesheet"/>
+        <!--<link href="https://cdnjs.cloudflare.com/ajax/libs/ratchet/2.0.2/css/ratchet.css" rel="stylesheet"/>-->
         <link rel="stylesheet" type="text/css" href="css/ss-style.css" />
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
@@ -29,10 +29,67 @@
                 float: left;
                 width: 45%;
                 margin-left: 4%;
-                height: 8vw;
+                height: 10vw;
             }
 
-        </style>
+            .myButton {
+                position: relative;
+                display: inline-block;
+                padding: 6px 8px 7px;
+                margin-bottom: 0;
+                font-size: 18px;
+                font-weight: 400;
+                line-height: 1;
+                color: #428bca;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: top;
+                cursor: pointer;
+                background-color: transparent;
+                border: 1px solid #ccc;
+                border-radius: 3px;
+                display: block;
+                width: 100%;
+                padding: 15px 0;
+                margin-bottom: 10px;
+                font-size: 18px;
+                border: 1px solid #428bca;
+                }
+/*
+            .myButton .otherStuff {
+                margin: -2px -4px -2px 4px;
+                font-size: 12px;
+                background-color: rgba(0, 0, 0, .15);
+            }
+
+            .myButton .otherStuff .moreStuff {
+                background-color: transparent;
+            }
+
+            .myButton .otherStuff .evenMoreStuff { font-size: inherit; }
+
+            .myButton .otherStuff {
+                           position: relative;
+                           top: 7px;
+                           z-index: 20;
+                           padding: 6px 12px 7px;
+                           margin-top: 0;
+                           font-weight: 400;
+                       }
+            .myButton .otherStuff {top: 3px;
+                padding: 0;}
+
+            .myButton-block {
+                display: block;
+                width: 100%;
+                padding: 15px 0;
+                margin-bottom: 10px;
+                font-size: 18px;
+            }
+*/
+
+
+         </style>
 
         <script src="js/syncscroll.js"></script>
     </head>
@@ -47,13 +104,14 @@
         <div class=mid>
 
             <div id=leftColumnHeader class="myColumnHeader">
-                <label for="filechoice1" class="btn btn-primary btn-block btn-outlined">Select lefthand file</label>
+                <label for="filechoice1" class="myButton">Select left-hand file</label>
                 <input type="file" id="filechoice1" accept="text/plain" style="display: none"/>
-                <h2 id=leftTitle>Left Title Here</h2>
+                <h3 id=leftTitle>Left Title Here</h3>
             </div>
             <div id=rightColumnHeader class="myColumnHeader">
-                <input type="file" id="filechoice2" accept="text/plain"/>
-                <h2 id=rightTitle>Right Title Here</h2>
+                <label for="filechoice2" class="myButton">Select right-hand file</label>
+                <input type="file" id="filechoice2" accept="text/plain" style="display: none"/>
+                <h3 id=rightTitle>Right Title Here</h3>
             </div>
 
             <div id=leftColumn class="myColumn syncscroll frame" name="sync1">
