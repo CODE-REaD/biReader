@@ -27,9 +27,10 @@ document.getElementById('filechoice2')
         );
 
 $(".clickable").click(function(e){
-    var s = window.getSelection();
+    var s     = window.getSelection();
     var range = s.getRangeAt(0);
-    var node = s.anchorNode;
+    var node  = s.anchorNode;
+
     while(range.toString().indexOf(' ') != 0) {
         range.setStart(node,(range.startOffset -1));
     }
@@ -40,7 +41,7 @@ $(".clickable").click(function(e){
 
     } while(range.toString().indexOf(' ') == -1 && range.toString().trim() != '');
     var str = range.toString().trim();
-    alert(str);
+    // alert(str);
 
 /*
     var can = this.hasSpeechError()
@@ -52,8 +53,19 @@ $(".clickable").click(function(e){
 */
     var msg = new SpeechSynthesisUtterance(str);
     // msg.lang = this.props.language;
-    msg.lang = 'fr';
-    msg.rate = 0.8;
+    // Bad for performance: proof-of-concept code only:
+    guessLanguage.info(str, function(languageInfo) {
+        // 3 .Display output
+        if (languageInfo[0] == 'unknown') {
+            console.log('Not enough text has been provided to determine the source language.');
+        } else {
+            console.log('Detected language of provided text is ' + languageInfo[2] + ' [' + languageInfo[0] + '].');
+            msg.lang = languageInfo[0];
+        }
+    });
+
+    // msg.lang = 'fr';
+    msg.rate = 0.6;
     speechSynthesis.speak(msg)
 
 });
