@@ -73,14 +73,17 @@
         <h3><div style="color: red;">Works best with Google Chrome</div></h3>
         <h4>Please provide two files from your computer's local filesystem.
             The files should contain <strong>plain text only</strong>, of the same article or story
-            but written in two different languages (e.g., left = English and right = German).
-            <br><br>
-            This program will attempt to present them as two synchronously scrolling columns below, and
-            to pronounce words or sentences when you click and drag on them.
+            but written in two different languages (e.g., left = English and right = German).  Text
+            should be alphanumeric only, with paragraphs separated by control characters
+            <cr><lf><cr><lf> (0d, 0a, 0d, 0a).
+
+            Parallel Reader will attempt to present the two texts synchronously scrolling columns below,
+            and to pronounce words when you click on them or a series of words when you click-and-drag over them.
             <br><br>
             PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
-            input as no input validity checks are yet in place.  Also, text to speech seems to fail
-            if more than one instance at a time is running on your workstation.
+            input as no input validity checks are yet in place.  Also, pronunciation seems to deadlock
+            if more than one instance at a time is running on your workstation.  The remedy for this is
+            to exit the browser instance running one of the pronunciation tasks.
         </h4>
 
         <div class=mid>
@@ -108,11 +111,11 @@
             </div>
         </div>
 
-        <script src="js/vendor/modernizr-3.5.0.min.js"></script>
-        <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+        <!--<script src="js/vendor/modernizr-3.5.0.min.js"></script>-->
+        <!--<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>-->
         <script src="js/guessLang/_languageData.js"></script>
         <script src="js/guessLang/guessLanguage.js"></script>
-        <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.2.1.min.js"><\/script>')</script>
+        <!--<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.2.1.min.js"><\/script>')</script>-->
 
         <script src="js/plugins.js"></script>
         <script src="js/main.js"></script>
