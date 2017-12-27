@@ -34,9 +34,6 @@
 
         .myButton {
             position: relative;
-            /*display: inline-block;*/
-            /*padding: 6px 8px 7px;*/
-            /*margin-bottom: 0;*/
             font-size: 18px;
             font-weight: 400;
             line-height: 1;
@@ -46,7 +43,6 @@
             vertical-align: top;
             cursor: pointer;
             background-color: transparent;
-            /*border: 1px solid #ccc;*/
             border-radius: 3px;
             display: block;
             width: 100%;
@@ -76,16 +72,14 @@
     The files should contain <strong>plain text only</strong>, of the same article or story
     but written in two different languages (e.g., left = English and right = German). Text
     should be alphanumeric only, with paragraphs separated by control characters
-    CR,LF,CR,LF (0d, 0a, 0d, 0a).
-
-                    Parallel Reader will attempt to present the two texts synchronously scrolling columns below,
-                    and to pronounce words when you click on them or a series of words when you click-and-drag over
-                    them.
-                    <br><br>
-                    PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
-                    input as no input validity checks are yet in place. Also, pronunciation seems to deadlock
-                    if more than one instance at a time is running on your workstation. The remedy for this is
-                    to exit the browser instance running one of the pronunciation tasks.
+    CR,LF,CR,LF (0D, 0A, 0D, 0A hex). Parallel Reader will attempt to present the two texts
+    synchronously scrolling columns below, and to pronounce words when you click on them or
+    a series of words when you click-and-drag over them.
+    <br><br>
+    PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
+    input as no input validity checks are yet in place. Also, pronunciation seems to deadlock
+    if more than one instance at a time is running on your workstation. The remedy for this is
+    to exit the browser instance running one of the pronunciation tasks.
 </h4>
 
 <div class=mid>
@@ -103,8 +97,6 @@
     </div>
 
     <div id=leftColumn class="myColumn syncscroll frame">
-        <!--<div id=leftPara style="white-space: pre" class=clickable></div>-->
-        <!--<div id=leftPara style="word-wrap: break-word; white-space: normal;" class=clickable></div>-->
         <div id=leftPara style="word-wrap: break-word; white-space: pre-wrap;" class=clickable></div>
     </div>
 
