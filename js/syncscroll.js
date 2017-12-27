@@ -1,9 +1,9 @@
 /**
  * @fileoverview syncscroll - scroll several areas simultaniously
  * @version 0.0.3
- * 
+ *
  * @license MIT, see http://github.com/asvd/intence
- * @copyright 2015 asvd <heliosframework@gmail.com> 
+ * @copyright 2015 asvd <heliosframework@gmail.com>
  */
 
 
@@ -106,7 +106,7 @@
                                 ) {
                                     otherEl[scroll+Left] = scrollX;
                                 }
-                                
+
                                 if (updateY &&
                                     Math_round(
                                         otherEl[scroll+Top] -
@@ -125,9 +125,9 @@
                 );
             })(el, name);
         }
-    }
-    
-       
+    };
+
+
     if (document.readyState == "complete") {
         reset();
     } else {

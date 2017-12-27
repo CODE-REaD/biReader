@@ -473,7 +473,7 @@
         // Extended Latin
         if (scripts["Latin-1 Supplement"] + scripts["Latin Extended-A"] + scripts["IPA Extensions"] >= 0.4) {
           check(text, EXTENDED_LATIN, function(latinLang) {
-            if (latinLang == "pt") {
+            if (latinLang === "pt") {
               check(text, PT, callback);
             } else {
               callback.apply(undefined, [latinLang]);
@@ -518,7 +518,7 @@
           scoresArr.push([index, scores[index]]);
         }
 
-        if (scoresArr.length == 0) {
+        if (scoresArr.length === 0) {
           callback.apply(undefined, [UNKNOWN]);
           return;
         }

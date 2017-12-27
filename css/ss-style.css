@@ -8,12 +8,12 @@ body {
 
 a {
     color: #556677;
-    text-shadow: 0px 0px 3px rgba(100, 187, 214, 0.31);
+    text-shadow: 0 0 3px rgba(100, 187, 214, 0.31);
 }
 
 a:hover {
     color: #778899;
-    text-shadow: 0px 0px 4px rgba(180, 237, 255, 0.31);
+    text-shadow: 0 0 4px rgba(180, 237, 255, 0.31);
 }
 
 
