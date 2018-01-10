@@ -7,11 +7,13 @@ var leftFileDrop = document.getElementById("leftColumn"); // use column rather t
 leftFileDrop.addEventListener("dragenter", dragenter, false);
 leftFileDrop.addEventListener("dragover", dragover, false);
 leftFileDrop.addEventListener("drop", leftDrop, false);
+leftFileDrop.addEventListener("paste", leftPaste, false);
 
 var rightFileDrop = document.getElementById("rightColumn");
 rightFileDrop.addEventListener("dragenter", dragenter, false);
 rightFileDrop.addEventListener("dragover", dragover, false);
 rightFileDrop.addEventListener("drop", rightDrop, false);
+rightFileDrop.addEventListener("paste", rightPaste, false); //todo: this replaces leftFileDrop.addEventListener (above).  Why?
 
 function dragenter(e) {
     e.stopPropagation();
@@ -43,25 +45,55 @@ function rightDrop(e) {
     handleRightFiles(files);
 }
 
+// todo: for some reason this is never triggered: only rightPaste:
+function leftPaste(e) {
+    var clipboardData, pastedData;
+    e.stopPropagation();
+    e.preventDefault();
+
+    // Get pasted data via clipboard API
+    // clipboardData = e.clipboardData || window.clipboardData;
+    clipboardData = e.clipboardData;
+    pastedData = clipboardData.getData('Text');
+
+    // Do whatever with pasteddata
+    alert(pastedData);
+    document.getElementById('leftPara').textContent = pastedData;
+}
+
+function rightPaste(e) {
+    var clipboardData, pastedData;
+    e.stopPropagation();
+    e.preventDefault();
+
+    // Get pasted data via clipboard API
+    // clipboardData = e.clipboardData || window.clipboardData;
+    clipboardData = e.clipboardData;
+    pastedData = clipboardData.getData('Text');
+
+    // Do whatever with pasteddata
+    alert(pastedData);
+    document.getElementById('rightPara').textContent = pastedData;
+}
 
 function handleLeftFiles(files) {
     console.log('left file is ' + files[0].name);
-        var fr = new FileReader();
-        fr.onload = function () {
-            document.getElementById('leftPara').textContent = this.result;
-        };
-        fr.readAsText(files[0]);
-        document.getElementById('leftTitle').textContent = files[0].name;
+    var fr = new FileReader();
+    fr.onload = function () {
+        document.getElementById('leftPara').textContent = this.result;
+    };
+    fr.readAsText(files[0]);
+    document.getElementById('leftTitle').textContent = files[0].name;
 }
 
 function handleRightFiles(files) {
     console.log('right file is ' + files[0].name);
-        var fr = new FileReader();
-        fr.onload = function () {
-            document.getElementById('rightPara').textContent = this.result;
-        };
-        fr.readAsText(files[0]);
-        document.getElementById('rightTitle').textContent = files[0].name;
+    var fr = new FileReader();
+    fr.onload = function () {
+        document.getElementById('rightPara').textContent = this.result;
+    };
+    fr.readAsText(files[0]);
+    document.getElementById('rightTitle').textContent = files[0].name;
 }
 
 document.getElementById('filechoice1')
@@ -93,19 +125,42 @@ document.getElementById('filechoice2')
 // .. apply D.R.Y. above
 
 var readTextAloud = function () {
-    var s = window.getSelection();
+    // derived from https://stackoverflow.com/a/9304990/5025060:
+    var s     = window.getSelection();
     var range = s.getRangeAt(0);
-    var node = s.anchorNode;
+    var node  = s.anchorNode;
 
-    while (range.toString().indexOf(' ') !== 0) {
-        range.setStart(node, (range.startOffset - 1));
+    // Move back to letter after first ' ':
+    // fixed bug: crashes if run from first word in text (no preceding space).
+    // todo: this fails if word is at start of paragraph (no preceding space, backs up to
+    // preceding line).
+
+/*
+    while (range.startOffset > 0 && range.toString()[0].match(/\w/))
+    {
+        range.setStart(range.startContainer, range.startOffset - 1);
+    }
+
+    while (range.endOffset < range.endContainer.length &&
+           range.toString()[range.toString().length - 1].match(/\w/))
+    {
+        range.setEnd(range.endContainer, range.endOffset + 1);
+    }
+*/
+
+
+    while ((range.toString().indexOf(' ') !== 0)) {
+        if (range.StartOffset === 0) break;
+        range.setStart(node, (range.startOffset - 1))
     }
     range.setStart(node, range.startOffset + 1);
 
+    //
     do {
         range.setEnd(node, range.endOffset + 1);
+    } while (range.toString().indexOf(' ') === -1 &&
+    range.toString().trim() !== '');
 
-    } while (range.toString().indexOf(' ') === -1 && range.toString().trim() !== '');
     var str = range.toString().trim();
     // alert(str);
 
@@ -133,6 +188,7 @@ var readTextAloud = function () {
 
     // msg.lang = 'fr';
     msg.rate = 0.6;
+    speechSynthesis.cancel(); // try to address "freezing"; see https://stackoverflow.com/questions/21947730/chrome-speech-synthesis-with-longer-texts
     speechSynthesis.speak(msg)
 
 };

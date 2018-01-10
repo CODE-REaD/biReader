@@ -73,7 +73,7 @@
     but written in two different languages (e.g., left = English and right = German). Text
     should be alphanumeric only, with paragraphs separated by control characters
     CR,LF,CR,LF (0D, 0A, 0D, 0A hex). Parallel Reader will attempt to present the two texts
-    synchronously scrolling columns below, and to pronounce words when you click on them or
+    as synchronously scrolling columns below, and to pronounce words when you click on them or
     a series of words when you click-and-drag over them.
     <br><br>
     PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
@@ -84,25 +84,37 @@
 
 <div class=mid>
 
-
     <div id=leftColumnHeader class="myColumnHeader">
         <label for="filechoice1" class="myButton">Select left-hand file</label>
         <input type="file" id="filechoice1" accept="text/plain" style="display: none"/>
         <h3 id=leftTitle>Left Title Here</h3>
     </div>
+
     <div id=rightColumnHeader class="myColumnHeader">
         <label for="filechoice2" class="myButton">Select right-hand file</label>
         <input type="file" id="filechoice2" accept="text/plain" style="display: none"/>
         <h3 id=rightTitle>Right Title Here</h3>
     </div>
 
-    <div id=leftColumn class="myColumn syncscroll frame">
-        <div id=leftPara style="word-wrap: break-word; white-space: pre-wrap;" class=clickable></div>
+<!--
+todo: contenteditable allows a cursor in the column to direct the paste, but leaves
+     the column permanently editable.  OTOH, .paste event in main.js works, but so far
+     no way to tell where the paste occurred (there is no *cursor* w/o contenteditable).
+-->
+    <!--<div contenteditable="true" id=leftColumn class="myColumn syncscroll frame">-->
+    <div id=leftColumn class="myColumn syncscroll frame" name="sync1">
+        <!--<p id=leftPara style="word-wrap: break-word; white-space: pre-wrap;" class=clickable>Drag-and-drop file or paste text here</p>-->
+        <p id=leftPara style="word-wrap: break-word; white-space: pre-wrap;" class=clickable>
+            &nbsp;&nbsp;Drag-and-drop a file, or paste text here.</p>
     </div>
 
-    <div id=rightColumn class="myColumn syncscroll frame">
-        <p id="rightPara" style="word-wrap: break-word; white-space: pre-wrap;" class=clickable></p>
+    <!--<div contenteditable="true" id=rightColumn class="myColumn syncscroll frame">-->
+    <div id=rightColumn class="myColumn syncscroll frame" name="sync1">
+        <!--<p id=rightPara style="word-wrap: break-word; white-space: pre-wrap;" class=clickable>Drag-and-drop file or paste text here</p>-->
+        <p id=rightPara style="word-wrap: break-word; white-space: pre-wrap;" class=clickable>
+            &nbsp;&nbsp;Drag-and-drop a file, or paste text here.</p>
     </div>
+
 </div>
 
 <!--<script src="js/vendor/modernizr-3.5.0.min.js"></script>-->
