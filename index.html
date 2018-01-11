@@ -82,40 +82,31 @@
     to exit the browser instance running one of the pronunciation tasks.
 </h4>
 
-<div class=mid>
+<!--<div class=mid>-->
 
     <div id=leftColumnHeader class="myColumnHeader">
-        <label for="filechoice1" class="myButton">Select left-hand file</label>
-        <input type="file" id="filechoice1" accept="text/plain" style="display: none"/>
-        <h3 id=leftTitle>Left Title Here</h3>
+        <label for="leftFileChoice" class="myButton">Select left-hand file</label>
+        <input type="file" id="leftFileChoice" accept="text/plain" style="display: none"/>
+        <h3 id=leftTitle></h3>
     </div>
 
     <div id=rightColumnHeader class="myColumnHeader">
-        <label for="filechoice2" class="myButton">Select right-hand file</label>
-        <input type="file" id="filechoice2" accept="text/plain" style="display: none"/>
-        <h3 id=rightTitle>Right Title Here</h3>
+        <label for="rightFileChoice" class="myButton">Select right-hand file</label>
+        <input type="file" id="rightFileChoice" accept="text/plain" style="display: none"/>
+        <h3 id=rightTitle></h3>
     </div>
 
-<!--
-todo: contenteditable allows a cursor in the column to direct the paste, but leaves
-     the column permanently editable.  OTOH, .paste event in main.js works, but so far
-     no way to tell where the paste occurred (there is no *cursor* w/o contenteditable).
--->
-    <!--<div contenteditable="true" id=leftColumn class="myColumn syncscroll frame">-->
     <div id=leftColumn class="myColumn syncscroll frame" name="sync1">
-        <!--<p id=leftPara style="word-wrap: break-word; white-space: pre-wrap;" class=clickable>Drag-and-drop file or paste text here</p>-->
         <p id=leftPara style="word-wrap: break-word; white-space: pre-wrap;" class=clickable>
             &nbsp;&nbsp;Drag-and-drop a file, or paste text here.</p>
     </div>
 
-    <!--<div contenteditable="true" id=rightColumn class="myColumn syncscroll frame">-->
     <div id=rightColumn class="myColumn syncscroll frame" name="sync1">
-        <!--<p id=rightPara style="word-wrap: break-word; white-space: pre-wrap;" class=clickable>Drag-and-drop file or paste text here</p>-->
         <p id=rightPara style="word-wrap: break-word; white-space: pre-wrap;" class=clickable>
             &nbsp;&nbsp;Drag-and-drop a file, or paste text here.</p>
     </div>
 
-</div>
+<!--</div>-->
 
 <!--<script src="js/vendor/modernizr-3.5.0.min.js"></script>-->
 <!--<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>-->
