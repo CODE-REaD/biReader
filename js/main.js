@@ -123,27 +123,38 @@ function handleRightFiles(files) {
 
 // .. apply D.R.Y. above
 
+/*function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}*/
+
 var readTextAloud = function () {
     // derived from https://stackoverflow.com/a/9304990/5025060:
     var s     = window.getSelection();
     var range = s.getRangeAt(0);
     var node  = s.anchorNode;
 
-    if (speechSynthesis.pending)
-        speechSynthesis.cancel(); // try to address "freezing"; see https://stackoverflow.com/questions/21947730/chrome-speech-synthesis-with-longer-texts
+    // Attempt to interrupt current speech if user makes a new selection:
+    if (speechSynthesis.pending || speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+        readTextAloud();
+    }
 
+/*
+    while (speechSynthesis.speaking)
+        await sleep(300);
+*/
 
     while (range.startOffset !== 0) {                   // start of node
         range.setStart(node, range.startOffset - 1)     // back up 1 char
-        if (range.toString().search(/\s/) === 0) {      // space character
-            range.setStart(node, range.startOffset + 1);// move forward 1 char
+        if (range.toString().search(/[.!?:\n]\s*/) === 0) {      // start of sentence
+            range.setStart(node, range.startOffset + 1);// move forward chars
             break;
         }
     }
 
     while (range.endOffset < node.length) {         // end of node
         range.setEnd(node, range.endOffset + 1)     // forward 1 char
-        if (range.toString().search(/\s/) !== -1) { // space character
+        if (range.toString().search(/[.!?:][\n\s]/) !== -1) { // end of sentence
             range.setEnd(node, range.endOffset - 1);// back 1 char
             break;
         }
@@ -153,6 +164,7 @@ var readTextAloud = function () {
     var msg = new SpeechSynthesisUtterance(str);
 
     // Bad for performance: run once after new file load: for proof-of-concept code only:
+    // (Actually, this may be a requirement if languages are mixed within a document):
     guessLanguage.info(str, function (languageInfo) {
         // 3 .Display output
         if (languageInfo[0] === 'unknown') {
@@ -165,7 +177,6 @@ var readTextAloud = function () {
 
     msg.rate = 0.6;
     speechSynthesis.speak(msg)
-
 };
 
 // $(".clickable").click(function(e) { // the jquery way (replaces the following lines.  Worth it?)
