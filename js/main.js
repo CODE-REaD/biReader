@@ -50,7 +50,10 @@ function updateLineSpacing() {
     console.log('Change to a column detected.  Updating line spacing.');
     var leftLength = document.getElementById('leftPara').textContent.length;
     var rightLength = document.getElementById('rightPara').textContent.length;
-    console.log('Left length = ' + leftLength + ', Right length = ' + rightLength);
+    var leftToRightRatio = leftLength / rightLength;
+    console.log('Left length = ' + leftLength + ', Right length = ' + rightLength
+    + ', Ratio = ' + leftToRightRatio);
+    document.getElementById('leftPara').style.lineHeight = "110%";
 }
 
 function dragenter(e) {
