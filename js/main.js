@@ -28,6 +28,11 @@ document.getElementById('rightFileChoice')
             fr.onload = function () {
                 document.getElementById('rightPara').textContent = this.result;
             };
+            // fr.readAsBinaryString(this.files[0]);
+            // fr.readAsText(this.files[0], 'ANSI'); // make high-bit characters display properly
+            // fr.readAsText(this.files[0], 'CP1251'); // make high-bit characters display properly
+            // fr.readAsText(this.files[0], 'windows-1252'); // make high-bit characters display properly
+            // fr.readAsText(this.files[0],  'ISO-8859-4'); // make high-bit characters display properly
             fr.readAsText(this.files[0]);
             document.getElementById('rightTitle').textContent = this.files[0].name;
             updateLineSpacing();
@@ -53,7 +58,15 @@ function updateLineSpacing() {
     var leftToRightRatio = leftLength / rightLength;
     console.log('Left length = ' + leftLength + ', Right length = ' + rightLength
     + ', Ratio = ' + leftToRightRatio);
-    document.getElementById('leftPara').style.lineHeight = "110%";
+
+    // todo: 1.4 hard coded to match main.css; globalize somehow.
+    document.getElementById('leftPara').style.lineHeight = 1.4;
+    document.getElementById('rightPara').style.lineHeight = 1.4;
+
+    if (leftToRightRatio < 1)
+        document.getElementById('leftPara').style.lineHeight = 1.4 * leftToRightRatio
+    else if (leftToRightRatio > 1)
+        document.getElementById('rightPara').style.lineHeight = 1.4 * leftToRightRatio
 }
 
 function dragenter(e) {
