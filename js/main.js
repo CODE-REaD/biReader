@@ -4,30 +4,93 @@
 
 // todo: Apply D.R.Y. here...
 
+// Issue an HTTP GET request for the contents of the specified URL.
+// When the response arrives successfully, verify that it is plain text
+// and if so, pass it to the specified callback function
+/*function getFileFromLibrary(url, callback) {
+    console.log('getFileFromLibrary running.');
+    var request = new XMLHttpRequest(); // Create new request
+    request.open("GET", url); // Specify URL to fetch
+    request.onreadystatechange = function() { // Define event listener
+        // If the request is complete and was successful
+        if (request.readyState === 4 && request.status === 200) {
+            var type = request.getResponseHeader("Content-Type");
+            if (type.match(/^text/)) // Make sure response is text
+                callback(request.responseText); // Pass it to callback
+        }
+    };
+    request.send(null); // Send the request now
+}*/
+
+function getFileFromLibrary(url) {
+    console.log('getFileFromLibrary running.');
+    var request = new XMLHttpRequest(); // Create new request
+    request.open("GET", url); // Specify URL to fetch
+    request.onreadystatechange = function () { // Define event listener
+        // If the request is complete and was successful
+        if (request.readyState === 4 && request.status === 200) {
+            var type = request.getResponseHeader("Content-Type");
+            if (type.match(/^text/)) // Make sure response is text
+                loadLibraryFile(request.responseText);
+        }
+    };
+    request.send(null); // Send the request now
+}
+
+function loadLibraryFile(fileContents) {
+    // var docPositions = fileContents.match(/\#\[LangBridge\:/g);
+    var docPositions = fileContents.split(/\#\[LangBridge\:/g);
+    document.getElementById('leftPara').textContent = docPositions[1];
+    document.getElementById('rightPara').textContent = docPositions[2];
+    updateLineSpacing();
+}
+
+
+/*document.getElementById('libraryLoadButton').addEventListener('click',
+    function () {
+        console.log('loadfromlibrary running from event listener..')
+        getFileFromLibrary('http://parallel.code-read.com/library/en-fr-180112-test.bridge',
+        gotLibraryFile);
+});*/
+
+// OK:
+document.getElementById('libraryLoadButton').addEventListener('click',
+    function () { getFileFromLibrary('http://parallel.code-read.com/library/en-fr-180112-test.bridge');
+});
+
+// These cause getFileFromLibrary to run immediately on page load, without waiting for a click,
+// because without 'function()' I am immediately calling the function rather than referencing
+// it:
+//
+// document.getElementById('libraryLoadButton').addEventListener('click',
+//     getFileFromLibrary('http://parallel.code-read.com/library/en-fr-180112-test.bridge',
+//         gotLibraryFile));
+
+// document.getElementById('libraryLoadButton').addEventListener('click',
+//     { HandleEvent: getFileFromLibrary('http://parallel.code-read.com/library/en-fr-180112-test.bridge',
+//         gotLibraryFile)});
+
 // When user makes a change to the 'filechoice1' field, fire this listener to load
 // the file to leftPara:
-document.getElementById('leftFileChoice')
-    .addEventListener(
-        'change',
-        function () {
-            var fr = new FileReader();
-            fr.onload = function () {
-                document.getElementById('leftPara').textContent = this.result;
-            };
-            fr.readAsText(this.files[0]);
-            document.getElementById('leftTitle').textContent = this.files[0].name;
-            updateLineSpacing();
-        }
-    );
+document.getElementById('leftFileChoice').addEventListener('change',
+    function () {
+        var fr = new FileReader();
+        fr.onload = function () {
+            document.getElementById('leftPara').textContent = this.result;
+        };
+        fr.readAsText(this.files[0]);
+        document.getElementById('leftTitle').textContent = this.files[0].name;
+        updateLineSpacing();
+    }
+);
 
-document.getElementById('rightFileChoice')
-    .addEventListener(
-        'change',
+document.getElementById('rightFileChoice').addEventListener('change',
         function () {
             var fr = new FileReader();
             fr.onload = function () {
                 document.getElementById('rightPara').textContent = this.result;
             };
+            // none of these allows ANSI encoding:
             // fr.readAsBinaryString(this.files[0]);
             // fr.readAsText(this.files[0], 'ANSI'); // make high-bit characters display properly
             // fr.readAsText(this.files[0], 'CP1251'); // make high-bit characters display properly
@@ -40,14 +103,14 @@ document.getElementById('rightFileChoice')
     );
 
 var leftFileColumn = document.getElementById("leftColumn"); // use column rather than para as para isn't inflated before a file is loaded
-leftFileColumn.addEventListener("dragenter", dragenter, false);
-leftFileColumn.addEventListener("dragover", dragover, false);
+leftFileColumn.addEventListener("dragenter", keepItLocal, false);
+leftFileColumn.addEventListener("dragover", keepItLocal, false);
 leftFileColumn.addEventListener("drop", leftDrop, false);
 leftFileColumn.addEventListener("paste", leftPaste, false);
 
 var rightFileColumn = document.getElementById("rightColumn");
-rightFileColumn.addEventListener("dragenter", dragenter, false);
-rightFileColumn.addEventListener("dragover", dragover, false);
+rightFileColumn.addEventListener("dragenter", keepItLocal, false);
+rightFileColumn.addEventListener("dragover", keepItLocal, false);
 rightFileColumn.addEventListener("drop", rightDrop, false);
 rightFileColumn.addEventListener("paste", rightPaste, false);
 
@@ -63,12 +126,19 @@ function updateLineSpacing() {
     document.getElementById('leftPara').style.lineHeight = 1.4;
     document.getElementById('rightPara').style.lineHeight = 1.4;
 
+    //todo: check for "edge" cases here (e.g., less that a screenful of text):
     if (leftToRightRatio < 1)
         document.getElementById('leftPara').style.lineHeight = 1.4 * leftToRightRatio
     else if (leftToRightRatio > 1)
         document.getElementById('rightPara').style.lineHeight = 1.4 * leftToRightRatio
 }
 
+function keepItLocal(e) {
+    e.stopPropagation();
+    e.preventDefault();
+}
+
+/*
 function dragenter(e) {
     e.stopPropagation();
     e.preventDefault();
@@ -78,18 +148,21 @@ function dragover(e) {
     e.stopPropagation();
     e.preventDefault();
 }
+*/
 
 function leftDrop(e) {
-    e.stopPropagation();
-    e.preventDefault();
+    keepItLocal(e);
+    // e.stopPropagation();
+    // e.preventDefault();
     var dt = e.dataTransfer;
     var files = dt.files;
     handleLeftFiles(files);
 }
 
 function rightDrop(e) {
-    e.stopPropagation();
-    e.preventDefault();
+    keepItLocal(e);
+    // e.stopPropagation();
+    // e.preventDefault();
     var dt = e.dataTransfer;
     var files = dt.files;
     handleRightFiles(files);
@@ -97,21 +170,23 @@ function rightDrop(e) {
 
 function leftPaste(e) {
     var clipboardData, pastedData;
-    e.stopPropagation();
-    e.preventDefault();
+    // e.stopPropagation();
+    // e.preventDefault();
     clipboardData = e.clipboardData;
     pastedData = clipboardData.getData('Text');
     document.getElementById('leftPara').textContent = pastedData;
+    document.getElementById('leftTitle').textContent = "(pasted)";
     updateLineSpacing();
 }
 
 function rightPaste(e) {
     var clipboardData, pastedData;
-    e.stopPropagation();
-    e.preventDefault();
+    // e.stopPropagation();
+    // e.preventDefault();
     clipboardData = e.clipboardData;
     pastedData = clipboardData.getData('Text');
     document.getElementById('rightPara').textContent = pastedData;
+    document.getElementById('rightTitle').textContent = "(pasted)";
     updateLineSpacing();
 }
 
@@ -194,6 +269,26 @@ var readTextAloud = function () {
     msg.rate = 0.6;
     speechSynthesis.speak(msg)
 };
+
+// Retrieve file from library: (synchronous: should probably avoid):
+//
+/*function getFileFromLibrary(){
+    // read from URL location
+    var request = new XMLHttpRequest();
+    // request.open('GET', 'http://www.puzzlers.org/pub/wordlists/pocket.txt', true);
+    request.open('GET', 'http://parallel.code-read.com/library/en-fr-180112-test.bridge', true);
+    request.send(null);
+    request.onreadystatechange = function () {
+        if (request.readyState === 4 && request.status === 200) {
+            var type = request.getResponseHeader('Content-Type');
+            if (type.indexOf("text") !== 1) {
+                return request.responseText;
+            }
+        }
+    }
+}*/
+
+
 
 // $(".clickable").click(function(e) { // the jquery way (replaces the following lines.  Worth it?)
 

@@ -67,7 +67,7 @@
 <!-- Add your site or application content here -->
 <div class=line>Кто поздний верховый под ветром ночным?</div>
 
-<h1>Parallel Reader Proof of Concept</h1>
+<h1>Language Bridge Proof of Concept</h1>
 <h3 style="color: red;">Works best with Google Chrome
 </h3>
 <h4>
@@ -87,27 +87,34 @@
 
 <!--<div class=mid>-->
 
-    <div id=leftColumnHeader class="myColumnHeader">
-        <label for="leftFileChoice" class="myButton">Select left-hand file</label>
-        <input type="file" id="leftFileChoice" accept="text/plain" style="display: none"/>
-        <h3 id=leftTitle></h3>
-    </div>
+<!--
+<label for="getFileFromLibrary" class="myButton">Load file from online library</label>
+<input type="file" id="getFileFromLibrary" accept="text/plain" style="display: none"/>
+-->
 
-    <div id=rightColumnHeader class="myColumnHeader">
-        <label for="rightFileChoice" class="myButton">Select right-hand file</label>
-        <input type="file" id="rightFileChoice" accept="text/plain" style="display: none"/>
-        <h3 id=rightTitle></h3>
-    </div>
+<button id="libraryLoadButton" class="myButton">Load file from online library</button>
 
-    <div id=leftColumn class="myColumn syncscroll frame" name="sync1">
-        <p id=leftPara style="word-wrap: break-word; white-space: pre-wrap;" class=clickable>
-            &nbsp;&nbsp;Drag-and-drop a file, or paste text here.</p>
-    </div>
+<div id=leftColumnHeader class="myColumnHeader">
+    <label for="leftFileChoice" class="myButton">Load left file from disc</label>
+    <input type="file" id="leftFileChoice" accept="text/plain" style="display: none"/>
+    <h3 id=leftTitle></h3>
+</div>
 
-    <div id=rightColumn class="myColumn syncscroll frame" name="sync1">
-        <p id=rightPara style="word-wrap: break-word; white-space: pre-wrap;" class=clickable>
-            &nbsp;&nbsp;Drag-and-drop a file, or paste text here.</p>
-    </div>
+<div id=rightColumnHeader class="myColumnHeader">
+    <label for="rightFileChoice" class="myButton">Load right file from disc</label>
+    <input type="file" id="rightFileChoice" accept="text/plain" style="display: none"/>
+    <h3 id=rightTitle></h3>
+</div>
+
+<div id=leftColumn class="myColumn syncscroll frame" name="sync1">
+    <p id=leftPara style="word-wrap: break-word; white-space: pre-wrap;" class=clickable>
+        &nbsp;&nbsp;Drag-and-drop a file, or paste text here.</p>
+</div>
+
+<div id=rightColumn class="myColumn syncscroll frame" name="sync1">
+    <p id=rightPara style="word-wrap: break-word; white-space: pre-wrap;" class=clickable>
+        &nbsp;&nbsp;Drag-and-drop a file, or paste text here.</p>
+</div>
 
 <!--</div>-->
 
