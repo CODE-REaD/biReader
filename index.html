@@ -27,11 +27,20 @@
             margin-left: 4%;
         }
 
-        .myColumnHeader {
+        .myColumnHeader, .myHeader {
             float: left;
-            width: 45%;
             margin-left: 4%;
             height: 10vw;
+        }
+
+        .myColumnHeader {
+            width: 45%;
+        }
+
+        .myHeader, .myIntro {
+            float: left;
+            margin-left: 4%;
+            width: 94%;
         }
 
         .myButton {
@@ -45,14 +54,31 @@
             vertical-align: top;
             cursor: pointer;
             background-color: transparent;
-            border-radius: 3px;
+            border-radius: 4px;
             display: block;
-            width: 100%;
+            /*width: 100%;*/
             padding: 15px 0;
             margin-bottom: 10px;
-            border: 1px solid #428bca;
+            border: 2px solid #428bca;
         }
 
+        /*from https://stackoverflow.com/a/9358802/5025060: */
+        #popUpDiv{
+            z-index: 100;
+            position: absolute;
+            background-color: rgba(123, 123,123, 0.8);
+            display: none;
+            top: 0;
+            left: 0;
+            width: 200px;
+            height: 300px;
+        }
+        #popupSelect{
+            z-index: 1000;
+            position: absolute;
+            top: 130px;
+            left: 50px;
+        }​
     </style>
 
     <script src="js/syncscroll.js"></script>
@@ -63,10 +89,7 @@
     your browser</a> to improve your experience and security.</p>
 <![endif]-->
 
-
-<!-- Add your site or application content here -->
-<div class=line>Кто поздний верховый под ветром ночным?</div>
-
+<div class=myIntro>
 <h1>Language Bridge Proof of Concept</h1>
 <h3 style="color: red;">Works best with Google Chrome
 </h3>
@@ -84,15 +107,19 @@
     if more than one instance at a time is running on your workstation. The remedy for this is
     to exit the browser instance running one of the pronunciation tasks.
 </h4>
+</div>
 
-<!--<div class=mid>-->
+<!--<div id="baseDiv">Load file from online library</div>-->
+<div id="popUpDiv">
+    <select id="popupSelect">
+        <option value="Test">en-fr-180112-test.bridge</option>
+        <option value="Babies">en-fr-180116-fewer-babies.bridge</option>
+        <option value="Panama">en-fr-180116-panama.bridge</option>
+        <option value="Phonetaps">en-fr-180116-phonetaps.bridge</option>
+    </select>
+</div>
 
-<!--
-<label for="getFileFromLibrary" class="myButton">Load file from online library</label>
-<input type="file" id="getFileFromLibrary" accept="text/plain" style="display: none"/>
--->
-
-<button id="libraryLoadButton" class="myButton">Load file from online library</button>
+<button id="libraryLoadButton" class="myHeader myButton">Load file from online library</button>
 
 <div id=leftColumnHeader class="myColumnHeader">
     <label for="leftFileChoice" class="myButton">Load left file from disc</label>
@@ -116,7 +143,6 @@
         &nbsp;&nbsp;Drag-and-drop a file, or paste text here.</p>
 </div>
 
-<!--</div>-->
 
 <!--<script src="js/vendor/modernizr-3.5.0.min.js"></script>-->
 <!--<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>-->

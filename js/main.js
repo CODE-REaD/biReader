@@ -29,8 +29,8 @@ function getFileFromLibrary(url) {
     request.onreadystatechange = function () { // Define event listener
         // If the request is complete and was successful
         if (request.readyState === 4 && request.status === 200) {
-            var type = request.getResponseHeader("Content-Type");
-            if (type.match(/^text/)) // Make sure response is text
+            // var type = request.getResponseHeader("Content-Type");
+            // if (type.match(/^text/)) // Make sure response is text
                 loadLibraryFile(request.responseText);
         }
     };
@@ -39,8 +39,8 @@ function getFileFromLibrary(url) {
 
 function loadLibraryFile(fileContents) {
     // var docPositions = fileContents.match(/\#\[LangBridge\:/g);
-    var docPositions = fileContents.split(/\#\[LangBridge\:/g);
-    document.getElementById('leftPara').textContent = docPositions[1];
+    var docPositions = fileContents.split(/#\[LangBridge\:..\:.*\]/g);
+    document.getElementById('leftPara').textContent = docPositions[1]; // skip newline
     document.getElementById('rightPara').textContent = docPositions[2];
     updateLineSpacing();
 }
@@ -53,22 +53,49 @@ function loadLibraryFile(fileContents) {
         gotLibraryFile);
 });*/
 
-// OK:
-document.getElementById('libraryLoadButton').addEventListener('click',
-    function () { getFileFromLibrary('http://parallel.code-read.com/library/en-fr-180112-test.bridge');
+/*document.getElementById('baseDiv').addEventListener('click', function() {
+    document.getElementById('popUpDiv').style.display = 'inline-block';
+});*/
+
+document.getElementById('popupSelect').addEventListener('change', function() {
+    var e = document.getElementById('popupSelect');
+    var libFileName = e.options[e.selectedIndex].text;
+    getFileFromLibrary('http://parallel.code-read.com/library/' + libFileName);
+    document.getElementById('popUpDiv').style.display = 'none';
 });
 
-// These cause getFileFromLibrary to run immediately on page load, without waiting for a click,
-// because without 'function()' I am immediately calling the function rather than referencing
-// it:
-//
-// document.getElementById('libraryLoadButton').addEventListener('click',
-//     getFileFromLibrary('http://parallel.code-read.com/library/en-fr-180112-test.bridge',
-//         gotLibraryFile));
+function chooseLibraryFile(fileList) {
 
-// document.getElementById('libraryLoadButton').addEventListener('click',
-//     { HandleEvent: getFileFromLibrary('http://parallel.code-read.com/library/en-fr-180112-test.bridge',
-//         gotLibraryFile)});
+
+    document.getElementById('leftPara').textContent = docPositions[1]; // skip newline
+    document.getElementById('rightPara').textContent = docPositions[2];
+}
+
+
+function getLibraryDirectory(url) {
+    var request = new XMLHttpRequest(); // Create new request
+    request.open("GET", url); // Specify URL to fetch
+    request.onreadystatechange = function () { // Define event listener
+        // If the request is complete and was successful
+        if (request.readyState === 4 && request.status === 200) {
+            // var type = request.getResponseHeader("Content-Type");
+            // if (type.match(/^text/)) // Make sure response is text
+            chooseLibraryFile(request.responseText);
+        }
+    };
+    request.send(null); // Send the request now
+}
+
+
+// OK:
+document.getElementById('libraryLoadButton').addEventListener('click',
+    // function () { getFileFromLibrary('http://parallel.code-read.com/library/en-fr-180112-test.bridge');
+    // function () { getFileFromLibrary('http://parallel.code-read.com/library/en-fr-180116-fewer-babies.bridge');
+    // function () { getFileFromLibrary('http://parallel.code-read.com/library/en-fr-180116-panama.bridge');
+    // function () { getFileFromLibrary('http://parallel.code-read.com/library/en-fr-180116-phonetaps.bridge');
+        function () { document.getElementById('popUpDiv').style.display = 'inline-block';
+    });
+
 
 // When user makes a change to the 'filechoice1' field, fire this listener to load
 // the file to leftPara:
@@ -128,7 +155,7 @@ function updateLineSpacing() {
 
     //todo: check for "edge" cases here (e.g., less that a screenful of text):
     if (leftToRightRatio < 1)
-        document.getElementById('leftPara').style.lineHeight = 1.4 * leftToRightRatio
+        document.getElementById('leftPara').style.lineHeight = 1.4 * leftToRightRatio;
     else if (leftToRightRatio > 1)
         document.getElementById('rightPara').style.lineHeight = 1.4 * leftToRightRatio
 }
@@ -137,18 +164,6 @@ function keepItLocal(e) {
     e.stopPropagation();
     e.preventDefault();
 }
-
-/*
-function dragenter(e) {
-    e.stopPropagation();
-    e.preventDefault();
-}
-
-function dragover(e) {
-    e.stopPropagation();
-    e.preventDefault();
-}
-*/
 
 function leftDrop(e) {
     keepItLocal(e);
@@ -236,7 +251,7 @@ var readTextAloud = function () {
 */
 
     while (range.startOffset !== 0) {                   // start of node
-        range.setStart(node, range.startOffset - 1)     // back up 1 char
+        range.setStart(node, range.startOffset - 1);     // back up 1 char
         if (range.toString().search(/[.!?:\n]\s*/) === 0) {      // start of sentence
             range.setStart(node, range.startOffset + 1);// move forward chars
             break;
@@ -244,7 +259,7 @@ var readTextAloud = function () {
     }
 
     while (range.endOffset < node.length) {         // end of node
-        range.setEnd(node, range.endOffset + 1)     // forward 1 char
+        range.setEnd(node, range.endOffset + 1);     // forward 1 char
         if (range.toString().search(/[.!?:][\n\s]/) !== -1) { // end of sentence
             range.setEnd(node, range.endOffset - 1);// back 1 char
             break;
@@ -266,7 +281,7 @@ var readTextAloud = function () {
         }
     });
 
-    msg.rate = 0.6;
+    msg.rate = 0.8;
     speechSynthesis.speak(msg)
 };
 
