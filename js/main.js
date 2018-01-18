@@ -23,7 +23,7 @@
 }*/
 
 function getFileFromLibrary(url) {
-    console.log('getFileFromLibrary running.');
+    // console.log('getFileFromLibrary running.');
     var request = new XMLHttpRequest(); // Create new request
     request.open("GET", url); // Specify URL to fetch
     request.onreadystatechange = function () { // Define event listener
@@ -45,7 +45,6 @@ function loadLibraryFile(fileContents) {
     updateLineSpacing();
 }
 
-
 /*document.getElementById('libraryLoadButton').addEventListener('click',
     function () {
         console.log('loadfromlibrary running from event listener..')
@@ -64,13 +63,10 @@ document.getElementById('popupSelect').addEventListener('change', function() {
     document.getElementById('popUpDiv').style.display = 'none';
 });
 
-function chooseLibraryFile(fileList) {
-
-
+/*function chooseLibraryFile(fileList) {
     document.getElementById('leftPara').textContent = docPositions[1]; // skip newline
     document.getElementById('rightPara').textContent = docPositions[2];
-}
-
+}*/
 
 function getLibraryDirectory(url) {
     var request = new XMLHttpRequest(); // Create new request
@@ -233,6 +229,8 @@ function handleRightFiles(files) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }*/
 
+// todo: firefox, see https://hacks.mozilla.org/2016/01/firefox-and-the-web-speech-api/
+//
 var readTextAloud = function () {
     // derived from https://stackoverflow.com/a/9304990/5025060:
     var s     = window.getSelection();
@@ -245,11 +243,6 @@ var readTextAloud = function () {
         readTextAloud();
     }
 
-/*
-    while (speechSynthesis.speaking)
-        await sleep(300);
-*/
-
     while (range.startOffset !== 0) {                   // start of node
         range.setStart(node, range.startOffset - 1);     // back up 1 char
         if (range.toString().search(/[.!?:\n]\s*/) === 0) {      // start of sentence
@@ -260,8 +253,8 @@ var readTextAloud = function () {
 
     while (range.endOffset < node.length) {         // end of node
         range.setEnd(node, range.endOffset + 1);     // forward 1 char
-        if (range.toString().search(/[.!?:][\n\s]/) !== -1) { // end of sentence
-            range.setEnd(node, range.endOffset - 1);// back 1 char
+        if (range.toString().slice(-2).search(/[.!?:][\n\s]/) !== -1) { // end of sentence
+            range.setEnd(node, range.endOffset - 1); // back 1 char
             break;
         }
     }
@@ -272,7 +265,6 @@ var readTextAloud = function () {
     // Bad for performance: run once after new file load: for proof-of-concept code only:
     // (Actually, this may be a requirement if languages are mixed within a document):
     guessLanguage.info(str, function (languageInfo) {
-        // 3 .Display output
         if (languageInfo[0] === 'unknown') {
             console.log('Not enough text has been provided to determine the source language.');
         } else {
@@ -283,6 +275,15 @@ var readTextAloud = function () {
 
     msg.rate = 0.8;
     speechSynthesis.speak(msg)
+
+    // workaround for Chrome 15 second limit on online TTS,
+    // see https://stackoverflow.com/questions/42875726/speechsynthesis-speak-in-web-speech-api-always-stops-after-a-few-seconds-in-go
+    // todo: only run under Chrome
+    var r = setInterval(function () {
+        // console.log(synth.speaking);
+        if (!speechSynthesis.speaking) clearInterval(r);
+        else speechSynthesis.resume();
+    }, 14000);
 };
 
 // Retrieve file from library: (synchronous: should probably avoid):
@@ -314,4 +315,6 @@ for (var i = 0; i < clickables.length; i++)
 
 // todo: when should I remove these listeners, if at all?
 
-// todo: readTextAloud seems to fail on some characters in French text file.
+// fixed: readTextAloud seems to fail on some characters in French text file.
+// (caused by ANSI file format, fixed by requiring UTF8).
+

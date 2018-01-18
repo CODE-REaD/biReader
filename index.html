@@ -94,22 +94,26 @@
 <h3 style="color: red;">Works best with Google Chrome
 </h3>
 <h4>
-    Please provide two files from your computer's local filesystem.
+    You may provide texts of the same article in different languages by pasting them
+    to the panels below, or drag-and-drop local files to the panels, or click on the "load"
+    buttons to select files from your local disc.  Or click on "Load File from Online Library" to
+    choose an existing pairing from the online library.
+<!--
+todo: update this description and show it when the user opens the file selection dialogue:
     The files should contain <strong>plain text only</strong>, of the same article or story
     but written in two different languages (e.g., left = English and right = German). Text
     should be alphanumeric only, with paragraphs separated by control characters
-    CR,LF,CR,LF (0D, 0A, 0D, 0A hex). Parallel Reader will attempt to present the two texts
-    as synchronously scrolling columns below, and to pronounce words when you click on them or
-    a series of words when you click-and-drag over them.
+    CR,LF,CR,LF (0D, 0A, 0D, 0A hex).
+-->
+    Language Bridge will attempt to present the two texts
+    as equal height, synchronously scrolling panels below, and to pronounce sentences
+    when you click on them or a series of sentences when you click-and-drag over them.
     <br><br>
     PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
-    input as no input validity checks are yet in place. Also, pronunciation seems to deadlock
-    if more than one instance at a time is running on your workstation. The remedy for this is
-    to exit the browser instance running one of the pronunciation tasks.
+    input as no input validity checks are yet in place.
 </h4>
 </div>
 
-<!--<div id="baseDiv">Load file from online library</div>-->
 <div id="popUpDiv">
     <select id="popupSelect">
         <option value="Test">en-fr-180112-test.bridge</option>
@@ -119,7 +123,7 @@
     </select>
 </div>
 
-<button id="libraryLoadButton" class="myHeader myButton">Load file from online library</button>
+<button id="libraryLoadButton" class="myHeader myButton">Load File from Online Library</button>
 
 <div id=leftColumnHeader class="myColumnHeader">
     <label for="leftFileChoice" class="myButton">Load left file from disc</label>
