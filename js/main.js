@@ -22,6 +22,21 @@
     request.send(null); // Send the request now
 }*/
 
+document.getElementById('libraryShowButton').addEventListener('click',
+    function () { showLibraryDirectory('http://parallel.code-read.com/library/');
+    });
+
+document.getElementById('libraryLoadButton').addEventListener('click',
+    function () { document.getElementById('popUpDiv').style.display = 'inline-block';
+    });
+
+document.getElementById('popupSelect').addEventListener('change', function() {
+    var e = document.getElementById('popupSelect');
+    var libFileName = e.options[e.selectedIndex].text;
+    getFileFromLibrary('http://parallel.code-read.com/library/' + libFileName);
+    document.getElementById('popUpDiv').style.display = 'none';
+});
+
 function getFileFromLibrary(url) {
     // console.log('getFileFromLibrary running.');
     var request = new XMLHttpRequest(); // Create new request
@@ -56,41 +71,38 @@ function loadLibraryFile(fileContents) {
     document.getElementById('popUpDiv').style.display = 'inline-block';
 });*/
 
-document.getElementById('popupSelect').addEventListener('change', function() {
-    var e = document.getElementById('popupSelect');
-    var libFileName = e.options[e.selectedIndex].text;
-    getFileFromLibrary('http://parallel.code-read.com/library/' + libFileName);
-    document.getElementById('popUpDiv').style.display = 'none';
-});
+
 
 /*function chooseLibraryFile(fileList) {
     document.getElementById('leftPara').textContent = docPositions[1]; // skip newline
     document.getElementById('rightPara').textContent = docPositions[2];
 }*/
 
-function getLibraryDirectory(url) {
+function showLibraryDirectory(url) {
     var request = new XMLHttpRequest(); // Create new request
+    var el = document.createElement('html');
+
     request.open("GET", url); // Specify URL to fetch
     request.onreadystatechange = function () { // Define event listener
         // If the request is complete and was successful
         if (request.readyState === 4 && request.status === 200) {
             // var type = request.getResponseHeader("Content-Type");
             // if (type.match(/^text/)) // Make sure response is text
-            chooseLibraryFile(request.responseText);
+            console.log('showLibraryDirectory: ', request.responseText);
+            el.innerHTML = request.responseText;
+            var libraryLinks = el.getElementsByTagName('a'); // Live NodeList of your anchor elements
+            var linkArray = [];
+            for (i = 5; i < libraryLinks.length; i++) {
+                console.log('link: ' + libraryLinks[i]);
+                linkArray.push(libraryLinks[i].href.replace(/.*\//g, ""));
+            }
+            console.log('my links: ' + linkArray);
+
+            chooseLibraryFile(linkArray);
         }
     };
     request.send(null); // Send the request now
 }
-
-
-// OK:
-document.getElementById('libraryLoadButton').addEventListener('click',
-    // function () { getFileFromLibrary('http://parallel.code-read.com/library/en-fr-180112-test.bridge');
-    // function () { getFileFromLibrary('http://parallel.code-read.com/library/en-fr-180116-fewer-babies.bridge');
-    // function () { getFileFromLibrary('http://parallel.code-read.com/library/en-fr-180116-panama.bridge');
-    // function () { getFileFromLibrary('http://parallel.code-read.com/library/en-fr-180116-phonetaps.bridge');
-        function () { document.getElementById('popUpDiv').style.display = 'inline-block';
-    });
 
 
 // When user makes a change to the 'filechoice1' field, fire this listener to load
@@ -163,26 +175,20 @@ function keepItLocal(e) {
 
 function leftDrop(e) {
     keepItLocal(e);
-    // e.stopPropagation();
-    // e.preventDefault();
     var dt = e.dataTransfer;
     var files = dt.files;
-    handleLeftFiles(files);
+    handleFiles(files, 'leftPara', 'leftTitle');
 }
 
 function rightDrop(e) {
     keepItLocal(e);
-    // e.stopPropagation();
-    // e.preventDefault();
     var dt = e.dataTransfer;
     var files = dt.files;
-    handleRightFiles(files);
+    handleFiles(files, 'rightPara', 'rightTitle');
 }
 
 function leftPaste(e) {
     var clipboardData, pastedData;
-    // e.stopPropagation();
-    // e.preventDefault();
     clipboardData = e.clipboardData;
     pastedData = clipboardData.getData('Text');
     document.getElementById('leftPara').textContent = pastedData;
@@ -192,8 +198,6 @@ function leftPaste(e) {
 
 function rightPaste(e) {
     var clipboardData, pastedData;
-    // e.stopPropagation();
-    // e.preventDefault();
     clipboardData = e.clipboardData;
     pastedData = clipboardData.getData('Text');
     document.getElementById('rightPara').textContent = pastedData;
@@ -201,6 +205,7 @@ function rightPaste(e) {
     updateLineSpacing();
 }
 
+/*
 function handleLeftFiles(files) {
     console.log('left file is ' + files[0].name);
     var fr = new FileReader();
@@ -221,6 +226,18 @@ function handleRightFiles(files) {
     };
     fr.readAsText(files[0]);
     document.getElementById('rightTitle').textContent = files[0].name;
+}
+*/
+
+function handleFiles(files, filePara, fileTitle) {
+    console.log('right file is ' + files[0].name);
+    var fr = new FileReader();
+    fr.onload = function () {
+        document.getElementById(filePara).textContent = this.result;
+        updateLineSpacing();
+    };
+    fr.readAsText(files[0]);
+    document.getElementById(fileTitle).textContent = files[0].name;
 }
 
 // .. apply D.R.Y. above
@@ -273,8 +290,25 @@ var readTextAloud = function () {
         }
     });
 
+
+    var voices = speechSynthesis.getVoices();
+
+    for(i = 0; i < voices.length ; i++)
+        console.log(voices[i].lang);
+
+        // console.log('available voices: ' + speechSynthesis.getVoices());
+
+    // List available voices
+    // (from https://stackoverflow.com/questions/27702842/html5-speech-synthesis-api-voice-languages-support):
+    speechSynthesis.onvoiceschanged = function () {
+        var voices = this.getVoices();
+        console.log(voices);
+        for(i = 0; i < voices.length ; i++)
+        console.log(voices[i].lang + '; ' + voices[i].name);
+    };
+
     msg.rate = 0.8;
-    speechSynthesis.speak(msg)
+    speechSynthesis.speak(msg);
 
     // workaround for Chrome 15 second limit on online TTS,
     // see https://stackoverflow.com/questions/42875726/speechsynthesis-speak-in-web-speech-api-always-stops-after-a-few-seconds-in-go
