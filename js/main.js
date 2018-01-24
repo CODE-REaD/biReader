@@ -4,32 +4,21 @@
 
 // todo: Apply D.R.Y. here...
 
-// Issue an HTTP GET request for the contents of the specified URL.
-// When the response arrives successfully, verify that it is plain text
-// and if so, pass it to the specified callback function
-/*function getFileFromLibrary(url, callback) {
-    console.log('getFileFromLibrary running.');
-    var request = new XMLHttpRequest(); // Create new request
-    request.open("GET", url); // Specify URL to fetch
-    request.onreadystatechange = function() { // Define event listener
-        // If the request is complete and was successful
-        if (request.readyState === 4 && request.status === 200) {
-            var type = request.getResponseHeader("Content-Type");
-            if (type.match(/^text/)) // Make sure response is text
-                callback(request.responseText); // Pass it to callback
-        }
-    };
-    request.send(null); // Send the request now
-}*/
-
+/*
 document.getElementById('libraryShowButton').addEventListener('click',
     function () { showLibraryDirectory('http://parallel.code-read.com/library/');
     });
+*/
 
+// Reveal the <select> node when the button is clicked:
 document.getElementById('libraryLoadButton').addEventListener('click',
     function () { document.getElementById('popUpDiv').style.display = 'inline-block';
     });
 
+
+// todo: consolidate next 3 functions (?):
+
+// Load a file when a selection is made:
 document.getElementById('popupSelect').addEventListener('change', function() {
     var e = document.getElementById('popupSelect');
     var libFileName = e.options[e.selectedIndex].text;
@@ -37,8 +26,8 @@ document.getElementById('popupSelect').addEventListener('change', function() {
     document.getElementById('popUpDiv').style.display = 'none';
 });
 
+
 function getFileFromLibrary(url) {
-    // console.log('getFileFromLibrary running.');
     var request = new XMLHttpRequest(); // Create new request
     request.open("GET", url); // Specify URL to fetch
     request.onreadystatechange = function () { // Define event listener
@@ -58,71 +47,6 @@ function loadLibraryFile(fileContents) {
     document.getElementById('leftPara').textContent = docPositions[1]; // skip newline
     document.getElementById('rightPara').textContent = docPositions[2];
     updateLineSpacing();
-}
-
-/*document.getElementById('libraryLoadButton').addEventListener('click',
-    function () {
-        console.log('loadfromlibrary running from event listener..')
-        getFileFromLibrary('http://parallel.code-read.com/library/en-fr-180112-test.bridge',
-        gotLibraryFile);
-});*/
-
-/*document.getElementById('baseDiv').addEventListener('click', function() {
-    document.getElementById('popUpDiv').style.display = 'inline-block';
-});*/
-
-
-
-/*function chooseLibraryFile(fileList) {
-    document.getElementById('leftPara').textContent = docPositions[1]; // skip newline
-    document.getElementById('rightPara').textContent = docPositions[2];
-}*/
-
-function showLibraryDirectory(url) {
-    var request = new XMLHttpRequest(); // Create new request
-    var el = document.createElement('html');
-
-    request.open("GET", url); // Specify URL to fetch
-    request.onreadystatechange = function () { // Define event listener
-        // If the request is complete and was successful
-        if (request.readyState === 4 && request.status === 200) {
-            // var type = request.getResponseHeader("Content-Type");
-            // if (type.match(/^text/)) // Make sure response is text
-            console.log('showLibraryDirectory: ', request.responseText);
-            el.innerHTML = request.responseText;
-            var libraryLinks = el.getElementsByTagName('a'); // Live NodeList of your anchor elements
-            var linkArray = [];
-            for (var i = 5; i < libraryLinks.length; i++) {
-                console.log('link: ' + libraryLinks[i]);
-                linkArray.push(libraryLinks[i].href.replace(/.*\//g, ""));
-            }
-            console.log('my links: ' + linkArray);
-            // populate chooser (derived from https://stackoverflow.com/a/17002049/5025060):
-            var myDiv = document.getElementById("popUpDiv");
-
-            //Create and append select list
-            var selectList = document.createElement("select");
-            selectList.id = "popupSelect";
-            myDiv.appendChild(selectList);
-
-            //Create and append the options
-            for (var j = 0; j < linkArray.length; j++) {
-                var option = document.createElement("option");
-                // option.value = "http://parallel.code-read.com/library/" + linkArray[i];
-                option.value = linkArray[j];
-                option.text = linkArray[j];
-                selectList.appendChild(option);
-            }
-
-            // reveal chooser:
-            // todo: reveals, but no longer triggers popupselect event listener
-            // (b/c we recreated popupselect?)
-            document.getElementById('popUpDiv').style.display = 'inline-block';
-
-            // chooseLibraryFile(linkArray);
-        }
-    };
-    request.send(null); // Send the request now
 }
 
 
@@ -146,12 +70,6 @@ document.getElementById('rightFileChoice').addEventListener('change',
             fr.onload = function () {
                 document.getElementById('rightPara').textContent = this.result;
             };
-            // none of these allows ANSI encoding:
-            // fr.readAsBinaryString(this.files[0]);
-            // fr.readAsText(this.files[0], 'ANSI'); // make high-bit characters display properly
-            // fr.readAsText(this.files[0], 'CP1251'); // make high-bit characters display properly
-            // fr.readAsText(this.files[0], 'windows-1252'); // make high-bit characters display properly
-            // fr.readAsText(this.files[0],  'ISO-8859-4'); // make high-bit characters display properly
             fr.readAsText(this.files[0]);
             document.getElementById('rightTitle').textContent = this.files[0].name;
             updateLineSpacing();
@@ -226,30 +144,6 @@ function rightPaste(e) {
     updateLineSpacing();
 }
 
-/*
-function handleLeftFiles(files) {
-    console.log('left file is ' + files[0].name);
-    var fr = new FileReader();
-    fr.onload = function () {
-        document.getElementById('leftPara').textContent = this.result;
-        updateLineSpacing();
-    };
-    fr.readAsText(files[0]);
-    document.getElementById('leftTitle').textContent = files[0].name;
-}
-
-function handleRightFiles(files) {
-    console.log('right file is ' + files[0].name);
-    var fr = new FileReader();
-    fr.onload = function () {
-        document.getElementById('rightPara').textContent = this.result;
-        updateLineSpacing();
-    };
-    fr.readAsText(files[0]);
-    document.getElementById('rightTitle').textContent = files[0].name;
-}
-*/
-
 function handleFiles(files, filePara, fileTitle) {
     console.log('right file is ' + files[0].name);
     var fr = new FileReader();
@@ -271,9 +165,9 @@ function handleFiles(files, filePara, fileTitle) {
 //
 var readTextAloud = function () {
     // derived from https://stackoverflow.com/a/9304990/5025060:
-    var s     = window.getSelection();
+    var s = window.getSelection();
     var range = s.getRangeAt(0);
-    var node  = s.anchorNode;
+    var node = s.anchorNode;
 
     // Attempt to interrupt current speech if user makes a new selection:
     if (speechSynthesis.pending || speechSynthesis.speaking) {
@@ -296,6 +190,32 @@ var readTextAloud = function () {
             break;
         }
     }
+
+    // Highlight selected text (some browsers lose highlighting during speech):
+
+    // First un-highlight any previously selected text(s):
+    while (true) {
+        var oldHL = document.getElementById('myHighlight');
+        if (oldHL) {
+            var pa = oldHL.parentNode;
+            while (oldHL.firstChild) {
+                pa.insertBefore(oldHL.firstChild, oldHL);
+            }
+            oldHL.remove();
+        } else break;
+    }
+
+    var newHL = document.createElement("span");
+    newHL.setAttribute(
+        // "border:1px dotted black;"
+        // "background-color: yellow; display: inline;"
+        "style",
+        "font-style: italic; color: red;"
+    );
+    newHL.setAttribute(
+        "id", "myHighlight"
+    );
+    range.surroundContents(newHL);
 
     var str = range.toString().trim();
     var msg = new SpeechSynthesisUtterance(str);
@@ -323,7 +243,7 @@ var readTextAloud = function () {
     // (from https://stackoverflow.com/questions/27702842/html5-speech-synthesis-api-voice-languages-support):
     speechSynthesis.onvoiceschanged = function () {
         var voices = this.getVoices();
-        console.log(voices);
+        // console.log(voices);
         for(i = 0; i < voices.length ; i++)
         console.log(voices[i].lang + '; ' + voices[i].name);
     };
@@ -341,26 +261,6 @@ var readTextAloud = function () {
     }, 14000);
 };
 
-// Retrieve file from library: (synchronous: should probably avoid):
-//
-/*function getFileFromLibrary(){
-    // read from URL location
-    var request = new XMLHttpRequest();
-    // request.open('GET', 'http://www.puzzlers.org/pub/wordlists/pocket.txt', true);
-    request.open('GET', 'http://parallel.code-read.com/library/en-fr-180112-test.bridge', true);
-    request.send(null);
-    request.onreadystatechange = function () {
-        if (request.readyState === 4 && request.status === 200) {
-            var type = request.getResponseHeader('Content-Type');
-            if (type.indexOf("text") !== 1) {
-                return request.responseText;
-            }
-        }
-    }
-}*/
-
-
-
 // $(".clickable").click(function(e) { // the jquery way (replaces the following lines.  Worth it?)
 
 var clickables = document.getElementsByClassName("clickable");
@@ -369,6 +269,59 @@ for (var i = 0; i < clickables.length; i++)
     clickables[i].addEventListener('click', readTextAloud, false);
 
 // todo: when should I remove these listeners, if at all?
+
+// Preload library file list to <select>:
+//
+var request = new XMLHttpRequest(); // Create new request
+var el = document.createElement('html');
+
+request.open("GET", "http://parallel.code-read.com/library/");
+request.onreadystatechange = function () { // Define event listener
+    // If the request is complete and was successful
+    if (request.readyState === 4 && request.status === 200) {
+        // var type = request.getResponseHeader("Content-Type");
+        // if (type.match(/^text/)) // Make sure response is text
+        console.log('showLibraryDirectory: ', request.responseText);
+        el.innerHTML = request.responseText;
+        var libraryLinks = el.getElementsByTagName('a'); // Live NodeList of your anchor elements
+        var linkArray = [];
+        for (var i = 5; i < libraryLinks.length; i++) {
+            console.log('link: ' + libraryLinks[i]);
+            linkArray.push(libraryLinks[i].href.replace(/.*\//g, ""));
+        }
+        console.log('my links: ' + linkArray);
+        // populate chooser (derived from https://stackoverflow.com/a/17002049/5025060):
+        // var myDiv = document.getElementById("popUpDiv");
+
+        //Create and append select list
+/*
+        var selectList = document.createElement("select");
+        selectList.id = "popupSelect";
+        myDiv.appendChild(selectList);
+*/
+
+        var selectList = document.getElementById("popupSelect");
+        selectList.length = 0; // empty it
+
+        //Create and append the options
+        for (var j = 0; j < linkArray.length; j++) {
+            var option = document.createElement("option");
+            // option.value = "http://parallel.code-read.com/library/" + linkArray[i];
+            option.value = linkArray[j];
+            option.text = linkArray[j];
+            selectList.appendChild(option);
+        }
+
+        // reveal chooser:
+        // todo: reveals, but no longer triggers popupselect event listener
+        // (b/c we recreated popupselect?)
+        // document.getElementById('popUpDiv').style.display = 'inline-block';
+
+        // chooseLibraryFile(linkArray);
+    }
+};
+request.send(null); // Send the request now
+
 
 // fixed: readTextAloud seems to fail on some characters in French text file.
 // (caused by ANSI file format, fixed by requiring UTF8).
