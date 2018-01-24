@@ -92,13 +92,34 @@ function showLibraryDirectory(url) {
             el.innerHTML = request.responseText;
             var libraryLinks = el.getElementsByTagName('a'); // Live NodeList of your anchor elements
             var linkArray = [];
-            for (i = 5; i < libraryLinks.length; i++) {
+            for (var i = 5; i < libraryLinks.length; i++) {
                 console.log('link: ' + libraryLinks[i]);
                 linkArray.push(libraryLinks[i].href.replace(/.*\//g, ""));
             }
             console.log('my links: ' + linkArray);
+            // populate chooser (derived from https://stackoverflow.com/a/17002049/5025060):
+            var myDiv = document.getElementById("popUpDiv");
 
-            chooseLibraryFile(linkArray);
+            //Create and append select list
+            var selectList = document.createElement("select");
+            selectList.id = "popupSelect";
+            myDiv.appendChild(selectList);
+
+            //Create and append the options
+            for (var j = 0; j < linkArray.length; j++) {
+                var option = document.createElement("option");
+                // option.value = "http://parallel.code-read.com/library/" + linkArray[i];
+                option.value = linkArray[j];
+                option.text = linkArray[j];
+                selectList.appendChild(option);
+            }
+
+            // reveal chooser:
+            // todo: reveals, but no longer triggers popupselect event listener
+            // (b/c we recreated popupselect?)
+            document.getElementById('popUpDiv').style.display = 'inline-block';
+
+            // chooseLibraryFile(linkArray);
         }
     };
     request.send(null); // Send the request now
