@@ -2,8 +2,6 @@
 <html class="no-js" lang="">
 <head>
     <meta charset="utf-8">
-    <!--<meta charset="windows-1252">-->
-    <!--<meta content="text/html" charset="windows-1252"-->
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>Parallel Reader PoC</title>
     <meta name="description" content="">
@@ -17,6 +15,7 @@
     <link rel="stylesheet" type="text/css" href="css/ss-style.css"/>
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/andadaFont.css">
 
     <style>
         .myColumn {
@@ -24,13 +23,19 @@
             overflow: auto; /*causes scrollbars*/
             float: left;
             width: 45%;
-            margin-left: 4%;
+            margin-left: 3%;
             border-radius: 4px;
+        }
+
+        .myPara {
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            padding: 9px;
         }
 
         .myColumnHeader, .myHeader {
             float: left;
-            margin-left: 4%;
+            margin-left: 3%;
             height: 10vw;
         }
 
@@ -40,7 +45,7 @@
 
         .myHeader, .myIntro {
             float: left;
-            margin-left: 4%;
+            margin-left: 3%;
             width: 94%;
         }
 
@@ -57,29 +62,31 @@
             background-color: transparent;
             border-radius: 4px;
             display: block;
-            /*width: 100%;*/
             padding: 15px 0;
             margin-bottom: 10px;
             border: 2px solid #428bca;
         }
 
         /*from https://stackoverflow.com/a/9358802/5025060: */
-        #popUpDiv{
+        #popUpDiv {
             z-index: 100;
             position: absolute;
-            background-color: rgba(123, 123,123, 0.8);
+            background-color: rgba(123, 123, 123, 0.8);
             display: none;
             top: 0;
             left: 0;
             width: 200px;
             height: 300px;
         }
-        #popupSelect{
+
+        #popupSelect {
             z-index: 1000;
             position: absolute;
             top: 130px;
             left: 50px;
-        }​
+        }
+
+        ​
     </style>
 
     <script src="js/syncscroll.js"></script>
@@ -91,28 +98,28 @@
 <![endif]-->
 
 <div class=myIntro>
-<h1>Language Bridge Proof of Concept</h1>
-<h3 style="color: red;">Works best with Google Chrome
-</h3>
-<h4>
-    You may provide texts of the same article in different languages by pasting them
-    to the panels below, or drag-and-drop local files to the panels, or click on the "load"
-    buttons to select files from your local disc.  Or click on "Load File from Online Library" to
-    choose an existing pairing from the online library.
-<!--
-todo: update this description and show it when the user opens the file selection dialogue:
-    The files should contain <strong>plain text only</strong>, of the same article or story
-    but written in two different languages (e.g., left = English and right = German). Text
-    should be alphanumeric only, with paragraphs separated by control characters
-    CR,LF,CR,LF (0D, 0A, 0D, 0A hex).
--->
-    Language Bridge will attempt to present the two texts
-    as equal height, synchronously scrolling panels below, and to pronounce sentences
-    when you click on them or a series of sentences when you click-and-drag over them.
-    <br><br>
-    PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
-    input as no input validity checks are yet in place.
-</h4>
+    <h1>Language Bridge Proof of Concept</h1>
+    <h3 style="color: red;">Works best with Google Chrome
+    </h3>
+    <h4>
+        You may provide texts of the same article in different languages by pasting them
+        to the panels below, or drag-and-drop local files to the panels, or click on the "load"
+        buttons to select files from your local disc. Or click on "Load File from Online Library" to
+        choose an existing pairing from the online library.
+        <!--
+        todo: update this description and show it when the user opens the file selection dialogue:
+            The files should contain <strong>plain text only</strong>, of the same article or story
+            but written in two different languages (e.g., left = English and right = German). Text
+            should be alphanumeric only, with paragraphs separated by control characters
+            CR,LF,CR,LF (0D, 0A, 0D, 0A hex).
+        -->
+        Language Bridge will attempt to present the two texts
+        as equal height, synchronously scrolling panels below, and to pronounce sentences
+        when you click on them or a series of sentences when you click-and-drag over them.
+        <br><br>
+        PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
+        input as no input validity checks are yet in place.
+    </h4>
 </div>
 
 <!--Filled in at runtime:-->
@@ -120,8 +127,6 @@ todo: update this description and show it when the user opens the file selection
     <select id="popupSelect">
     </select>
 </div>
-
-<!--<button id="libraryShowButton" class="myHeader myButton">Show Directory of Online Library</button>-->
 
 <button id="libraryLoadButton" class="myHeader myButton">Load File from Online Library</button>
 
@@ -138,13 +143,20 @@ todo: update this description and show it when the user opens the file selection
 </div>
 
 <div id=leftColumn class="myColumn syncscroll frame" name="sync1">
-    <p id=leftPara style="word-wrap: break-word; white-space: pre-wrap;" class=clickable>
-        &nbsp;&nbsp;Drag-and-drop a file, or paste text here.</p>
+    <p id=leftPara class="clickable myPara">
+        <span style="color: #e7e7e7; font-size: 219%; white-space:
+        pre-line; font-family: sans-serif; font-weight: bold;">
+
+            Drag-and-drop a file, or paste text here.</span></p>
 </div>
 
 <div id=rightColumn class="myColumn syncscroll frame" name="sync1">
-    <p id=rightPara style="word-wrap: break-word; white-space: pre-wrap;" class=clickable>
-        &nbsp;&nbsp;Drag-and-drop a file, or paste text here.</p>
+    <p id=rightPara class="clickable myPara">
+        <span style="color: #e7e7e7; font-size: 219%; white-space:
+        pre-line; font-family: sans-serif; font-weight: bold;">
+
+            Drag-and-drop a file, or paste text here.</span></p>
+    </p>
 </div>
 
 
@@ -154,7 +166,7 @@ todo: update this description and show it when the user opens the file selection
 <script src="js/guessLang/guessLanguage.js"></script>
 <!--<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.2.1.min.js"><\/script>')</script>-->
 
-<script src="js/plugins.js"></script>
+<!--<script src="js/plugins.js"></script>-->
 <script src="js/main.js"></script>
 
 <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->

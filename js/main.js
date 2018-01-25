@@ -4,28 +4,21 @@
 
 // todo: Apply D.R.Y. here...
 
-/*
-document.getElementById('libraryShowButton').addEventListener('click',
-    function () { showLibraryDirectory('http://parallel.code-read.com/library/');
-    });
-*/
-
 // Reveal the <select> node when the button is clicked:
 document.getElementById('libraryLoadButton').addEventListener('click',
     function () { document.getElementById('popUpDiv').style.display = 'inline-block';
     });
 
-
 // todo: consolidate next 3 functions (?):
 
-// Load a file when a selection is made:
+// Load a file when a selection is made.
+// todo: does nothing when 1st file is selected (not 'changed?'):
 document.getElementById('popupSelect').addEventListener('change', function() {
     var e = document.getElementById('popupSelect');
     var libFileName = e.options[e.selectedIndex].text;
     getFileFromLibrary('http://parallel.code-read.com/library/' + libFileName);
     document.getElementById('popUpDiv').style.display = 'none';
 });
-
 
 function getFileFromLibrary(url) {
     var request = new XMLHttpRequest(); // Create new request
@@ -253,7 +246,7 @@ var readTextAloud = function () {
 
     // workaround for Chrome 15 second limit on online TTS,
     // see https://stackoverflow.com/questions/42875726/speechsynthesis-speak-in-web-speech-api-always-stops-after-a-few-seconds-in-go
-    // todo: only run under Chrome
+    // todo: only run this workaround under Chrome
     var r = setInterval(function () {
         // console.log(synth.speaking);
         if (!speechSynthesis.speaking) clearInterval(r);
@@ -281,24 +274,16 @@ request.onreadystatechange = function () { // Define event listener
     if (request.readyState === 4 && request.status === 200) {
         // var type = request.getResponseHeader("Content-Type");
         // if (type.match(/^text/)) // Make sure response is text
-        console.log('showLibraryDirectory: ', request.responseText);
+        // console.log('showLibraryDirectory: ', request.responseText);
         el.innerHTML = request.responseText;
         var libraryLinks = el.getElementsByTagName('a'); // Live NodeList of your anchor elements
         var linkArray = [];
         for (var i = 5; i < libraryLinks.length; i++) {
-            console.log('link: ' + libraryLinks[i]);
+            // console.log('link: ' + libraryLinks[i]);
             linkArray.push(libraryLinks[i].href.replace(/.*\//g, ""));
         }
-        console.log('my links: ' + linkArray);
+        // console.log('my links: ' + linkArray);
         // populate chooser (derived from https://stackoverflow.com/a/17002049/5025060):
-        // var myDiv = document.getElementById("popUpDiv");
-
-        //Create and append select list
-/*
-        var selectList = document.createElement("select");
-        selectList.id = "popupSelect";
-        myDiv.appendChild(selectList);
-*/
 
         var selectList = document.getElementById("popupSelect");
         selectList.length = 0; // empty it
@@ -311,13 +296,6 @@ request.onreadystatechange = function () { // Define event listener
             option.text = linkArray[j];
             selectList.appendChild(option);
         }
-
-        // reveal chooser:
-        // todo: reveals, but no longer triggers popupselect event listener
-        // (b/c we recreated popupselect?)
-        // document.getElementById('popUpDiv').style.display = 'inline-block';
-
-        // chooseLibraryFile(linkArray);
     }
 };
 request.send(null); // Send the request now
