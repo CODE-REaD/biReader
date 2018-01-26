@@ -158,33 +158,34 @@ function handleFiles(files, filePara, fileTitle) {
 //
 var readTextAloud = function () {
     // derived from https://stackoverflow.com/a/9304990/5025060:
-    var s = window.getSelection();
-    var range = s.getRangeAt(0);
-    var node = s.anchorNode;
+    var textSel = window.getSelection();
+    var speakRange = textSel.getRangeAt(0);
+    var node = textSel.anchorNode;
 
     // Attempt to interrupt current speech if user makes a new selection:
     if (speechSynthesis.pending || speechSynthesis.speaking) {
         speechSynthesis.cancel();
         readTextAloud();
+        return;
     }
 
-    while (range.startOffset !== 0) {                   // start of node
-        range.setStart(node, range.startOffset - 1);     // back up 1 char
-        if (range.toString().search(/[.!?:\n]\s*/) === 0) {      // start of sentence
-            range.setStart(node, range.startOffset + 1);// move forward chars
+    while (speakRange.startOffset !== 0) {                   // start of node
+        speakRange.setStart(node, speakRange.startOffset - 1);     // back up 1 char
+        if (speakRange.toString().search(/[.!?:\n]\s*/) === 0) {      // start of sentence
+            speakRange.setStart(node, speakRange.startOffset + 1);// move forward chars
             break;
         }
     }
 
-    while (range.endOffset < node.length) {         // end of node
-        range.setEnd(node, range.endOffset + 1);     // forward 1 char
-        if (range.toString().slice(-2).search(/[.!?:][\n\s]/) !== -1) { // end of sentence
-            range.setEnd(node, range.endOffset - 1); // back 1 char
+    while (speakRange.endOffset < node.length) {         // end of node
+        speakRange.setEnd(node, speakRange.endOffset + 1);     // forward 1 char
+        if (speakRange.toString().slice(-2).search(/[.!?:][\n\s]/) !== -1) { // end of sentence
+            speakRange.setEnd(node, speakRange.endOffset - 1); // back 1 char
             break;
         }
     }
 
-    // Highlight selected text (some browsers lose highlighting during speech):
+    /*// Highlight selected text (some browsers lose highlighting during speech):
 
     // First un-highlight any previously selected text(s):
     while (true) {
@@ -202,65 +203,70 @@ var readTextAloud = function () {
     newHL.setAttribute(
         // "border:1px dotted black;"
         // "background-color: yellow; display: inline;"
-        "style",
-        "font-style: italic; color: red;"
+        "class",
+        "highlighted"
+        // "font-style: italic; color: red;"
     );
     newHL.setAttribute(
-        "id", "myHighlight"
+        "id", "myHighlight" // Mark our place so we can remove the span
     );
-    range.surroundContents(newHL);
+    range.surroundContents(newHL);*/
 
-    var str = range.toString().trim();
-    var msg = new SpeechSynthesisUtterance(str);
+    var speakStr = speakRange.toString().trim();
+    var speakMsg = new SpeechSynthesisUtterance(speakStr);
 
     // Bad for performance: run once after new file load: for proof-of-concept code only:
     // (Actually, this may be a requirement if languages are mixed within a document):
-    guessLanguage.info(str, function (languageInfo) {
+    guessLanguage.info(speakStr, function (languageInfo) {
         if (languageInfo[0] === 'unknown') {
             console.log('Not enough text has been provided to determine the source language.');
         } else {
             console.log('Detected language of provided text is ' + languageInfo[2] + ' [' + languageInfo[0] + '].');
-            msg.lang = languageInfo[0];
+            speakMsg.lang = languageInfo[0];
         }
     });
 
-
+/*
     var voices = speechSynthesis.getVoices();
-
     for(i = 0; i < voices.length ; i++)
         console.log(voices[i].lang);
+*/
 
         // console.log('available voices: ' + speechSynthesis.getVoices());
 
+/*
     // List available voices
     // (from https://stackoverflow.com/questions/27702842/html5-speech-synthesis-api-voice-languages-support):
     speechSynthesis.onvoiceschanged = function () {
         var voices = this.getVoices();
-        // console.log(voices);
+        console.log(voices);
         for(i = 0; i < voices.length ; i++)
         console.log(voices[i].lang + '; ' + voices[i].name);
     };
+*/
 
-    msg.rate = 0.8;
-    speechSynthesis.speak(msg);
+    speakMsg.rate = 0.8;
+    speechSynthesis.speak(speakMsg);
 
     // workaround for Chrome 15 second limit on online TTS,
     // see https://stackoverflow.com/questions/42875726/speechsynthesis-speak-in-web-speech-api-always-stops-after-a-few-seconds-in-go
-    // todo: only run this workaround under Chrome
-    var r = setInterval(function () {
-        // console.log(synth.speaking);
-        if (!speechSynthesis.speaking) clearInterval(r);
-        else speechSynthesis.resume();
-    }, 14000);
+    if (navigator.userAgent.toLowerCase().indexOf('chrome')) {  // Only run under Chrome
+        var resumeTimer = setInterval(function () {
+            // console.log(synth.speaking);
+            if (!speechSynthesis.speaking) clearInterval(resumeTimer);
+            else speechSynthesis.resume();
+        }, 14000);
+    }
 };
 
 // $(".clickable").click(function(e) { // the jquery way (replaces the following lines.  Worth it?)
 
-var clickables = document.getElementsByClassName("clickable");
+let clickables = document.getElementsByClassName('clickable');
 
-for (var i = 0; i < clickables.length; i++)
-    clickables[i].addEventListener('click', readTextAloud, false);
-
+for (let elNum = 0; elNum < clickables.length; elNum++) {
+    clickables[elNum].addEventListener('click', readTextAloud, false);
+    clickables[elNum].addEventListener('mouseup', keepItLocal, false); // else touchscreen browser removes highlighting
+}
 // todo: when should I remove these listeners, if at all?
 
 // Preload library file list to <select>:
@@ -276,24 +282,24 @@ request.onreadystatechange = function () { // Define event listener
         // if (type.match(/^text/)) // Make sure response is text
         // console.log('showLibraryDirectory: ', request.responseText);
         el.innerHTML = request.responseText;
-        var libraryLinks = el.getElementsByTagName('a'); // Live NodeList of your anchor elements
-        var linkArray = [];
-        for (var i = 5; i < libraryLinks.length; i++) {
+        let libraryLinks = el.getElementsByTagName('a'); // Live NodeList of your anchor elements
+        let linkArray = [];
+        for (let linkInd = 5; linkInd < libraryLinks.length; linkInd++) {
             // console.log('link: ' + libraryLinks[i]);
-            linkArray.push(libraryLinks[i].href.replace(/.*\//g, ""));
+            linkArray.push(libraryLinks[linkInd].href.replace(/.*\//g, ""));
         }
         // console.log('my links: ' + linkArray);
         // populate chooser (derived from https://stackoverflow.com/a/17002049/5025060):
 
-        var selectList = document.getElementById("popupSelect");
+        let selectList = document.getElementById("popupSelect");
         selectList.length = 0; // empty it
 
         //Create and append the options
-        for (var j = 0; j < linkArray.length; j++) {
-            var option = document.createElement("option");
+        for (let linkNum = 0; linkNum < linkArray.length; linkNum++) {
+            let option = document.createElement("option");
             // option.value = "http://parallel.code-read.com/library/" + linkArray[i];
-            option.value = linkArray[j];
-            option.text = linkArray[j];
+            option.value = linkArray[linkNum];
+            option.text = linkArray[linkNum];
             selectList.appendChild(option);
         }
     }

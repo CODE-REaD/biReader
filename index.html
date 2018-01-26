@@ -27,10 +27,28 @@
             border-radius: 4px;
         }
 
-        .myPara {
+        .myPara, .highlighted {
             word-wrap: break-word;
             white-space: pre-wrap;
-            padding: 9px;
+            /*padding: 9px; NO GOOD: this gives overlap in highlight bg*/
+            margin: 9px;
+            /*color: transparent;*/
+            text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+        }
+
+        .highlighted        {
+            /*font-style: italic;*/
+            /*color: red;*/
+            background: #d4d4d4;
+            text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+        }
+
+        ::selection {
+            background: #b3d4fc;
+        }
+
+        ::-moz-selection {
+            background: #b3d4fc;
         }
 
         .myColumnHeader, .myHeader {
@@ -65,6 +83,14 @@
             padding: 15px 0;
             margin-bottom: 10px;
             border: 2px solid #428bca;
+        }
+
+        .colInstructions {
+            color: #e7e7e7;
+            font-size: 219%;
+            white-space: pre-line;
+            font-family: sans-serif;
+            font-weight: bold;
         }
 
         /*from https://stackoverflow.com/a/9358802/5025060: */
@@ -144,16 +170,14 @@
 
 <div id=leftColumn class="myColumn syncscroll frame" name="sync1">
     <p id=leftPara class="clickable myPara">
-        <span style="color: #e7e7e7; font-size: 219%; white-space:
-        pre-line; font-family: sans-serif; font-weight: bold;">
+        <span class=colInstructions>
 
             Drag-and-drop a file, or paste text here.</span></p>
 </div>
 
 <div id=rightColumn class="myColumn syncscroll frame" name="sync1">
     <p id=rightPara class="clickable myPara">
-        <span style="color: #e7e7e7; font-size: 219%; white-space:
-        pre-line; font-family: sans-serif; font-weight: bold;">
+        <span class=colInstructions>
 
             Drag-and-drop a file, or paste text here.</span></p>
     </p>
