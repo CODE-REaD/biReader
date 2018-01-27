@@ -1,5 +1,7 @@
 "use strict";
 
+// todo: TTS speed control(s)
+
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications
 
 // todo: Apply D.R.Y. here...
@@ -26,12 +28,10 @@ function getFileFromLibrary(url) {
     request.onreadystatechange = function () { // Define event listener
         // If the request is complete and was successful
         if (request.readyState === 4 && request.status === 200) {
-            // var type = request.getResponseHeader("Content-Type");
-            // if (type.match(/^text/)) // Make sure response is text
                 loadLibraryFile(request.responseText);
         }
     };
-    request.send(null); // Send the request now
+    request.send(null);
 }
 
 function loadLibraryFile(fileContents) {
@@ -41,7 +41,6 @@ function loadLibraryFile(fileContents) {
     document.getElementById('rightPara').textContent = docPositions[2];
     updateLineSpacing();
 }
-
 
 // When user makes a change to the 'filechoice1' field, fire this listener to load
 // the file to leftPara:
@@ -82,12 +81,12 @@ rightFileColumn.addEventListener("drop", rightDrop, false);
 rightFileColumn.addEventListener("paste", rightPaste, false);
 
 function updateLineSpacing() {
-    console.log('Change to a column detected.  Updating line spacing.');
+    // console.log('Change to a column detected.  Updating line spacing.');
     var leftLength = document.getElementById('leftPara').textContent.length;
     var rightLength = document.getElementById('rightPara').textContent.length;
     var leftToRightRatio = leftLength / rightLength;
-    console.log('Left length = ' + leftLength + ', Right length = ' + rightLength
-    + ', Ratio = ' + leftToRightRatio);
+    // console.log('Left length = ' + leftLength + ', Right length = ' + rightLength
+    // + ', Ratio = ' + leftToRightRatio);
 
     // todo: 1.4 hard coded to match main.css; globalize somehow.
     document.getElementById('leftPara').style.lineHeight = 1.4;
@@ -95,8 +94,10 @@ function updateLineSpacing() {
 
     //todo: check for "edge" cases here (e.g., less that a screenful of text):
     if (leftToRightRatio < 1)
-        document.getElementById('leftPara').style.lineHeight = 1.4 * leftToRightRatio;
+        // Stretch left side:
+        document.getElementById('leftPara').style.lineHeight = 1.4 / leftToRightRatio;
     else if (leftToRightRatio > 1)
+        // Stretch right side:
         document.getElementById('rightPara').style.lineHeight = 1.4 * leftToRightRatio
 }
 
@@ -154,7 +155,7 @@ function handleFiles(files, filePara, fileTitle) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }*/
 
-// todo: firefox, see https://hacks.mozilla.org/2016/01/firefox-and-the-web-speech-api/
+// todo: firefox TTS, see https://hacks.mozilla.org/2016/01/firefox-and-the-web-speech-api/
 //
 var readTextAloud = function () {
     // derived from https://stackoverflow.com/a/9304990/5025060:
@@ -169,54 +170,31 @@ var readTextAloud = function () {
         return;
     }
 
-    while (speakRange.startOffset !== 0) {                   // start of node
+    // Find and include start of sentence containing clicked region:
+    while (speakRange.startOffset !== 0) {                         // start of node
         speakRange.setStart(node, speakRange.startOffset - 1);     // back up 1 char
-        if (speakRange.toString().search(/[.!?:\n]\s*/) === 0) {      // start of sentence
-            speakRange.setStart(node, speakRange.startOffset + 1);// move forward chars
+        if (speakRange.toString().search(/[.。!?:\n]\s*/) === 0) { // start of sentence
+            speakRange.setStart(node, speakRange.startOffset + 1); // move forward chars
             break;
         }
     }
 
-    while (speakRange.endOffset < node.length) {         // end of node
-        speakRange.setEnd(node, speakRange.endOffset + 1);     // forward 1 char
-        if (speakRange.toString().slice(-2).search(/[.!?:][\n\s]/) !== -1) { // end of sentence
+    // Find and include end of sentence containing clicked region:
+    let searchStr = "";
+    while (speakRange.endOffset < node.length) {                // end of node
+        speakRange.setEnd(node, speakRange.endOffset + 1);      // look ahead 1 char
+        searchStr = speakRange.toString().slice(-2);            // Last 2 chars
+        if (searchStr.search(/[.!?:][\r\n\s]|(\r|\n|\r\n){2}|。/) === 0) { // end of sentence
             speakRange.setEnd(node, speakRange.endOffset - 1); // back 1 char
             break;
         }
     }
 
-    /*// Highlight selected text (some browsers lose highlighting during speech):
-
-    // First un-highlight any previously selected text(s):
-    while (true) {
-        var oldHL = document.getElementById('myHighlight');
-        if (oldHL) {
-            var pa = oldHL.parentNode;
-            while (oldHL.firstChild) {
-                pa.insertBefore(oldHL.firstChild, oldHL);
-            }
-            oldHL.remove();
-        } else break;
-    }
-
-    var newHL = document.createElement("span");
-    newHL.setAttribute(
-        // "border:1px dotted black;"
-        // "background-color: yellow; display: inline;"
-        "class",
-        "highlighted"
-        // "font-style: italic; color: red;"
-    );
-    newHL.setAttribute(
-        "id", "myHighlight" // Mark our place so we can remove the span
-    );
-    range.surroundContents(newHL);*/
-
     var speakStr = speakRange.toString().trim();
     var speakMsg = new SpeechSynthesisUtterance(speakStr);
 
-    // Bad for performance: run once after new file load: for proof-of-concept code only:
-    // (Actually, this may be a requirement if languages are mixed within a document):
+    // todo: Bad for performance: run once after new file load: for proof-of-concept code only:
+    // (Actually, this MAY be a requirement if languages are mixed within a document):
     guessLanguage.info(speakStr, function (languageInfo) {
         if (languageInfo[0] === 'unknown') {
             console.log('Not enough text has been provided to determine the source language.');
@@ -288,9 +266,7 @@ request.onreadystatechange = function () { // Define event listener
             // console.log('link: ' + libraryLinks[i]);
             linkArray.push(libraryLinks[linkInd].href.replace(/.*\//g, ""));
         }
-        // console.log('my links: ' + linkArray);
         // populate chooser (derived from https://stackoverflow.com/a/17002049/5025060):
-
         let selectList = document.getElementById("popupSelect");
         selectList.length = 0; // empty it
 
@@ -305,7 +281,6 @@ request.onreadystatechange = function () { // Define event listener
     }
 };
 request.send(null); // Send the request now
-
 
 // fixed: readTextAloud seems to fail on some characters in French text file.
 // (caused by ANSI file format, fixed by requiring UTF8).
