@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Parallel Reader PoC</title>
+    <title>Language Bridge PoC</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -24,7 +24,7 @@
             float: left;
             width: 45%;
             margin-left: 3%;
-            border-radius: 4px;
+            border-radius: 8px;
         }
 
         .myPara, .highlighted {
@@ -54,7 +54,7 @@
         .myColumnHeader, .myHeader {
             float: left;
             margin-left: 3%;
-            height: 10vw;
+            height: 3em;
         }
 
         .myColumnHeader {
@@ -62,7 +62,7 @@
         }
 
         .myHeader, .myIntro {
-            float: left;
+            /*float: left;  !*troublemaker*!*/
             margin-left: 3%;
             width: 94%;
         }
@@ -74,14 +74,15 @@
             line-height: 1;
             color: #428bca;
             text-align: center;
-            white-space: nowrap;
+            /*white-space: nowrap;*/
             vertical-align: top;
             cursor: pointer;
             background-color: transparent;
             border-radius: 4px;
             display: block;
-            padding: 15px 0;
-            margin-bottom: 10px;
+            padding: 7px;
+            margin: 5px;
+            /*margin-bottom: 10px;*/
             border: 2px solid #428bca;
         }
 
@@ -98,21 +99,30 @@
             z-index: 100;
             position: absolute;
             background-color: rgba(123, 123, 123, 0.8);
+            color: white;
             display: none;
-            top: 0;
-            left: 0;
-            width: 200px;
-            height: 300px;
+            top: 10%;
+            left: 10%;
+            width: 50%;
+            height: 10%;
         }
 
         #popupSelect {
-            z-index: 1000;
+            z-index: 101;
             position: absolute;
-            top: 130px;
-            left: 50px;
+            top: 25%;
+            left: 12%;
         }
 
-        ​
+        .container {
+            display: flex;
+        }
+        .container.space-around {
+            justify-content: space-around;
+            margin-left: 3%;
+            width: 94%
+        }
+
     </style>
 
     <script src="js/syncscroll.js"></script>
@@ -132,13 +142,15 @@
         to the panels below, or drag-and-drop local files to the panels, or click on the "load"
         buttons to select files from your local disc. Or click on "Load File from Online Library" to
         choose an existing pairing from the online library.
-        <!--
+
+<!--
         todo: update this description and show it when the user opens the file selection dialogue:
             The files should contain <strong>plain text only</strong>, of the same article or story
             but written in two different languages (e.g., left = English and right = German). Text
             should be alphanumeric only, with paragraphs separated by control characters
             CR,LF,CR,LF (0D, 0A, 0D, 0A hex).
-        -->
+-->
+
         Language Bridge will attempt to present the two texts
         as equal height, synchronously scrolling panels below, and to pronounce sentences
         when you click on them or a series of sentences when you click-and-drag over them.
@@ -148,23 +160,40 @@
     </h4>
 </div>
 
-<!--Filled in at runtime:-->
-<div id="popUpDiv">
-    <select id="popupSelect">
-    </select>
-</div>
+<div id="topRowButtons" class="container space-around">
+    <button id="helpButton" class="myButton">Help</button>
+    <button id="ttsSpeedButton" class="myButton">Speech Speed</button>
+    <button id="libraryLoadButton" class="myButton">Load File from Online Library</button>
 
-<button id="libraryLoadButton" class="myHeader myButton">Load File from Online Library</button>
-
-<div id=leftColumnHeader class="myColumnHeader">
     <label for="leftFileChoice" class="myButton">Load left file from disc</label>
     <input type="file" id="leftFileChoice" accept="text/plain" style="display: none"/>
+
+    <label for="rightFileChoice" class="myButton">Load right file from disc</label>
+    <input type="file" id="rightFileChoice" accept="text/plain" style="display: none"/>
+</div>
+
+<!--Filled in at runtime:-->
+<div id="popUpDiv">
+    Select a file from the online library:
+        <select id="popupSelect">
+        </select>
+</div>
+
+<!--<button id="libraryLoadButton" class="myHeader myButton">Load File from Online Library</button>-->
+
+<div id=leftColumnHeader class="myColumnHeader">
+<!--
+    <label for="leftFileChoice" class="myButton">Load left file from disc</label>
+    <input type="file" id="leftFileChoice" accept="text/plain" style="display: none"/>
+-->
     <h3 id=leftTitle></h3>
 </div>
 
 <div id=rightColumnHeader class="myColumnHeader">
+<!--
     <label for="rightFileChoice" class="myButton">Load right file from disc</label>
     <input type="file" id="rightFileChoice" accept="text/plain" style="display: none"/>
+-->
     <h3 id=rightTitle></h3>
 </div>
 

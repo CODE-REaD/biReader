@@ -8,7 +8,18 @@
 
 // Reveal the <select> node when the button is clicked:
 document.getElementById('libraryLoadButton').addEventListener('click',
-    function () { document.getElementById('popUpDiv').style.display = 'inline-block';
+    function () {
+    document.getElementById('popUpDiv').style.display = 'inline-block';
+    // let el = document.getElementById('popupSelect');
+    // el.selectedIndex = 999; // works, but with blank as first selection
+    // el.selectedIndex = 3; // selects 4th choice, effectively disabling it
+
+    // document.getElementById('popupSelect').options[0].selected = false;
+    // document.getElementById('popupSelect').options[0].defaultSelected = false;
+
+    // document.getElementById('popupSelect').options[0].defaultSelected = false;
+
+
     });
 
 // todo: consolidate next 3 functions (?):
@@ -16,9 +27,11 @@ document.getElementById('libraryLoadButton').addEventListener('click',
 // Load a file when a selection is made.
 // todo: does nothing when 1st file is selected (not 'changed?'):
 document.getElementById('popupSelect').addEventListener('change', function() {
+// document.getElementById('popupSelect').addEventListener('select', function() { // does nothing
+// document.getElementById('popupSelect').addEventListener('click', function() { // always chooses 1st option
     var e = document.getElementById('popupSelect');
     var libFileName = e.options[e.selectedIndex].text;
-    getFileFromLibrary('http://parallel.code-read.com/library/' + libFileName);
+    getFileFromLibrary('http://bridge.code-read.com/library/' + libFileName);
     document.getElementById('popUpDiv').style.display = 'none';
 });
 
@@ -252,7 +265,7 @@ for (let elNum = 0; elNum < clickables.length; elNum++) {
 var request = new XMLHttpRequest(); // Create new request
 var el = document.createElement('html');
 
-request.open("GET", "http://parallel.code-read.com/library/");
+request.open("GET", "http://bridge.code-read.com/library/");
 request.onreadystatechange = function () { // Define event listener
     // If the request is complete and was successful
     if (request.readyState === 4 && request.status === 200) {
@@ -270,14 +283,34 @@ request.onreadystatechange = function () { // Define event listener
         let selectList = document.getElementById("popupSelect");
         selectList.length = 0; // empty it
 
+        // selectList.appendChild(new Option("Choose one:", "", false, false));
+
+
+        // Create a new Option object
+/*
+        var zaire = new Option("Zaire", // The text property
+            "zaire", // The value property
+            false, // The defaultSelected property
+            false); // The selected property
+*/
+        // NB: set this BEFORE populating selectList, else first is set as default choice:
+        selectList.size = (linkArray.length < 12 ? linkArray.length : 12);
+
         //Create and append the options
+        // See also, Option object at http://www.javascriptkit.com/jsref/select.shtml#section2
         for (let linkNum = 0; linkNum < linkArray.length; linkNum++) {
             let option = document.createElement("option");
             // option.value = "http://parallel.code-read.com/library/" + linkArray[i];
             option.value = linkArray[linkNum];
             option.text = linkArray[linkNum];
+            // option.selected = false;
+            // option.defaultSelected = false;
             selectList.appendChild(option);
         }
+        // selectList.size = 6;
+        // selectList.options[selectList.selectedIndex] = null; // removes option entirely
+        // selectList.options[selectList.selectedIndex].defaultSelected = false; // no effect
+        // selectList.options[selectList.selectedIndex].selected = false; // no effect
     }
 };
 request.send(null); // Send the request now
