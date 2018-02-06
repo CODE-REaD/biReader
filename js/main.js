@@ -1,5 +1,7 @@
 "use strict";
 
+// let voiceList = [];
+
 // todo: TTS speed control(s)
 
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications
@@ -9,26 +11,38 @@
 // Reveal the <select> node when the button is clicked:
 document.getElementById('libraryLoadButton').addEventListener('click',
     function () {
-    document.getElementById('popUpDiv').style.display = 'inline-block';
-    // let el = document.getElementById('popupSelect');
-    // el.selectedIndex = 999; // works, but with blank as first selection
-    // el.selectedIndex = 3; // selects 4th choice, effectively disabling it
+        document.getElementById('popUpDiv').style.display = 'inline-block';
+    });
 
-    // document.getElementById('popupSelect').options[0].selected = false;
-    // document.getElementById('popupSelect').options[0].defaultSelected = false;
+document.getElementById('helpButton').addEventListener('click',
+    function () {
+        let helpEl = document.getElementById('Help');
 
-    // document.getElementById('popupSelect').options[0].defaultSelected = false;
+        // todo: rather than only append if not present, always replace (so the list
+        // ..changes if the user adds voices):
+        
+        // We need insertAdjacentHTML here because simply modifying innerHTML strips the
+        // ..event handler we add with addEventListener.
+        // See https://stackoverflow.com/a/5113132/5025060:
+        if (helpEl.innerHTML.search(/Enabled Voices/) == -1) {
+            helpEl.insertAdjacentHTML("beforeend", "<hr>" + "Voices currently supported by your browser:<ul>");
+            voiceList.forEach(function(listMem) {
+                helpEl.insertAdjacentHTML("beforeend", "<li>" + listMem);
+            })
+            helpEl.insertAdjacentHTML("beforeend", "</ul>");
+        }
+        helpEl.style.display = 'inline-block';
+    });
 
-
+document.getElementById('helpCloseButton').addEventListener('click',
+    function () {
+        document.getElementById('Help').style.display = 'none';
     });
 
 // todo: consolidate next 3 functions (?):
 
 // Load a file when a selection is made.
-// todo: does nothing when 1st file is selected (not 'changed?'):
 document.getElementById('popupSelect').addEventListener('change', function() {
-// document.getElementById('popupSelect').addEventListener('select', function() { // does nothing
-// document.getElementById('popupSelect').addEventListener('click', function() { // always chooses 1st option
     var e = document.getElementById('popupSelect');
     var libFileName = e.options[e.selectedIndex].text;
     getFileFromLibrary('http://bridge.code-read.com/library/' + libFileName);
@@ -217,11 +231,13 @@ var readTextAloud = function () {
         }
     });
 
-/*
+
     var voices = speechSynthesis.getVoices();
-    for(i = 0; i < voices.length ; i++)
-        console.log(voices[i].lang);
-*/
+    for(let i = 0; i < voices.length ; i++)
+        // console.log(voices[i].lang);
+                console.log(voices[i].lang + '; ' + voices[i].name);
+
+
 
         // console.log('available voices: ' + speechSynthesis.getVoices());
 
@@ -269,30 +285,16 @@ request.open("GET", "http://bridge.code-read.com/library/");
 request.onreadystatechange = function () { // Define event listener
     // If the request is complete and was successful
     if (request.readyState === 4 && request.status === 200) {
-        // var type = request.getResponseHeader("Content-Type");
-        // if (type.match(/^text/)) // Make sure response is text
-        // console.log('showLibraryDirectory: ', request.responseText);
         el.innerHTML = request.responseText;
         let libraryLinks = el.getElementsByTagName('a'); // Live NodeList of your anchor elements
         let linkArray = [];
         for (let linkInd = 5; linkInd < libraryLinks.length; linkInd++) {
-            // console.log('link: ' + libraryLinks[i]);
             linkArray.push(libraryLinks[linkInd].href.replace(/.*\//g, ""));
         }
         // populate chooser (derived from https://stackoverflow.com/a/17002049/5025060):
         let selectList = document.getElementById("popupSelect");
         selectList.length = 0; // empty it
 
-        // selectList.appendChild(new Option("Choose one:", "", false, false));
-
-
-        // Create a new Option object
-/*
-        var zaire = new Option("Zaire", // The text property
-            "zaire", // The value property
-            false, // The defaultSelected property
-            false); // The selected property
-*/
         // NB: set this BEFORE populating selectList, else first is set as default choice:
         selectList.size = (linkArray.length < 12 ? linkArray.length : 12);
 
@@ -300,20 +302,24 @@ request.onreadystatechange = function () { // Define event listener
         // See also, Option object at http://www.javascriptkit.com/jsref/select.shtml#section2
         for (let linkNum = 0; linkNum < linkArray.length; linkNum++) {
             let option = document.createElement("option");
-            // option.value = "http://parallel.code-read.com/library/" + linkArray[i];
             option.value = linkArray[linkNum];
             option.text = linkArray[linkNum];
-            // option.selected = false;
-            // option.defaultSelected = false;
             selectList.appendChild(option);
         }
-        // selectList.size = 6;
-        // selectList.options[selectList.selectedIndex] = null; // removes option entirely
-        // selectList.options[selectList.selectedIndex].defaultSelected = false; // no effect
-        // selectList.options[selectList.selectedIndex].selected = false; // no effect
     }
 };
 request.send(null); // Send the request now
+
+// https://stackoverflow.com/a/22978802 says,
+// "...the voice list is loaded async to the page. An onvoiceschanged
+// event is fired when they are loaded":
+let voiceList = [];
+speechSynthesis.onvoiceschanged = function () {
+    let ssVoices = this.getVoices();
+    for (let voiceInd = 0; voiceInd < ssVoices.length; voiceInd++)
+        // voiceList[voiceInd] = ssVoices[voiceInd].lang + '; ' + ssVoices[voiceInd].name;
+        voiceList[voiceInd] = ssVoices[voiceInd].name;
+};
 
 // fixed: readTextAloud seems to fail on some characters in French text file.
 // (caused by ANSI file format, fixed by requiring UTF8).

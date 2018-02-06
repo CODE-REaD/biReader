@@ -24,6 +24,9 @@
             float: left;
             width: 45%;
             margin-left: 3%;
+        }
+
+        .myColumn, #Help {
             border-radius: 8px;
         }
 
@@ -61,6 +64,7 @@
             width: 45%;
         }
 
+        /*.myHeader, .myIntro {*/
         .myHeader, .myIntro {
             /*float: left;  !*troublemaker*!*/
             margin-left: 3%;
@@ -76,7 +80,6 @@
             text-align: center;
             /*white-space: nowrap;*/
             vertical-align: top;
-            cursor: pointer;
             background-color: transparent;
             border-radius: 4px;
             display: block;
@@ -84,6 +87,10 @@
             margin: 5px;
             /*margin-bottom: 10px;*/
             border: 2px solid #428bca;
+        }
+
+        .bridgeButton, .myButton {
+            cursor: pointer;
         }
 
         .colInstructions {
@@ -104,7 +111,7 @@
             top: 10%;
             left: 10%;
             width: 50%;
-            height: 10%;
+            height: 20%;
         }
 
         #popupSelect {
@@ -112,6 +119,18 @@
             position: absolute;
             top: 25%;
             left: 12%;
+        }
+
+        #Help {
+            z-index: 102;
+            position: absolute;
+            background-color: white;
+            display: none;
+            top: 5%;
+            left: 5%;
+            width: 80%;
+            /*height: 80%; auto-adjust to content size */
+            padding: 5%;
         }
 
         .container {
@@ -133,7 +152,7 @@
     your browser</a> to improve your experience and security.</p>
 <![endif]-->
 
-<div class=myIntro>
+<div id=Help class="frame">
     <h1>Language Bridge Proof of Concept</h1>
     <h3 style="color: red;">Works best with Google Chrome
     </h3>
@@ -158,6 +177,7 @@
         PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
         input as no input validity checks are yet in place.
     </h4>
+    <button id="helpCloseButton" class="bridgeButton">Done</button>
 </div>
 
 <div id="topRowButtons" class="container space-around">
@@ -170,6 +190,7 @@
 
     <label for="rightFileChoice" class="myButton">Load right file from disc</label>
     <input type="file" id="rightFileChoice" accept="text/plain" style="display: none"/>
+    <button id="saveFileButton" class="myButton">Save to Files</button>
 </div>
 
 <!--Filled in at runtime:-->
