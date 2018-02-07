@@ -1,5 +1,7 @@
 "use strict";
 
+// todo: store filenames as English and translate to native language for display.
+
 // let voiceList = [];
 
 let linkArray = [];
@@ -28,7 +30,7 @@ document.getElementById('helpCloseButton').addEventListener('click',
 
 // todo: consolidate next 3 functions (?):
 
-// Load a file when a selection is made.
+// Load a file when a library selection is made.
 document.getElementById('popupSelect').addEventListener('change', function () {
     var e = document.getElementById('popupSelect');
     let leftlibFilePath = e.options[e.selectedIndex].text;  // Left-hand file
@@ -45,11 +47,12 @@ document.getElementById('popupSelect').addEventListener('change', function () {
 
     if (leftlibFilePath.length)
         getFileFromLibrary('leftPara', 'http://bridge.code-read.com/library/' + leftlibFilePath,
-            gotFile);
+            loadedAfile);
+    document.getElementById('leftTitle').textContent = leftlibFilePath;
     if (rightlibFilePath.length)
         getFileFromLibrary('rightPara', 'http://bridge.code-read.com/library/' + rightlibFilePath,
-            gotFile);
-    // updateLineSpacing();
+            loadedAfile);
+    document.getElementById('rightTitle').textContent = rightlibFilePath;
     document.getElementById('popUpDiv').style.display = 'none';
 });
 
@@ -68,17 +71,13 @@ function getFileFromLibrary(Element, url, callback) {
 
 // Register file loaded so updateLineSpacing() is only called when both (async AJAX)
 // ..file loads completed:
-function gotFile(Element) {
+function loadedAfile(Element) {
+/*
+obsoleted: using DOMSubtreeModified trigger instead
+
     if (Element === 'rightPara')
         updateLineSpacing();
-}
-
-function loadLibraryFile(fileContents) {
-    // var docPositions = fileContents.match(/\#\[LangBridge\:/g);
-    var docPositions = fileContents.split(/#\[LangBridge\:..\:.*\]/g);
-    document.getElementById('leftPara').textContent = docPositions[1]; // skip newline
-    document.getElementById('rightPara').textContent = docPositions[2];
-    updateLineSpacing();
+*/
 }
 
 // When user makes a change to the 'filechoice1' field, fire this listener to load
@@ -91,7 +90,7 @@ document.getElementById('leftFileChoice').addEventListener('change',
         };
         fr.readAsText(this.files[0]);
         document.getElementById('leftTitle').textContent = this.files[0].name;
-        updateLineSpacing();
+        // updateLineSpacing();
     }
 );
 
@@ -103,7 +102,7 @@ document.getElementById('rightFileChoice').addEventListener('change',
         };
         fr.readAsText(this.files[0]);
         document.getElementById('rightTitle').textContent = this.files[0].name;
-        updateLineSpacing();
+        // updateLineSpacing();
     }
 );
 
@@ -119,21 +118,11 @@ rightFileColumn.addEventListener("dragover", keepItLocal, false);
 rightFileColumn.addEventListener("drop", rightDrop, false);
 rightFileColumn.addEventListener("paste", rightPaste, false);
 
+
+document.getElementById('leftPara').addEventListener('DOMSubtreeModified', updateLineSpacing);
+document.getElementById('rightPara').addEventListener('DOMSubtreeModified', updateLineSpacing);
+
 function updateLineSpacing() {
-    // todo: textContent.length is simply length of the text, not always
-    // proportional to vertical space required (esp. Japanese).  Try to find
-    // a means of measuring vertical space consumed by elements (include
-    // font size in calculation?)
-
-    // console.log('Change to a column detected.  Updating line spacing.');
-/*
-    var leftLength = document.getElementById('leftPara').textContent.length;
-    var rightLength = document.getElementById('rightPara').textContent.length;
-    var leftToRightRatio = leftLength / rightLength;
-    console.log('Left length = ' + leftLength + ', Right length = ' + rightLength
-    + ', Ratio = ' + leftToRightRatio);
-*/
-
     // todo: 1.4 hard coded to match main.css; globalize somehow.
     document.getElementById('leftPara').style.lineHeight = 1.4;
     document.getElementById('rightPara').style.lineHeight = 1.4;
@@ -141,8 +130,8 @@ function updateLineSpacing() {
     let leftHeight = document.getElementById('leftPara').scrollHeight;
     let rightHeight = document.getElementById('rightPara').scrollHeight;
     let leftToRightRatio = leftHeight / rightHeight;
-    console.log('left height: ' + leftHeight + ' right height: ' + rightHeight
-        + ', Ratio = ' + leftToRightRatio);
+    // console.log('left height: ' + leftHeight + ' right height: ' + rightHeight
+    //     + ', Ratio = ' + leftToRightRatio);
 
     //todo: check for "edge" cases here (e.g., less that a screenful of text):
     if (leftToRightRatio < 1)
@@ -284,6 +273,7 @@ for (let elNum = 0; elNum < clickables.length; elNum++) {
 //
 var request = new XMLHttpRequest(); // Create new request
 var el = document.createElement('html');
+let libFileName = '';
 
 request.open("GET", "http://bridge.code-read.com/library/");
 request.onreadystatechange = function () { // Define event listener
@@ -291,10 +281,10 @@ request.onreadystatechange = function () { // Define event listener
     if (request.readyState === 4 && request.status === 200) {
         el.innerHTML = request.responseText;
         let libraryLinks = el.getElementsByTagName('a'); // Live NodeList of your anchor elements
-        // let linkArray = [];
         linkArray = []; // global
         for (let linkInd = 5; linkInd < libraryLinks.length; linkInd++) {
-            linkArray.push(libraryLinks[linkInd].href.replace(/.*\//g, "")); // Remove all before last '/'
+            libFileName = libraryLinks[linkInd].href.replace(/.*\//g, ""); // Remove all before last '/'
+            libFileName.length && linkArray.push(libFileName);
         }
         // Populate chooser (derived from https://stackoverflow.com/a/17002049/5025060):
         let selectList = document.getElementById("popupSelect");
