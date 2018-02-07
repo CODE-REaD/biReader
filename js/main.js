@@ -2,6 +2,8 @@
 
 // let voiceList = [];
 
+let linkArray = [];
+
 // todo: TTS speed control(s)
 
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications
@@ -16,22 +18,7 @@ document.getElementById('libraryLoadButton').addEventListener('click',
 
 document.getElementById('helpButton').addEventListener('click',
     function () {
-        let helpEl = document.getElementById('Help');
-
-        // todo: rather than only append if not present, always replace (so the list
-        // ..changes if the user adds voices):
-        
-        // We need insertAdjacentHTML here because simply modifying innerHTML strips the
-        // ..event handler we add with addEventListener.
-        // See https://stackoverflow.com/a/5113132/5025060:
-        if (helpEl.innerHTML.search(/Enabled Voices/) == -1) {
-            helpEl.insertAdjacentHTML("beforeend", "<hr>" + "Voices currently supported by your browser:<ul>");
-            voiceList.forEach(function(listMem) {
-                helpEl.insertAdjacentHTML("beforeend", "<li>" + listMem);
-            })
-            helpEl.insertAdjacentHTML("beforeend", "</ul>");
-        }
-        helpEl.style.display = 'inline-block';
+        document.getElementById('Help').style.display = 'inline-block';
     });
 
 document.getElementById('helpCloseButton').addEventListener('click',
@@ -42,23 +29,48 @@ document.getElementById('helpCloseButton').addEventListener('click',
 // todo: consolidate next 3 functions (?):
 
 // Load a file when a selection is made.
-document.getElementById('popupSelect').addEventListener('change', function() {
+document.getElementById('popupSelect').addEventListener('change', function () {
     var e = document.getElementById('popupSelect');
-    var libFileName = e.options[e.selectedIndex].text;
-    getFileFromLibrary('http://bridge.code-read.com/library/' + libFileName);
+    let leftlibFilePath = e.options[e.selectedIndex].text;  // Left-hand file
+    let rightlibFilePath = '';
+
+    let libFileName = leftlibFilePath.replace(/\.[a-z][a-z]$/, "");
+
+    // Select right-hand file:
+    linkArray.forEach(function (link) {
+        if ((link.replace(/\.[a-z][a-z]$/, "") === libFileName)
+            && (link !== leftlibFilePath))
+            rightlibFilePath = link;
+    });
+
+    if (leftlibFilePath.length)
+        getFileFromLibrary('leftPara', 'http://bridge.code-read.com/library/' + leftlibFilePath,
+            gotFile);
+    if (rightlibFilePath.length)
+        getFileFromLibrary('rightPara', 'http://bridge.code-read.com/library/' + rightlibFilePath,
+            gotFile);
+    // updateLineSpacing();
     document.getElementById('popUpDiv').style.display = 'none';
 });
 
-function getFileFromLibrary(url) {
-    var request = new XMLHttpRequest(); // Create new request
+function getFileFromLibrary(Element, url, callback) {
+    let request = new XMLHttpRequest(); // Create new request
     request.open("GET", url); // Specify URL to fetch
     request.onreadystatechange = function () { // Define event listener
         // If the request is complete and was successful
         if (request.readyState === 4 && request.status === 200) {
-                loadLibraryFile(request.responseText);
+            document.getElementById(Element).textContent = request.responseText;
+            callback(Element);
         }
     };
     request.send(null);
+}
+
+// Register file loaded so updateLineSpacing() is only called when both (async AJAX)
+// ..file loads completed:
+function gotFile(Element) {
+    if (Element === 'rightPara')
+        updateLineSpacing();
 }
 
 function loadLibraryFile(fileContents) {
@@ -84,16 +96,16 @@ document.getElementById('leftFileChoice').addEventListener('change',
 );
 
 document.getElementById('rightFileChoice').addEventListener('change',
-        function () {
-            var fr = new FileReader();
-            fr.onload = function () {
-                document.getElementById('rightPara').textContent = this.result;
-            };
-            fr.readAsText(this.files[0]);
-            document.getElementById('rightTitle').textContent = this.files[0].name;
-            updateLineSpacing();
-        }
-    );
+    function () {
+        var fr = new FileReader();
+        fr.onload = function () {
+            document.getElementById('rightPara').textContent = this.result;
+        };
+        fr.readAsText(this.files[0]);
+        document.getElementById('rightTitle').textContent = this.files[0].name;
+        updateLineSpacing();
+    }
+);
 
 var leftFileColumn = document.getElementById("leftColumn"); // use column rather than para as para isn't inflated before a file is loaded
 leftFileColumn.addEventListener("dragenter", keepItLocal, false);
@@ -108,23 +120,36 @@ rightFileColumn.addEventListener("drop", rightDrop, false);
 rightFileColumn.addEventListener("paste", rightPaste, false);
 
 function updateLineSpacing() {
+    // todo: textContent.length is simply length of the text, not always
+    // proportional to vertical space required (esp. Japanese).  Try to find
+    // a means of measuring vertical space consumed by elements (include
+    // font size in calculation?)
+
     // console.log('Change to a column detected.  Updating line spacing.');
+/*
     var leftLength = document.getElementById('leftPara').textContent.length;
     var rightLength = document.getElementById('rightPara').textContent.length;
     var leftToRightRatio = leftLength / rightLength;
-    // console.log('Left length = ' + leftLength + ', Right length = ' + rightLength
-    // + ', Ratio = ' + leftToRightRatio);
+    console.log('Left length = ' + leftLength + ', Right length = ' + rightLength
+    + ', Ratio = ' + leftToRightRatio);
+*/
 
     // todo: 1.4 hard coded to match main.css; globalize somehow.
     document.getElementById('leftPara').style.lineHeight = 1.4;
     document.getElementById('rightPara').style.lineHeight = 1.4;
 
+    let leftHeight = document.getElementById('leftPara').scrollHeight;
+    let rightHeight = document.getElementById('rightPara').scrollHeight;
+    let leftToRightRatio = leftHeight / rightHeight;
+    console.log('left height: ' + leftHeight + ' right height: ' + rightHeight
+        + ', Ratio = ' + leftToRightRatio);
+
     //todo: check for "edge" cases here (e.g., less that a screenful of text):
     if (leftToRightRatio < 1)
-        // Stretch left side:
+    // Stretch left side:
         document.getElementById('leftPara').style.lineHeight = 1.4 / leftToRightRatio;
     else if (leftToRightRatio > 1)
-        // Stretch right side:
+    // Stretch right side:
         document.getElementById('rightPara').style.lineHeight = 1.4 * leftToRightRatio
 }
 
@@ -231,27 +256,6 @@ var readTextAloud = function () {
         }
     });
 
-
-    var voices = speechSynthesis.getVoices();
-    for(let i = 0; i < voices.length ; i++)
-        // console.log(voices[i].lang);
-                console.log(voices[i].lang + '; ' + voices[i].name);
-
-
-
-        // console.log('available voices: ' + speechSynthesis.getVoices());
-
-/*
-    // List available voices
-    // (from https://stackoverflow.com/questions/27702842/html5-speech-synthesis-api-voice-languages-support):
-    speechSynthesis.onvoiceschanged = function () {
-        var voices = this.getVoices();
-        console.log(voices);
-        for(i = 0; i < voices.length ; i++)
-        console.log(voices[i].lang + '; ' + voices[i].name);
-    };
-*/
-
     speakMsg.rate = 0.8;
     speechSynthesis.speak(speakMsg);
 
@@ -287,13 +291,15 @@ request.onreadystatechange = function () { // Define event listener
     if (request.readyState === 4 && request.status === 200) {
         el.innerHTML = request.responseText;
         let libraryLinks = el.getElementsByTagName('a'); // Live NodeList of your anchor elements
-        let linkArray = [];
+        // let linkArray = [];
+        linkArray = []; // global
         for (let linkInd = 5; linkInd < libraryLinks.length; linkInd++) {
-            linkArray.push(libraryLinks[linkInd].href.replace(/.*\//g, ""));
+            linkArray.push(libraryLinks[linkInd].href.replace(/.*\//g, "")); // Remove all before last '/'
         }
-        // populate chooser (derived from https://stackoverflow.com/a/17002049/5025060):
+        // Populate chooser (derived from https://stackoverflow.com/a/17002049/5025060):
         let selectList = document.getElementById("popupSelect");
         selectList.length = 0; // empty it
+        selectList.insertAdjacentHTML("beforebegin", "Select left-hand file:");
 
         // NB: set this BEFORE populating selectList, else first is set as default choice:
         selectList.size = (linkArray.length < 12 ? linkArray.length : 12);
@@ -317,10 +323,14 @@ let voiceList = [];
 speechSynthesis.onvoiceschanged = function () {
     let ssVoices = this.getVoices();
     for (let voiceInd = 0; voiceInd < ssVoices.length; voiceInd++)
-        // voiceList[voiceInd] = ssVoices[voiceInd].lang + '; ' + ssVoices[voiceInd].name;
-        voiceList[voiceInd] = ssVoices[voiceInd].name;
+        voiceList[voiceInd] = ssVoices[voiceInd].name + ' (' + ssVoices[voiceInd].lang + ')';
+
+    let vListEl = document.getElementById('vList');
+    vListEl.insertAdjacentHTML("beforeend", "<ul>");
+    voiceList.forEach(function (listMem) {
+        vListEl.insertAdjacentHTML("beforeend", "<li>" + listMem);
+    })
+    vListEl.insertAdjacentHTML("beforeend", "</ul>");
 };
 
-// fixed: readTextAloud seems to fail on some characters in French text file.
-// (caused by ANSI file format, fixed by requiring UTF8).
 

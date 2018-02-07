@@ -73,7 +73,7 @@
 
         .myButton {
             position: relative;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 400;
             line-height: 1;
             color: #428bca;
@@ -83,8 +83,8 @@
             background-color: transparent;
             border-radius: 4px;
             display: block;
-            padding: 7px;
-            margin: 5px;
+            padding: 4px;
+            margin: 4px;
             /*margin-bottom: 10px;*/
             border: 2px solid #428bca;
         }
@@ -102,7 +102,7 @@
         }
 
         /*from https://stackoverflow.com/a/9358802/5025060: */
-        #popUpDiv {
+        #popUpDiv, #RFChooserDiv {
             z-index: 100;
             position: absolute;
             background-color: rgba(123, 123, 123, 0.8);
@@ -114,7 +114,7 @@
             height: 20%;
         }
 
-        #popupSelect {
+        #popupSelect, #RFSelect {
             z-index: 101;
             position: absolute;
             top: 25%;
@@ -138,7 +138,7 @@
         }
         .container.space-around {
             justify-content: space-around;
-            margin-left: 3%;
+            margin-left: 4%;
             width: 94%
         }
 
@@ -158,28 +158,35 @@
     </h3>
     <h4>
         You may provide texts of the same article in different languages by pasting them
-        to the panels below, or drag-and-drop local files to the panels, or click on the "load"
+        to the two panels, or drag-and-drop local files to the panels, or click on the "load"
         buttons to select files from your local disc. Or click on "Load File from Online Library" to
         choose an existing pairing from the online library.
-
 <!--
         todo: update this description and show it when the user opens the file selection dialogue:
-            The files should contain <strong>plain text only</strong>, of the same article or story
-            but written in two different languages (e.g., left = English and right = German). Text
-            should be alphanumeric only, with paragraphs separated by control characters
-            CR,LF,CR,LF (0D, 0A, 0D, 0A hex).
+            The files should contain <strong>plain text,
+            using UTF-8 encoding</strong>,
+            of the same article or story
+            but written in two different languages (e.g., left = English and right = German).
+            Text should consist of paragraphs separated by double returns (control characters
+            CR,LF,CR,LF, which is 0D, 0A, 0D, 0A when shown as hexadecimal codes).
 -->
-
         Language Bridge will attempt to present the two texts
-        as equal height, synchronously scrolling panels below, and to pronounce sentences
+        as equal height, synchronously scrolling panels, and to pronounce sentences
+        in their native language
         when you click on them or a series of sentences when you click-and-drag over them.
         <br><br>
         PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
         input as no input validity checks are yet in place.
     </h4>
     <button id="helpCloseButton" class="bridgeButton">Done</button>
+    <span id="vList">
+        <hr>
+        Voices currently supported by your browser:
+    </span>
 </div>
 
+
+<!--todo: make "responsive" (use CSS formulae?):-->
 <div id="topRowButtons" class="container space-around">
     <button id="helpButton" class="myButton">Help</button>
     <button id="ttsSpeedButton" class="myButton">Speech Speed</button>
@@ -195,8 +202,12 @@
 
 <!--Filled in at runtime:-->
 <div id="popUpDiv">
-    Select a file from the online library:
         <select id="popupSelect">
+        </select>
+</div>
+
+<div id="RFChooserDiv">
+        <select id="RFSelect">
         </select>
 </div>
 
