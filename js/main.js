@@ -4,7 +4,8 @@
 
 // let voiceList = [];
 
-let linkArray = [];
+let linkArray;
+let prevSRStart, prevSREnd;
 
 // todo: TTS speed control(s)
 
@@ -72,12 +73,12 @@ function getFileFromLibrary(Element, url, callback) {
 // Register file loaded so updateLineSpacing() is only called when both (async AJAX)
 // ..file loads completed:
 function loadedAfile(Element) {
-/*
-obsoleted: using DOMSubtreeModified trigger instead
+    /*
+    obsoleted: using DOMSubtreeModified trigger instead
 
-    if (Element === 'rightPara')
-        updateLineSpacing();
-*/
+        if (Element === 'rightPara')
+            updateLineSpacing();
+    */
 }
 
 // When user makes a change to the 'filechoice1' field, fire this listener to load
@@ -118,11 +119,13 @@ rightFileColumn.addEventListener("dragover", keepItLocal, false);
 rightFileColumn.addEventListener("drop", rightDrop, false);
 rightFileColumn.addEventListener("paste", rightPaste, false);
 
-
 document.getElementById('leftPara').addEventListener('DOMSubtreeModified', updateLineSpacing);
 document.getElementById('rightPara').addEventListener('DOMSubtreeModified', updateLineSpacing);
 
 function updateLineSpacing() {
+
+    prevSRStart = prevSREnd = 0;
+
     // todo: 1.4 hard coded to match main.css; globalize somehow.
     document.getElementById('leftPara').style.lineHeight = 1.4;
     document.getElementById('rightPara').style.lineHeight = 1.4;
@@ -192,17 +195,40 @@ function handleFiles(files, filePara, fileTitle) {
 
 // .. apply D.R.Y. above
 
-/*function sleep(ms) {
+function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-}*/
+}
+
+// todo: long click code masks click-and-drag function
+
+let lookingUpWord = false;
+// let readingTextAloud = false;
+let textWasRead = false;
+
+async function lookupWord(ev) {
+    await sleep(500);
+    // if (readingTextAloud) return;  // A short click occurred, so read text instead
+    if (textWasRead) {
+        textWasRead = false;  // For next time
+        return;
+    }
+    lookingUpWord = true;
+    alert('lookupWord called.');
+    lookingUpWord = false;
+};
 
 // todo: firefox TTS, see https://hacks.mozilla.org/2016/01/firefox-and-the-web-speech-api/
 //
-var readTextAloud = function () {
+// todo: if user clicks a word within highlighted text, show foreign language definition
+let readTextAloud = function () {
+    if (lookingUpWord) return; // A long mouse click occurred, so look up word instead
+    // readingTextAloud = true;
+    textWasRead = true;
+
     // derived from https://stackoverflow.com/a/9304990/5025060:
-    var textSel = window.getSelection();
-    var speakRange = textSel.getRangeAt(0);
-    var node = textSel.anchorNode;
+    let textSel = window.getSelection();
+    let speakRange = textSel.getRangeAt(0);
+    let node = textSel.anchorNode;
 
     // Attempt to interrupt current speech if user makes a new selection:
     if (speechSynthesis.pending || speechSynthesis.speaking) {
@@ -210,6 +236,13 @@ var readTextAloud = function () {
         readTextAloud();
         return;
     }
+
+    /*
+        if (speakRange.startOffset >= prevSRStart &&
+        speakRange.endOffset <= prevSREnd) {
+            alert('Clicked within highlight');
+        }
+        */
 
     // Find and include start of sentence containing clicked region:
     while (speakRange.startOffset !== 0) {                         // start of node
@@ -231,8 +264,43 @@ var readTextAloud = function () {
         }
     }
 
-    var speakStr = speakRange.toString().trim();
-    var speakMsg = new SpeechSynthesisUtterance(speakStr);
+
+    let speakStr = speakRange.toString().trim();
+    let speakMsg = new SpeechSynthesisUtterance(speakStr);
+
+    /*   // Highlight selected text (some browsers lose highlighting during speech):
+       // todo: this triggers updateLineSpacing() due to 'changed' event.
+
+       // First un-highlight any previously selected text(s):
+       while (true) {
+           let oldHL = document.getElementById('myHighlight');
+           if (oldHL) {
+               var pa = oldHL.parentNode;
+               while (oldHL.firstChild) {
+                   pa.insertBefore(oldHL.firstChild, oldHL);
+               }
+               oldHL.remove();
+           } else break;
+       }
+
+       var newHL = document.createElement("span");
+       newHL.setAttribute(
+           // "border:1px dotted black;"
+           // "background-color: yellow; display: inline;"
+           "class",
+           "highlighted"
+           // "font-style: italic; color: red;"
+       );
+       newHL.setAttribute(
+           "id", "myHighlight" // Mark our place so we can remove the span
+       );
+       speakRange.surroundContents(newHL);
+
+       // Save for "click within range" detection:
+       prevSRStart = speakRange.startOffset;
+       prevSREnd = speakRange.endOffset;
+
+       speakRange.collapse(true);*/
 
     // todo: Bad for performance: run once after new file load: for proof-of-concept code only:
     // (Actually, this MAY be a requirement if languages are mixed within a document):
@@ -245,26 +313,34 @@ var readTextAloud = function () {
         }
     });
 
-    speakMsg.rate = 0.8;
+    speakMsg.rate = 0.8; // todo: make this a user setting
     speechSynthesis.speak(speakMsg);
 
     // workaround for Chrome 15 second limit on online TTS,
     // see https://stackoverflow.com/questions/42875726/speechsynthesis-speak-in-web-speech-api-always-stops-after-a-few-seconds-in-go
     if (navigator.userAgent.toLowerCase().indexOf('chrome')) {  // Only run under Chrome
-        var resumeTimer = setInterval(function () {
+        let resumeTimer = setInterval(function () {
             // console.log(synth.speaking);
             if (!speechSynthesis.speaking) clearInterval(resumeTimer);
             else speechSynthesis.resume();
         }, 14000);
     }
+    // readingTextAloud = false;
 };
 
-// $(".clickable").click(function(e) { // the jquery way (replaces the following lines.  Worth it?)
+/*let transDict = function() {
+    let textSel = window.getSelection();
+    let lookupRange = textSel.getRangeAt(0);
+    let node = textSel.anchorNode;
+    alert(lookupRange);
+}*/
 
 let clickables = document.getElementsByClassName('clickable');
 
 for (let elNum = 0; elNum < clickables.length; elNum++) {
+    clickables[elNum].addEventListener('mousedown', lookupWord, false);
     clickables[elNum].addEventListener('click', readTextAloud, false);
+    // clickables[elNum].addEventListener('dblclick', transDict, false);
     clickables[elNum].addEventListener('mouseup', keepItLocal, false); // else touchscreen browser removes highlighting
 }
 // todo: when should I remove these listeners, if at all?
@@ -273,7 +349,6 @@ for (let elNum = 0; elNum < clickables.length; elNum++) {
 //
 var request = new XMLHttpRequest(); // Create new request
 var el = document.createElement('html');
-let libFileName = '';
 
 request.open("GET", "http://bridge.code-read.com/library/");
 request.onreadystatechange = function () { // Define event listener
@@ -282,6 +357,7 @@ request.onreadystatechange = function () { // Define event listener
         el.innerHTML = request.responseText;
         let libraryLinks = el.getElementsByTagName('a'); // Live NodeList of your anchor elements
         linkArray = []; // global
+        let libFileName = '';
         for (let linkInd = 5; linkInd < libraryLinks.length; linkInd++) {
             libFileName = libraryLinks[linkInd].href.replace(/.*\//g, ""); // Remove all before last '/'
             libFileName.length && linkArray.push(libFileName);
