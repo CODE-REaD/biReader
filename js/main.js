@@ -195,31 +195,79 @@ function handleFiles(files, filePara, fileTitle) {
 
 // .. apply D.R.Y. above
 
+let mouseWasMoved = false;
+let lastX = window.clientX;
+let lastY = window.clientY;
+
+function mouseMoved(ev) {
+    // console.log('mouseMoved() called.' + "X = " + ev.clientX + " Y = " + ev.clientY);
+    // console.log('mouseMoved() called.');
+    if ((Math.abs(ev.clientX - lastX) > 2) || (Math.abs(ev.clientY - lastY) > 2))
+        mouseWasMoved = true;
+    lastX = ev.clientX;
+    lastY = ev.clientY;
+}
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// todo: long click code masks click-and-drag function
-
 let lookingUpWord = false;
-// let readingTextAloud = false;
 let textWasRead = false;
 
 async function lookupWord(ev) {
+    lookingUpWord = false;  // Not true until we have waited
+    mouseWasMoved = false;
+    textWasRead = false;    // Wait for it..
     await sleep(500);
     // if (readingTextAloud) return;  // A short click occurred, so read text instead
     if (textWasRead) {
-        textWasRead = false;  // For next time
+        // textWasRead = false;  // For next time
+        return;
+    }
+    if (mouseWasMoved) {
+        console.log('lookupWord(): mouse was moved, abort.');
+        mouseWasMoved = false;  // For next time
         return;
     }
     lookingUpWord = true;
-    alert('lookupWord called.');
-    lookingUpWord = false;
+
+    let textSel = window.getSelection();
+    let speakRange = textSel.getRangeAt(0);
+    let node = textSel.anchorNode;
+
+    // Find and include start of word containing clicked region:
+    while (speakRange.startOffset !== 0) {                         // start of node
+        speakRange.setStart(node, speakRange.startOffset - 1);     // back up 1 char
+        if (speakRange.toString().search(/^\s/) === 0) { // start of word
+            speakRange.setStart(node, speakRange.startOffset + 1); // move forward char
+            break;
+        }
+    }
+
+    // Find and include end of word containing clicked region:
+    let searchStr = "";
+    while (speakRange.endOffset < node.length) {                // end of node
+        speakRange.setEnd(node, speakRange.endOffset + 1);      // look ahead 1 char
+        searchStr = speakRange.toString().slice(-2);            // Last 2 chars
+        if (searchStr.search(/[\r\n\s]/) != -1) { // end of word
+            speakRange.setEnd(node, speakRange.endOffset - 1); // back 1 char
+            break;
+        }
+    }
+
+    let speakStr = speakRange.toString().trim();
+
+    console.log('lookupWord: ' + speakStr);
+
+    let speakMsg = new SpeechSynthesisUtterance(speakStr);
+    speechSynthesis.speak(speakMsg);
+
+    // lookingUpWord = false;
 };
 
 // todo: firefox TTS, see https://hacks.mozilla.org/2016/01/firefox-and-the-web-speech-api/
 //
-// todo: if user clicks a word within highlighted text, show foreign language definition
 let readTextAloud = function () {
     if (lookingUpWord) return; // A long mouse click occurred, so look up word instead
     // readingTextAloud = true;
@@ -247,8 +295,9 @@ let readTextAloud = function () {
     // Find and include start of sentence containing clicked region:
     while (speakRange.startOffset !== 0) {                         // start of node
         speakRange.setStart(node, speakRange.startOffset - 1);     // back up 1 char
-        if (speakRange.toString().search(/[.。!?:\n]\s*/) === 0) { // start of sentence
-            speakRange.setStart(node, speakRange.startOffset + 1); // move forward chars
+        // if (speakRange.toString().search(/[.。!?:\n]\s*/) === 0) { // start of sentence
+        if (speakRange.toString().search(/^[.。!?:\n]\s*/) === 0) { // start of sentence
+            speakRange.setStart(node, speakRange.startOffset + 1); // move forward char
             break;
         }
     }
@@ -339,6 +388,9 @@ let clickables = document.getElementsByClassName('clickable');
 
 for (let elNum = 0; elNum < clickables.length; elNum++) {
     clickables[elNum].addEventListener('mousedown', lookupWord, false);
+    clickables[elNum].addEventListener('mousemove', mouseMoved, false);
+    clickables[elNum].addEventListener('touchstart', lookupWord, false); // tablet
+    clickables[elNum].addEventListener('touchmove', mouseMoved, false); // tablet
     clickables[elNum].addEventListener('click', readTextAloud, false);
     // clickables[elNum].addEventListener('dblclick', transDict, false);
     clickables[elNum].addEventListener('mouseup', keepItLocal, false); // else touchscreen browser removes highlighting
