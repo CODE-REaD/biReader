@@ -19,7 +19,7 @@
 
     <style>
         .myColumn {
-            height: 90vh;
+            height: 80vh;
             overflow: auto; /*causes scrollbars*/
             float: left;
             width: 45%;
@@ -90,7 +90,7 @@
             -webkit-transition: all 0.5s;
             -moz-transition: all 0.5s;
             -o-transition: all 0.5s;
-            box-shadow: 1px 1px 10px gray;
+            box-shadow: 1px 1px 7px gray;
         }
 
         .myButton:hover {
@@ -195,19 +195,20 @@
     </span>
 </div>
 
-
 <!--todo: make "responsive" (use CSS formulae?):-->
+
+<!--todo: use "ribbon" rather than buttons here (background-color=black?):-->
 <div id="topRowButtons" class="container space-around">
     <button id="helpButton" class="myButton">Help</button>
     <button id="ttsSpeedButton" class="myButton">Speech Speed</button>
     <button id="libraryLoadButton" class="myButton">Load File from Online Library</button>
 
     <label for="leftFileChoice" class="myButton">Load left file from disc</label>
-    <!--<input type="file" id="leftFileChoice" accept="text/plain" style="display: none"/>-->
     <input type="file" id="leftFileChoice" style="display: none"/>
 
     <label for="rightFileChoice" class="myButton">Load right file from disc</label>
     <input type="file" id="rightFileChoice" style="display: none"/>
+
     <button id="saveFileButton" class="myButton">Save to Files</button>
 </div>
 
@@ -222,21 +223,11 @@
         </select>
 </div>
 
-<!--<button id="libraryLoadButton" class="myHeader myButton">Load File from Online Library</button>-->
-
 <div id=leftColumnHeader class="myColumnHeader">
-<!--
-    <label for="leftFileChoice" class="myButton">Load left file from disc</label>
-    <input type="file" id="leftFileChoice" accept="text/plain" style="display: none"/>
--->
     <h3 id=leftTitle></h3>
 </div>
 
 <div id=rightColumnHeader class="myColumnHeader">
-<!--
-    <label for="rightFileChoice" class="myButton">Load right file from disc</label>
-    <input type="file" id="rightFileChoice" accept="text/plain" style="display: none"/>
--->
     <h3 id=rightTitle></h3>
 </div>
 
@@ -255,11 +246,15 @@
     </p>
 </div>
 
+<div class="container space-around frame" id="glosbeBuf" style="height: 10vh"></div>
 
 <!--<script src="js/vendor/modernizr-3.5.0.min.js"></script>-->
-<!--<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>-->
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 <script src="js/guessLang/_languageData.js"></script>
 <script src="js/guessLang/guessLanguage.js"></script>
+
+<!--<script src="js/node_modules/google-translate-api"></script>-->
 <!--<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.2.1.min.js"><\/script>')</script>-->
 
 <!--<script src="js/plugins.js"></script>-->

@@ -110,20 +110,19 @@ document.getElementById('rightFileChoice').addEventListener('change',
 var leftFileColumn = document.getElementById("leftColumn"); // use column rather than para as para isn't inflated before a file is loaded
 leftFileColumn.addEventListener("dragenter", keepItLocal, false);
 leftFileColumn.addEventListener("dragover", keepItLocal, false);
-leftFileColumn.addEventListener("drop", leftDrop, false);
-leftFileColumn.addEventListener("paste", leftPaste, false);
+leftFileColumn.addEventListener("drop", fileDrop, false);
+leftFileColumn.addEventListener("paste", pasteToCol, false);
 
 var rightFileColumn = document.getElementById("rightColumn");
 rightFileColumn.addEventListener("dragenter", keepItLocal, false);
 rightFileColumn.addEventListener("dragover", keepItLocal, false);
-rightFileColumn.addEventListener("drop", rightDrop, false);
-rightFileColumn.addEventListener("paste", rightPaste, false);
+rightFileColumn.addEventListener("drop", fileDrop, false);
+rightFileColumn.addEventListener("paste", pasteToCol, false);
 
 document.getElementById('leftPara').addEventListener('DOMSubtreeModified', updateLineSpacing);
 document.getElementById('rightPara').addEventListener('DOMSubtreeModified', updateLineSpacing);
 
 function updateLineSpacing() {
-
     prevSRStart = prevSREnd = 0;
 
     // todo: 1.4 hard coded to match main.css; globalize somehow.
@@ -150,40 +149,47 @@ function keepItLocal(e) {
     e.preventDefault();
 }
 
-function leftDrop(e) {
-    keepItLocal(e);
-    var dt = e.dataTransfer;
-    var files = dt.files;
-    handleFiles(files, 'leftPara', 'leftTitle');
+function fileDrop(ev) {
+    keepItLocal(ev);
+    let dt = ev.dataTransfer;
+    let files = dt.files;
+
+    switch (this.id.toString()) {
+        case 'leftColumn':
+            handleFiles(files, 'leftPara', 'leftTitle');
+            break;
+        case 'rightColumn':
+            handleFiles(files, 'rightPara', 'rightTitle');
+            break;
+        default:
+            console.log('fileDrop: error: source ID is: ' + this.id.toString());
+            return;
+    }
 }
 
-function rightDrop(e) {
-    keepItLocal(e);
-    var dt = e.dataTransfer;
-    var files = dt.files;
-    handleFiles(files, 'rightPara', 'rightTitle');
-}
-
-function leftPaste(e) {
-    var clipboardData, pastedData;
-    clipboardData = e.clipboardData;
+function pasteToCol(ev) {
+    let clipboardData, pastedData;
+    clipboardData = ev.clipboardData;
     pastedData = clipboardData.getData('Text');
-    document.getElementById('leftPara').textContent = pastedData;
-    document.getElementById('leftTitle').textContent = "(pasted)";
-    updateLineSpacing();
-}
 
-function rightPaste(e) {
-    var clipboardData, pastedData;
-    clipboardData = e.clipboardData;
-    pastedData = clipboardData.getData('Text');
-    document.getElementById('rightPara').textContent = pastedData;
-    document.getElementById('rightTitle').textContent = "(pasted)";
+    switch (this.id.toString()) {
+        case 'leftColumn':
+            document.getElementById('leftPara').textContent = pastedData;
+            document.getElementById('leftTitle').textContent = "(pasted)";
+            break;
+        case 'rightColumn':
+            document.getElementById('rightPara').textContent = pastedData;
+            document.getElementById('rightTitle').textContent = "(pasted)";
+            break;
+        default:
+            console.log('pasteToCol: error: source ID is: ' + this.id.toString());
+            return;
+    }
     updateLineSpacing();
 }
 
 function handleFiles(files, filePara, fileTitle) {
-    console.log('right file is ' + files[0].name);
+    // console.log('right file is ' + files[0].name);
     var fr = new FileReader();
     fr.onload = function () {
         document.getElementById(filePara).textContent = this.result;
@@ -199,9 +205,8 @@ let mouseWasMoved = false;
 let lastX = window.clientX;
 let lastY = window.clientY;
 
+// Set boolean if mouse moved a significant amount; otherwise simply absorb the event:
 function mouseMoved(ev) {
-    // console.log('mouseMoved() called.' + "X = " + ev.clientX + " Y = " + ev.clientY);
-    // console.log('mouseMoved() called.');
     if ((Math.abs(ev.clientX - lastX) > 2) || (Math.abs(ev.clientY - lastY) > 2))
         mouseWasMoved = true;
     lastX = ev.clientX;
@@ -214,32 +219,43 @@ function sleep(ms) {
 
 let lookingUpWord = false;
 let textWasRead = false;
+let xlation = '';
 
 async function lookupWord(ev) {
+    let speakRange;
     lookingUpWord = false;  // Not true until we have waited
     mouseWasMoved = false;
-    textWasRead = false;    // Wait for it..
-    await sleep(500);
-    // if (readingTextAloud) return;  // A short click occurred, so read text instead
-    if (textWasRead) {
-        // textWasRead = false;  // For next time
-        return;
+    textWasRead = false;    // Set here and recheck after sleep
+
+    let textSel = window.getSelection();
+    if (!textSel.isCollapsed) {
+        speakRange = textSel.getRangeAt(0);
+        speakRange.collapse(true);  // So we can get new selection (below)
     }
-    if (mouseWasMoved) {
+
+    if (speechSynthesis.pending || speechSynthesis.speaking)
+        speechSynthesis.cancel();
+
+    await sleep(500);
+
+    if (textWasRead)    // A short click occurred, so read text instead
+        return;
+
+    if (mouseWasMoved) {    // User is dragging over text, rather than long-clicking
         console.log('lookupWord(): mouse was moved, abort.');
         mouseWasMoved = false;  // For next time
         return;
     }
-    lookingUpWord = true;
+    lookingUpWord = true;   // Tell other handlers we will handle this action exclusively
 
-    let textSel = window.getSelection();
-    let speakRange = textSel.getRangeAt(0);
+    textSel = window.getSelection();
+    speakRange = textSel.getRangeAt(0);
     let node = textSel.anchorNode;
 
     // Find and include start of word containing clicked region:
     while (speakRange.startOffset !== 0) {                         // start of node
         speakRange.setStart(node, speakRange.startOffset - 1);     // back up 1 char
-        if (speakRange.toString().search(/^\s/) === 0) { // start of word
+        if (speakRange.toString().search(/^[\s"'({[]/) === 0) { // start of word
             speakRange.setStart(node, speakRange.startOffset + 1); // move forward char
             break;
         }
@@ -250,7 +266,9 @@ async function lookupWord(ev) {
     while (speakRange.endOffset < node.length) {                // end of node
         speakRange.setEnd(node, speakRange.endOffset + 1);      // look ahead 1 char
         searchStr = speakRange.toString().slice(-2);            // Last 2 chars
-        if (searchStr.search(/[\r\n\s]/) != -1) { // end of word
+        // if ((searchStr.search(/\W/) != -1) && (searchStr.search(/\-/) === -1)) { // end of word
+        // if (searchStr.search(/\p{White_Space}/u) != -1) {    // end of word (international)
+        if (searchStr.search(/[\r\n\s.,:;"'\]\)}]/) !== -1) {    // end of word (international)
             speakRange.setEnd(node, speakRange.endOffset - 1); // back 1 char
             break;
         }
@@ -259,6 +277,13 @@ async function lookupWord(ev) {
     let speakStr = speakRange.toString().trim();
 
     console.log('lookupWord: ' + speakStr);
+
+    // getTranslation("from=fra&dest=eng&phrase=" + speakStr, xlation);
+    getTranslation("from=fra&dest=eng&phrase=" + speakStr);
+    // alert(speakStr + " translated: " + xlation);
+    // console.log(speakStr + " translated: " + xlation);
+
+    // https://glosbe.com/gapi/translate?from=pol&dest=eng&format=json&phrase=witaj&pretty=true
 
     let speakMsg = new SpeechSynthesisUtterance(speakStr);
     speechSynthesis.speak(speakMsg);
@@ -273,24 +298,10 @@ let readTextAloud = function () {
     // readingTextAloud = true;
     textWasRead = true;
 
-    // derived from https://stackoverflow.com/a/9304990/5025060:
+    // Derived from https://stackoverflow.com/a/9304990/5025060:
     let textSel = window.getSelection();
     let speakRange = textSel.getRangeAt(0);
     let node = textSel.anchorNode;
-
-    // Attempt to interrupt current speech if user makes a new selection:
-    if (speechSynthesis.pending || speechSynthesis.speaking) {
-        speechSynthesis.cancel();
-        readTextAloud();
-        return;
-    }
-
-    /*
-        if (speakRange.startOffset >= prevSRStart &&
-        speakRange.endOffset <= prevSREnd) {
-            alert('Clicked within highlight');
-        }
-        */
 
     // Find and include start of sentence containing clicked region:
     while (speakRange.startOffset !== 0) {                         // start of node
@@ -313,43 +324,8 @@ let readTextAloud = function () {
         }
     }
 
-
     let speakStr = speakRange.toString().trim();
     let speakMsg = new SpeechSynthesisUtterance(speakStr);
-
-    /*   // Highlight selected text (some browsers lose highlighting during speech):
-       // todo: this triggers updateLineSpacing() due to 'changed' event.
-
-       // First un-highlight any previously selected text(s):
-       while (true) {
-           let oldHL = document.getElementById('myHighlight');
-           if (oldHL) {
-               var pa = oldHL.parentNode;
-               while (oldHL.firstChild) {
-                   pa.insertBefore(oldHL.firstChild, oldHL);
-               }
-               oldHL.remove();
-           } else break;
-       }
-
-       var newHL = document.createElement("span");
-       newHL.setAttribute(
-           // "border:1px dotted black;"
-           // "background-color: yellow; display: inline;"
-           "class",
-           "highlighted"
-           // "font-style: italic; color: red;"
-       );
-       newHL.setAttribute(
-           "id", "myHighlight" // Mark our place so we can remove the span
-       );
-       speakRange.surroundContents(newHL);
-
-       // Save for "click within range" detection:
-       prevSRStart = speakRange.startOffset;
-       prevSREnd = speakRange.endOffset;
-
-       speakRange.collapse(true);*/
 
     // todo: Bad for performance: run once after new file load: for proof-of-concept code only:
     // (Actually, this MAY be a requirement if languages are mixed within a document):
@@ -377,13 +353,6 @@ let readTextAloud = function () {
     // readingTextAloud = false;
 };
 
-/*let transDict = function() {
-    let textSel = window.getSelection();
-    let lookupRange = textSel.getRangeAt(0);
-    let node = textSel.anchorNode;
-    alert(lookupRange);
-}*/
-
 let clickables = document.getElementsByClassName('clickable');
 
 for (let elNum = 0; elNum < clickables.length; elNum++) {
@@ -392,7 +361,6 @@ for (let elNum = 0; elNum < clickables.length; elNum++) {
     clickables[elNum].addEventListener('touchstart', lookupWord, false); // tablet
     clickables[elNum].addEventListener('touchmove', mouseMoved, false); // tablet
     clickables[elNum].addEventListener('click', readTextAloud, false);
-    // clickables[elNum].addEventListener('dblclick', transDict, false);
     clickables[elNum].addEventListener('mouseup', keepItLocal, false); // else touchscreen browser removes highlighting
 }
 // todo: when should I remove these listeners, if at all?
@@ -451,4 +419,53 @@ speechSynthesis.onvoiceschanged = function () {
     vListEl.insertAdjacentHTML("beforeend", "</ul>");
 };
 
+// Retrieve a translation from online service (todo: check user is online):
+/*function getTranslation(toXlate, xlated) {
+    var XMLReq = new XMLHttpRequest(); // Create new request
+    // XMLReq.withCredentials = false;
 
+    // XMLReq.open("GET", "https://glosbe.com/gapi/translate?from=pol&dest=eng&format=json&phrase=witaj&pretty=true");
+    // if ("withCredentials" in XMLReq)
+    //     XMLReq.open("GET", "https://glosbe.com/gapi/translate?format=json&" + toXlate, true);
+        XMLReq.open("GET", "https://glosbe.com/gapi/translate?format=json&" + toXlate);
+
+    // XMLReq.setRequestHeader("Origin", "http://localhost:63342"); // Causes 'refused to set unsafe header "Origin"'
+
+    XMLReq.onreadystatechange = function () { // Define event listener
+        // If the request is complete and was successful
+        if (XMLReq.readyState === 4 && XMLReq.status === 200)
+            xlated = XMLReq.responseText;
+    };
+    XMLReq.send(null); // Send the request now
+}*/
+
+function getTranslation(toXlate) {
+    // JSONP needed because glosbe.com does not provide CORS:
+    // $('#glosbeBuf').html("Translations appear here.");
+    $.getJSON("https://glosbe.com/gapi/translate?format=json&" + toXlate + "&callback=?", function (json) {
+        if (json !== "Nothing found.") {
+            // $('#glosbeBuf').html(JSON.stringify(json));
+            if (json.tuc.length)
+            // $('#glosbeBuf').html(JSON.stringify(json.tuc[0].meanings[0].text));
+                if (json.tuc[0].phrase)
+                    $('#glosbeBuf').html(toXlate + ': ' + JSON.stringify(json.tuc[0].phrase.text));
+                else
+                    $('#glosbeBuf').html(toXlate + ': ' + JSON.stringify(json.tuc[0].meanings[0].text));
+            else
+                $('#glosbeBuf').html(toXlate + ': Not found.');
+            // xlated = JSON.stringify(json);
+            // xlation = JSON.stringify(json);
+        } else {
+            // $.getJSON("http://glosbe.com/gapi/translate?from=eng&dest=rus&format=json&phrase=hello&pretty=true" + "?callback=?", function (json) {
+            $.getJSON("https://glosbe.com/gapi/translate?format=json&" + toXlate + "&callback=?", function (json) {
+                console.log(json);
+                // $('#glosbeBuf').html('<h2 class="loading">Nothing found.</h2><img id="thePoster" src=' + json.posters[0].image.url + ' />');
+                $('#glosbeBuf').html('<h3>' + JSON.stringify(json) + '</h3>');
+            });
+        }
+
+        // https://glosbe.com/gapi/translate?from=fra&dest=eng&format=json&phrase=avec&pretty=true
+
+    });
+    return false;
+}
