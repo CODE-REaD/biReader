@@ -7,8 +7,8 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="manifest" href="site.webmanifest">
-    <link rel="apple-touch-icon" href="icon.png">
+    <!--<link rel="manifest" href="site.webmanifest">-->
+    <!--<link rel="apple-touch-icon" href="icon.png">-->
     <!-- Place favicon.ico in the root directory -->
 
     <!--<link href="https://cdnjs.cloudflare.com/ajax/libs/ratchet/2.0.2/css/ratchet.css" rel="stylesheet"/>-->
@@ -19,7 +19,7 @@
 
     <style>
         .myColumn {
-            height: 80vh;
+            /*height: 80vh;*/
             overflow: auto; /*causes scrollbars*/
             /*float: left;*/
             /*width: 45%;*/
@@ -145,16 +145,16 @@
         }
 
 
-        .vertContainter,
+        .vertContainer,
         .horizContainer,
         .container {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
         }
 
         .vertContainer {
             flex-direction: column;
-            height: 94%;
+            height: 100vh;
         }
 
         .horizContainer {
@@ -188,15 +188,15 @@
         to the two panels, or drag-and-drop local files to the panels, or click on the "load"
         buttons to select files from your local disc. Or click on "Load File from Online Library" to
         choose an existing pairing from the online library.
-<!--
-        todo: update this description and show it when the user opens the file selection dialogue:
-            The files should contain <strong>plain text,
-            using UTF-8 encoding</strong>,
-            of the same article or story
-            but written in two different languages (e.g., left = English and right = German).
-            Text should consist of paragraphs separated by double returns (control characters
-            CR,LF,CR,LF, which is 0D, 0A, 0D, 0A when shown as hexadecimal codes).
--->
+        <!--
+                todo: update this description and show it when the user opens the file selection dialogue:
+                    The files should contain <strong>plain text,
+                    using UTF-8 encoding</strong>,
+                    of the same article or story
+                    but written in two different languages (e.g., left = English and right = German).
+                    Text should consist of paragraphs separated by double returns (control characters
+                    CR,LF,CR,LF, which is 0D, 0A, 0D, 0A when shown as hexadecimal codes).
+        -->
         Language Bridge will attempt to present the two texts
         as equal height, synchronously scrolling panels, and to pronounce sentences
         in their native language
@@ -216,66 +216,70 @@
 
 <!--todo: make "responsive" (use CSS formulae?):-->
 
-<!--todo: use "ribbon" rather than buttons here (background-color=black?):-->
-<div id="topRowButtons" class="horizContainer">
-    <button id="helpButton" class="myButton">Help</button>
-    <button id="ttsSpeedButton" class="myButton">Speech Speed</button>
-    <button id="libraryLoadButton" class="myButton">Load File from Online Library</button>
+<div class="vertContainer">
 
-    <label for="leftFileChoice" class="myButton">Load left file from disc</label>
-    <input type="file" id="leftFileChoice" style="display: none"/>
+    <!--todo: use "ribbon" rather than buttons here (background-color=black?):-->
+    <div id="topRowButtons" class="horizContainer">
+        <button id="helpButton" class="myButton">Help</button>
+        <button id="ttsSpeedButton" class="myButton">Speech Speed</button>
+        <button id="libraryLoadButton" class="myButton">Load File from Online Library</button>
 
-    <label for="rightFileChoice" class="myButton">Load right file from disc</label>
-    <input type="file" id="rightFileChoice" style="display: none"/>
+        <label for="leftFileChoice" class="myButton">Load left file from disc</label>
+        <input type="file" id="leftFileChoice" style="display: none"/>
 
-    <button id="saveFileButton" class="myButton">Save to Files</button>
-</div>
+        <label for="rightFileChoice" class="myButton">Load right file from disc</label>
+        <input type="file" id="rightFileChoice" style="display: none"/>
 
-<!--Filled in at runtime:-->
-<div id="popUpDiv">
+        <button id="saveFileButton" class="myButton">Save to Files</button>
+    </div>
+
+    <!--Filled in at runtime:-->
+    <div id="popUpDiv">
         <select id="popupSelect">
         </select>
-</div>
+    </div>
 
-<div id="RFChooserDiv">
+    <div id="RFChooserDiv">
         <select id="RFSelect">
         </select>
-</div>
+    </div>
 
-<div class="vertContainer">
-<div class="horizContainer">
-<div id=leftColumnHeader class="myColumnHeader">
-    <h3 id=leftTitle></h3>
-</div>
+    <!--<div class="vertContainer">-->
 
-<div id=rightColumnHeader class="myColumnHeader">
-    <h3 id=rightTitle></h3>
-</div>
-
-</div>
     <div class="horizContainer">
-<div id=leftColumn class="myColumn syncscroll frame" name="sync1">
-    <p id=leftPara class="clickable myPara">
+        <div id=leftColumnHeader class="myColumnHeader">
+            <h3 id=leftTitle></h3>
+        </div>
+
+        <div id=rightColumnHeader class="myColumnHeader">
+            <h3 id=rightTitle></h3>
+        </div>
+
+    </div>
+    <div class="horizContainer">
+        <div id=leftColumn class="myColumn syncscroll frame" name="sync1">
+            <p id=leftPara class="clickable myPara">
         <span class=colInstructions>
 
             Drag-and-drop a file, or paste text here.</span></p>
-</div>
+        </div>
 
-<div id=rightColumn class="myColumn syncscroll frame" name="sync1">
-    <p id=rightPara class="clickable myPara">
+        <div id=rightColumn class="myColumn syncscroll frame" name="sync1">
+            <p id=rightPara class="clickable myPara">
         <span class=colInstructions>
 
             Drag-and-drop a file, or paste text here.</span></p>
-    </p>
-</div>
-</div>
+            </p>
+        </div>
+    </div>
 
-<div class="container space-around frame">
-    <span id="glosbeBuf" style="height: 10vh"></span>
-    <span style="position: absolute; bottom: 0; font-size: x-small">
-        Translations provided by <a href="https://glosbe.com/"; target="_blank">Glosbe</a>.</span></div>
+        <div class="container space-around frame">
+            <span id="glosbeBuf" style="height: 10vh"></span>
+            <span style="position: absolute; bottom: 0; font-size: x-small">
+        Translations provided by <a href="https://glosbe.com/" ; target="_blank">Glosbe</a>.</span></div>
+    </div>
 
-</div>
+
 <!--<script src="js/vendor/modernizr-3.5.0.min.js"></script>-->
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
