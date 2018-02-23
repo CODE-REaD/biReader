@@ -9,7 +9,7 @@ Language Bridge will attempt to present the two texts
         as equal height, synchronously scrolling panels, and to pronounce sentences
         in their native language
         when you click on them or a series of sentences when you click-and-drag over them.
-        It will also attempt to show a definition of a word if you long-click on it (PoC:
+        It will also attempt to pronounce and then show a definition of a word if you long-click on it (PoC:
         French to English only).
         <br><br>
         PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
