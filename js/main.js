@@ -47,24 +47,23 @@ document.getElementById('popupSelect').addEventListener('change', function () {
     });
 
     if (leftlibFilePath.length)
-        getFileFromLibrary('leftPara', 'http://bridge.code-read.com/library/' + leftlibFilePath,
-            loadedAfile);
+        getFileFromLibrary('leftPara', 'http://bridge.code-read.com/library/' + leftlibFilePath);
     document.getElementById('leftTitle').textContent = leftlibFilePath;
     if (rightlibFilePath.length)
-        getFileFromLibrary('rightPara', 'http://bridge.code-read.com/library/' + rightlibFilePath,
-            loadedAfile);
+        getFileFromLibrary('rightPara', 'http://bridge.code-read.com/library/' + rightlibFilePath);
     document.getElementById('rightTitle').textContent = rightlibFilePath;
     document.getElementById('popUpDiv').style.display = 'none';
 });
 
-function getFileFromLibrary(Element, url, callback) {
+// function getFileFromLibrary(Element, url, callback) {
+function getFileFromLibrary(Element, url) {
     let request = new XMLHttpRequest(); // Create new request
     request.open("GET", url); // Specify URL to fetch
     request.onreadystatechange = function () { // Define event listener
         // If the request is complete and was successful
         if (request.readyState === 4 && request.status === 200) {
             document.getElementById(Element).textContent = request.responseText;
-            callback(Element);
+            // callback(Element);
         }
     };
     request.send(null);
@@ -72,14 +71,14 @@ function getFileFromLibrary(Element, url, callback) {
 
 // Register file loaded so updateLineSpacing() is only called when both (async AJAX)
 // ..file loads completed:
-function loadedAfile(Element) {
-    /*
+/*function loadedAfile(Element) {
+    /!*
     obsoleted: using DOMSubtreeModified trigger instead
 
         if (Element === 'rightPara')
             updateLineSpacing();
-    */
-}
+    *!/
+}*/
 
 // When user makes a change to the 'filechoice1' field, fire this listener to load
 // the file to leftPara:
