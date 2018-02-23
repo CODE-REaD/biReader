@@ -416,26 +416,6 @@ speechSynthesis.onvoiceschanged = function () {
     vListEl.insertAdjacentHTML("beforeend", "</ul>");
 };
 
-// Retrieve a translation from online service (todo: check user is online):
-/*function getTranslation(toXlate, xlated) {
-    var XMLReq = new XMLHttpRequest(); // Create new request
-    // XMLReq.withCredentials = false;
-
-    // XMLReq.open("GET", "https://glosbe.com/gapi/translate?from=pol&dest=eng&format=json&phrase=witaj&pretty=true");
-    // if ("withCredentials" in XMLReq)
-    //     XMLReq.open("GET", "https://glosbe.com/gapi/translate?format=json&" + toXlate, true);
-        XMLReq.open("GET", "https://glosbe.com/gapi/translate?format=json&" + toXlate);
-
-    // XMLReq.setRequestHeader("Origin", "http://localhost:63342"); // Causes 'refused to set unsafe header "Origin"'
-
-    XMLReq.onreadystatechange = function () { // Define event listener
-        // If the request is complete and was successful
-        if (XMLReq.readyState === 4 && XMLReq.status === 200)
-            xlated = XMLReq.responseText;
-    };
-    XMLReq.send(null); // Send the request now
-}*/
-
 function getTranslation(toXlate) {
     // JSONP needed because glosbe.com does not provide CORS:
     // $('#glosbeBuf').html("Translations appear here.");
