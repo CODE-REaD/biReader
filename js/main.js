@@ -2,8 +2,6 @@
 
 // todo: store filenames as English and translate to native language for display.
 
-// let voiceList = [];
-
 let linkArray;
 let prevSRStart, prevSREnd;
 
