@@ -5,6 +5,14 @@
 let linkArray;
 let prevSRStart, prevSREnd;
 
+// Prevent Android context menu so we can use the "long tap" to show word definitions.
+// From: https://stackoverflow.com/a/28748222/5025060
+/*window.oncontextmenu = function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    return false;
+};*/
+
 // todo: TTS speed control(s)
 
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications
@@ -219,6 +227,8 @@ let textWasRead = false;
 let xlation = '';
 
 async function lookupWord(ev) {
+    // todo: some languages such as Japanese and Chinese do not use word separation characters
+    // todo: ..in sentences, so exclude this function for those languages.
     let speakRange;
     lookingUpWord = false;  // Not true until we have waited
     mouseWasMoved = false;
@@ -233,7 +243,7 @@ async function lookupWord(ev) {
     if (speechSynthesis.pending || speechSynthesis.speaking)
         speechSynthesis.cancel();
 
-    await sleep(500);
+    await sleep(400);
 
     if (textWasRead)    // A short click occurred, so read text instead
         return;
@@ -252,7 +262,7 @@ async function lookupWord(ev) {
     // Find and include start of word containing clicked region:
     while (speakRange.startOffset !== 0) {                         // start of node
         speakRange.setStart(node, speakRange.startOffset - 1);     // back up 1 char
-        if (speakRange.toString().search(/^[\s"'({[]/) === 0) { // start of word
+        if (speakRange.toString().search(/^[\s、。"'({[]/) === 0) { // start of word
             speakRange.setStart(node, speakRange.startOffset + 1); // move forward char
             break;
         }
@@ -265,7 +275,7 @@ async function lookupWord(ev) {
         searchStr = speakRange.toString().slice(-2);            // Last 2 chars
         // if ((searchStr.search(/\W/) != -1) && (searchStr.search(/\-/) === -1)) { // end of word
         // if (searchStr.search(/\p{White_Space}/u) != -1) {    // end of word (international)
-        if (searchStr.search(/[\r\n\s.,:;"'\]\)}]/) !== -1) {    // end of word (international)
+        if (searchStr.search(/[\r\n\s.,:;。、"'\]\)}]/) !== -1) {    // end of word (international)
             speakRange.setEnd(node, speakRange.endOffset - 1); // back 1 char
             break;
         }
@@ -275,8 +285,7 @@ async function lookupWord(ev) {
 
     console.log('lookupWord: ' + speakStr);
 
-    // getTranslation("from=fra&dest=eng&phrase=" + speakStr, xlation);
-    getTranslation("from=fra&dest=eng&phrase=" + speakStr);
+    getTranslation("from=fra&dest=eng&phrase=", speakStr);
     // alert(speakStr + " translated: " + xlation);
     // console.log(speakStr + " translated: " + xlation);
 
@@ -354,10 +363,13 @@ let clickables = document.getElementsByClassName('clickable');
 
 for (let elNum = 0; elNum < clickables.length; elNum++) {
     clickables[elNum].addEventListener('mousedown', lookupWord, false);
-    clickables[elNum].addEventListener('mousemove', mouseMoved, false);
     clickables[elNum].addEventListener('touchstart', lookupWord, false); // tablet
+
+    clickables[elNum].addEventListener('mousemove', mouseMoved, false);
     clickables[elNum].addEventListener('touchmove', mouseMoved, false); // tablet
+
     clickables[elNum].addEventListener('click', readTextAloud, false);
+
     clickables[elNum].addEventListener('mouseup', keepItLocal, false); // else touchscreen browser removes highlighting
 }
 // todo: when should I remove these listeners, if at all?
@@ -416,10 +428,10 @@ speechSynthesis.onvoiceschanged = function () {
     vListEl.insertAdjacentHTML("beforeend", "</ul>");
 };
 
-function getTranslation(toXlate) {
+function getTranslation(prefix, toXlate) {
     // JSONP needed because glosbe.com does not provide CORS:
     // $('#glosbeBuf').html("Translations appear here.");
-    $.getJSON("https://glosbe.com/gapi/translate?format=json&" + toXlate + "&callback=?", function (json) {
+    $.getJSON("https://glosbe.com/gapi/translate?format=json&" + prefix + toXlate + "&callback=?", function (json) {
         if (json !== "Nothing found.") {
             // $('#glosbeBuf').html(JSON.stringify(json));
             if (json.tuc.length)

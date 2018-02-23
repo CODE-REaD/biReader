@@ -21,13 +21,14 @@
         .myColumn {
             height: 80vh;
             overflow: auto; /*causes scrollbars*/
-            float: left;
-            width: 45%;
-            margin-left: 3%;
+            /*float: left;*/
+            /*width: 45%;*/
+            /*margin-left: 3%;*/
         }
 
         .myColumn, #Help {
             border-radius: 7px;
+            margin: 4px;
         }
 
         .myPara, .highlighted {
@@ -143,9 +144,25 @@
             box-shadow: 5px 5px 10px gray;
         }
 
+
+        .vertContainter,
+        .horizContainer,
         .container {
             display: flex;
+            justify-content: space-around;
         }
+
+        .vertContainer {
+            flex-direction: column;
+            height: 94%;
+        }
+
+        .horizContainer {
+            flex-direction: row;
+            margin-left: 4%;
+            width: 94%
+        }
+
         .container.space-around {
             justify-content: space-around;
             margin-left: 4%;
@@ -200,7 +217,7 @@
 <!--todo: make "responsive" (use CSS formulae?):-->
 
 <!--todo: use "ribbon" rather than buttons here (background-color=black?):-->
-<div id="topRowButtons" class="container space-around">
+<div id="topRowButtons" class="horizContainer">
     <button id="helpButton" class="myButton">Help</button>
     <button id="ttsSpeedButton" class="myButton">Speech Speed</button>
     <button id="libraryLoadButton" class="myButton">Load File from Online Library</button>
@@ -225,6 +242,8 @@
         </select>
 </div>
 
+<div class="vertContainer">
+<div class="horizContainer">
 <div id=leftColumnHeader class="myColumnHeader">
     <h3 id=leftTitle></h3>
 </div>
@@ -233,6 +252,8 @@
     <h3 id=rightTitle></h3>
 </div>
 
+</div>
+    <div class="horizContainer">
 <div id=leftColumn class="myColumn syncscroll frame" name="sync1">
     <p id=leftPara class="clickable myPara">
         <span class=colInstructions>
@@ -247,12 +268,14 @@
             Drag-and-drop a file, or paste text here.</span></p>
     </p>
 </div>
+</div>
 
 <div class="container space-around frame">
     <span id="glosbeBuf" style="height: 10vh"></span>
     <span style="position: absolute; bottom: 0; font-size: x-small">
         Translations provided by <a href="https://glosbe.com/"; target="_blank">Glosbe</a>.</span></div>
 
+</div>
 <!--<script src="js/vendor/modernizr-3.5.0.min.js"></script>-->
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
