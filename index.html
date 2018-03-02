@@ -40,7 +40,7 @@
             text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
         }
 
-        .highlighted        {
+        .highlighted {
             font-style: italic;
             color: red;
             background: #d4d4d4;
@@ -143,7 +143,6 @@
             padding: 5%;
             box-shadow: 5px 5px 10px gray;
         }
-
 
         .vertContainer,
         .horizContainer,
@@ -254,35 +253,37 @@
         <div id=rightColumnHeader class="myColumnHeader">
             <h3 id=rightTitle></h3>
         </div>
-
     </div>
+
     <div class="horizContainer">
         <div id=leftColumn class="myColumn syncscroll frame" name="sync1">
             <p id=leftPara class="clickable myPara">
-        <span class=colInstructions>
-
-            Drag-and-drop a file, or paste text here.</span></p>
+                <span class=colInstructions>
+                    Drag-and-drop a file, or paste text here.
+                </span>
+            </p>
         </div>
 
         <div id=rightColumn class="myColumn syncscroll frame" name="sync1">
             <p id=rightPara class="clickable myPara">
-        <span class=colInstructions>
-
-            Drag-and-drop a file, or paste text here.</span></p>
+                <span class=colInstructions>
+                    Drag-and-drop a file, or paste text here.
+                </span>
             </p>
         </div>
     </div>
 
-        <div class="container space-around frame">
-            <span id="glosbeBuf" style="height: 10vh"></span>
-            <span style="position: absolute; bottom: 0; font-size: x-small">
+    <div class="container space-around frame">
+        <span id="glosbeBuf" style="height: 10vh"></span>
+        <span style="position: absolute; bottom: 0; font-size: x-small">
         Translations provided by <a href="https://glosbe.com/" ; target="_blank">Glosbe</a>.</span></div>
-    </div>
+</div>
 
 
 <!--<script src="js/vendor/modernizr-3.5.0.min.js"></script>-->
 
-<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 <script src="js/guessLang/_languageData.js"></script>
 <script src="js/guessLang/guessLanguage.js"></script>
 

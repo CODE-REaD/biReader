@@ -1,6 +1,7 @@
 "use strict";
 
 // todo: store filenames as English and translate to native language for display.
+// todo: web storage for things like show help first time.
 
 let linkArray;
 let prevSRStart, prevSREnd;
@@ -12,6 +13,23 @@ let prevSRStart, prevSREnd;
     event.stopPropagation();
     return false;
 };*/
+
+// This prevents Chrome from opening a cut/paste dialog, but does not prevent
+// ..it from displaying a popup search link at bottom of screen:
+// window.addEventListener("contextmenu", function(e) { e.preventDefault(); });
+window.addEventListener("contextmenu", function(e) {
+    e.preventDefault();
+    return true;    // true = propagation continues
+});
+
+/*window.addEventListener("contextmenu", function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+    e.cancelBubble = true;
+    e.returnValue = false;
+    return false;
+});*/
 
 // todo: TTS speed control(s)
 
@@ -216,6 +234,7 @@ function mouseMoved(ev) {
         mouseWasMoved = true;
     lastX = ev.clientX;
     lastY = ev.clientY;
+    return true;    // true = propagation continues
 }
 
 function sleep(ms) {
@@ -233,6 +252,14 @@ async function lookupWord(ev) {
     lookingUpWord = false;  // Not true until we have waited
     mouseWasMoved = false;
     textWasRead = false;    // Set here and recheck after sleep
+    // alert(ev.type);
+
+    console.log('============ lookupWord: Event is: ' + ev.type);
+
+/*    if (ev.type === 'touchstart') {
+        // Temporarily squelch the pending mousedown:
+        ev.target.addEventListener('mousedown', keepItLocal, false);
+    }*/
 
     let textSel = window.getSelection();
     if (!textSel.isCollapsed) {
@@ -246,12 +273,14 @@ async function lookupWord(ev) {
     await sleep(400);
 
     if (textWasRead)    // A short click occurred, so read text instead
-        return;
+        // ev.target.addEventListener('mousedown', lookupWord, false);
+        return true;    // true = propagation continues
 
     if (mouseWasMoved) {    // User is dragging over text, rather than long-clicking
         console.log('lookupWord(): mouse was moved, abort.');
         mouseWasMoved = false;  // For next time
-        return;
+        // ev.target.addEventListener('mousedown', lookupWord, false);
+        return true; // true = propagation continues
     }
     lookingUpWord = true;   // Tell other handlers we will handle this action exclusively
 
@@ -294,13 +323,14 @@ async function lookupWord(ev) {
     let speakMsg = new SpeechSynthesisUtterance(speakStr);
     speechSynthesis.speak(speakMsg);
 
+    // ev.target.addEventListener('mousedown', lookupWord, false);
     // lookingUpWord = false;
 };
 
 // todo: firefox TTS, see https://hacks.mozilla.org/2016/01/firefox-and-the-web-speech-api/
 //
 let readTextAloud = function () {
-    if (lookingUpWord) return; // A long mouse click occurred, so look up word instead
+    if (lookingUpWord) return true; // A long mouse click occurred, so look up word instead
     // readingTextAloud = true;
     textWasRead = true;
 
@@ -363,7 +393,7 @@ let clickables = document.getElementsByClassName('clickable');
 
 for (let elNum = 0; elNum < clickables.length; elNum++) {
     clickables[elNum].addEventListener('mousedown', lookupWord, false);
-    clickables[elNum].addEventListener('touchstart', lookupWord, false); // tablet
+    clickables[elNum].addEventListener('touchstart', lookupWord, false); // required for tablet
 
     clickables[elNum].addEventListener('mousemove', mouseMoved, false);
     clickables[elNum].addEventListener('touchmove', mouseMoved, false); // tablet
@@ -371,8 +401,10 @@ for (let elNum = 0; elNum < clickables.length; elNum++) {
     clickables[elNum].addEventListener('click', readTextAloud, false);
 
     clickables[elNum].addEventListener('mouseup', keepItLocal, false); // else touchscreen browser removes highlighting
+    // clickables[elNum].addEventListener('touchend', keepItLocal, false);
 }
 // todo: when should I remove these listeners, if at all?
+
 
 // Preload library file list to <select>:
 //
