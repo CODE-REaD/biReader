@@ -15,7 +15,9 @@ let prevSRStart, prevSREnd;
 };*/
 
 // This prevents Chrome from opening a cut/paste dialog, but does not prevent
-// ..it from displaying a popup search link at bottom of screen:
+// ..it from displaying a popup search link at bottom of screen.  No known
+// ..programmatic way of disabling that "feature," user must disable it from
+// ..Chrome's "privacy" settings menu:
 // window.addEventListener("contextmenu", function(e) { e.preventDefault(); });
 window.addEventListener("contextmenu", function(e) {
     e.preventDefault();
@@ -40,7 +42,7 @@ window.addEventListener("contextmenu", function(e) {
 // Reveal the <select> node when the button is clicked:
 document.getElementById('libraryLoadButton').addEventListener('click',
     function () {
-        document.getElementById('popUpDiv').style.display = 'inline-block';
+        document.getElementById('leftFilePopup').style.display = 'inline-block';
     });
 
 document.getElementById('helpButton').addEventListener('click',
@@ -53,58 +55,83 @@ document.getElementById('helpCloseButton').addEventListener('click',
         document.getElementById('Help').style.display = 'none';
     });
 
-// todo: consolidate next 3 functions (?):
+let leftSel = null;
+let libFileOK = false; // Global flag for library file load result
 
 // Load a file when a library selection is made.
-document.getElementById('popupSelect').addEventListener('change', function () {
-    var e = document.getElementById('popupSelect');
-    let leftlibFilePath = e.options[e.selectedIndex].text;  // Left-hand file
+document.getElementById('leftFileSelect').addEventListener('change', function () {
+    leftSel = document.getElementById('leftFileSelect');
+    let leftlibFilePath = leftSel.options[leftSel.selectedIndex].text;  // Left-hand file
     let rightlibFilePath = '';
 
     let libFileName = leftlibFilePath.replace(/\.[a-z][a-z]$/, "");
 
     // Select right-hand file:
+    // Populate chooser (derived from https://stackoverflow.com/a/17002049/5025060):
+    let rightList = document.getElementById("rightFileSelect");
+    rightList.length = 0; // empty it
+    // rightList.insertAdjacentHTML("beforebegin", "Select right-hand file:");
+
+    // NB: set this BEFORE populating selectList, else first is set as default choice:
+    rightList.size = (linkArray.length < 12 ? linkArray.length : 12);
+
+    // Create and append the right-file choice options
+    // See also, Option object at http://www.javascriptkit.com/jsref/select.shtml#section2
+    //
     linkArray.forEach(function (link) {
         if ((link.replace(/\.[a-z][a-z]$/, "") === libFileName)
-            && (link !== leftlibFilePath))
-            rightlibFilePath = link;
+            && (link !== leftlibFilePath)) {
+            let RFopt = document.createElement("option");
+            RFopt.value = link;
+            RFopt.text = link;
+            rightList.appendChild(RFopt);
+        }
     });
 
+    // Now that user has selected lefthand file, show righthand file menu:
+    document.getElementById('rightFilePopup').style.display = 'inline-block';
+
     if (leftlibFilePath.length)
-        getFileFromLibrary('leftPara', 'http://bridge.code-read.com/library/' + leftlibFilePath);
-    document.getElementById('leftTitle').textContent = leftlibFilePath;
-    if (rightlibFilePath.length)
-        getFileFromLibrary('rightPara', 'http://bridge.code-read.com/library/' + rightlibFilePath);
-    document.getElementById('rightTitle').textContent = rightlibFilePath;
-    document.getElementById('popUpDiv').style.display = 'none';
+        // libFileOK = false;
+        getFileFromLibrary('leftPara', leftlibFilePath, 'leftTitle');
+
+    /*        getFileFromLibrary('leftPara', 'http://bridge.code-read.com/library/' + leftlibFilePath);
+            if (libFileOK)
+                document.getElementById('leftTitle').textContent = leftlibFilePath;*/
 });
 
-// function getFileFromLibrary(Element, url, callback) {
-function getFileFromLibrary(Element, url) {
+document.getElementById('rightFileSelect').addEventListener('change', function () {
+    let rightSel = document.getElementById('rightFileSelect');
+    let rightlibFilePath = rightSel.options[rightSel.selectedIndex].text;  // Right-hand file
+    if (rightlibFilePath.length)
+        getFileFromLibrary('rightPara', rightlibFilePath, 'rightTitle');
+/*        if (getFileFromLibrary('rightPara', 'http://bridge.code-read.com/library/' + rightlibFilePath))
+            document.getElementById('rightTitle').textContent = rightlibFilePath;*/
+
+    document.getElementById('leftFilePopup').style.display = 'none';
+    document.getElementById('rightFilePopup').style.display = 'none';
+
+    leftSel.value = "";  // Else we won't trigger again on current choice
+});
+
+function getFileFromLibrary(contentElement, fileName, titleElement) {
     let request = new XMLHttpRequest(); // Create new request
-    request.open("GET", url); // Specify URL to fetch
+    // request.open("GET", url); // Specify URL to fetch
+    request.open("GET", 'http://bridge.code-read.com/library/' + fileName); // Specify URL to fetch
     request.onreadystatechange = function () { // Define event listener
         // If the request is complete and was successful
         if (request.readyState === 4 && request.status === 200) {
-            document.getElementById(Element).textContent = request.responseText;
-            // callback(Element);
+            document.getElementById(contentElement).textContent = request.responseText;
+            document.getElementById(titleElement).textContent = fileName;
         }
     };
-    request.send(null);
+    request.onload = function () {
+        libFileOK = true;
+    }
+    return request.send(null);
 }
 
-// Register file loaded so updateLineSpacing() is only called when both (async AJAX)
-// ..file loads completed:
-/*function loadedAfile(Element) {
-    /!*
-    obsoleted: using DOMSubtreeModified trigger instead
-
-        if (Element === 'rightPara')
-            updateLineSpacing();
-    *!/
-}*/
-
-// When user makes a change to the 'filechoice1' field, fire this listener to load
+// When user makes a change to the 'leftFilechoice' field, fire this listener to load
 // the file to leftPara:
 document.getElementById('leftFileChoice').addEventListener('change',
     function () {
@@ -114,7 +141,6 @@ document.getElementById('leftFileChoice').addEventListener('change',
         };
         fr.readAsText(this.files[0]);
         document.getElementById('leftTitle').textContent = this.files[0].name;
-        // updateLineSpacing();
     }
 );
 
@@ -212,7 +238,6 @@ function pasteToCol(ev) {
 }
 
 function handleFiles(files, filePara, fileTitle) {
-    // console.log('right file is ' + files[0].name);
     var fr = new FileReader();
     fr.onload = function () {
         document.getElementById(filePara).textContent = this.result;
@@ -401,7 +426,6 @@ for (let elNum = 0; elNum < clickables.length; elNum++) {
     clickables[elNum].addEventListener('click', readTextAloud, false);
 
     clickables[elNum].addEventListener('mouseup', keepItLocal, false); // else touchscreen browser removes highlighting
-    // clickables[elNum].addEventListener('touchend', keepItLocal, false);
 }
 // todo: when should I remove these listeners, if at all?
 
@@ -424,14 +448,14 @@ request.onreadystatechange = function () { // Define event listener
             libFileName.length && linkArray.push(libFileName);
         }
         // Populate chooser (derived from https://stackoverflow.com/a/17002049/5025060):
-        let selectList = document.getElementById("popupSelect");
+        let selectList = document.getElementById("leftFileSelect");
         selectList.length = 0; // empty it
-        selectList.insertAdjacentHTML("beforebegin", "Select left-hand file:");
+        // selectList.insertAdjacentHTML("beforebegin", "Select left-hand file:");
 
         // NB: set this BEFORE populating selectList, else first is set as default choice:
         selectList.size = (linkArray.length < 12 ? linkArray.length : 12);
 
-        //Create and append the options
+        // Create and append the file choice options
         // See also, Option object at http://www.javascriptkit.com/jsref/select.shtml#section2
         for (let linkNum = 0; linkNum < linkArray.length; linkNum++) {
             let option = document.createElement("option");

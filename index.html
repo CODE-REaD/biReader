@@ -22,13 +22,20 @@
             /*height: 80vh;*/
             overflow: auto; /*causes scrollbars*/
             /*float: left;*/
-            /*width: 45%;*/
+            width: 48%;
             /*margin-left: 3%;*/
         }
 
-        .myColumn, #Help {
-            border-radius: 7px;
+        .myColumn, #Help, #vocab {
+            border-radius: 1px;
             margin: 4px;
+            box-shadow: 5px 5px 10px gray;
+            text-rendering: optimizeLegibility;
+            -moz-font-feature-settings: "liga" 1, "kern" 1;
+            -ms-font-feature-settings: "liga" 1, "kern" 1;
+            -o-font-feature-settings: "liga" 1, "kern" 1;
+            -webkit-font-feature-settings: "liga" 1, "kern" 1;
+            font-feature-settings: "liga" 1, "kern" 1;
         }
 
         .myPara, .highlighted {
@@ -38,6 +45,7 @@
             margin: 9px;
             /*color: transparent;*/
             text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+            height: 80vh;
         }
 
         .highlighted {
@@ -112,23 +120,30 @@
         }
 
         /*from https://stackoverflow.com/a/9358802/5025060: */
-        #popUpDiv, #RFChooserDiv {
+        #leftFilePopup, #rightFilePopup {
             z-index: 100;
             position: absolute;
-            background-color: rgba(123, 123, 123, 0.8);
-            color: white;
+            /*background-color: rgba(123, 123, 123, 0.8);*/
+            background-color: yellow;
+            color: red;
+            font-family: sans-serif;
+            font-size: 125%;
+            font-weight: bold;
             display: none;
             top: 10%;
-            left: 10%;
-            width: 50%;
-            height: 20%;
+            width: 30%;
         }
 
-        #popupSelect, #RFSelect {
-            z-index: 101;
-            position: absolute;
-            top: 25%;
-            left: 12%;
+        #leftFilePopup {
+            left: 10%;
+        }
+
+        #rightFilePopup {
+            left: 50%;
+        }
+
+        #leftFilePopup *, #rightFilePopup * {
+            font-size: initial;
         }
 
         #Help {
@@ -156,10 +171,15 @@
             height: 100vh;
         }
 
-        .horizContainer {
+        .horizContainer, #vocab {
             flex-direction: row;
-            margin-left: 4%;
-            width: 94%
+            margin-left: 2%;
+            width: 96%
+        }
+
+        .horizElement {
+            margin-left: 2%;
+            width: 96%
         }
 
         .container.space-around {
@@ -185,7 +205,7 @@
     <h4>
         You may provide texts of the same article in different languages by pasting them
         to the two panels, or drag-and-drop local files to the panels, or click on the "load"
-        buttons to select files from your local disc. Or click on "Load File from Online Library" to
+        buttons to select files from your local disc. Or click on "Load Files from Online Library" to
         choose an existing pairing from the online library.
         <!--
                 todo: update this description and show it when the user opens the file selection dialogue:
@@ -200,8 +220,8 @@
         as equal height, synchronously scrolling panels, and to pronounce sentences
         in their native language
         when you click on them or a series of sentences when you click-and-drag over them.
-        It will also attempt to show a definition of a word if you long-click on it (PoC:
-        French to English only).
+        It will also attempt to show a definition of a word if you long-click (tablet: long-tap)
+        on it (PoC: French to English only).
         <br><br>
         PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
         input as no input validity checks are yet in place.
@@ -221,7 +241,7 @@
     <div id="topRowButtons" class="horizContainer">
         <button id="helpButton" class="myButton">Help</button>
         <button id="ttsSpeedButton" class="myButton">Speech Speed</button>
-        <button id="libraryLoadButton" class="myButton">Load File from Online Library</button>
+        <button id="libraryLoadButton" class="myButton">Load Files from Online Library</button>
 
         <label for="leftFileChoice" class="myButton">Load left file from disc</label>
         <input type="file" id="leftFileChoice" style="display: none"/>
@@ -232,18 +252,19 @@
         <button id="saveFileButton" class="myButton">Save to Files</button>
     </div>
 
-    <!--Filled in at runtime:-->
-    <div id="popUpDiv">
-        <select id="popupSelect">
-        </select>
+    <div class="horizContainer">
+        <!--Filled in at runtime:-->
+        <div id="leftFilePopup">
+            Select left-hand file:
+            <select id="leftFileSelect">
+            </select>
+        </div>
+        <div id="rightFilePopup">
+            Select right-hand file:
+            <select id="rightFileSelect">
+            </select>
+        </div>
     </div>
-
-    <div id="RFChooserDiv">
-        <select id="RFSelect">
-        </select>
-    </div>
-
-    <!--<div class="vertContainer">-->
 
     <div class="horizContainer">
         <div id=leftColumnHeader class="myColumnHeader">
@@ -273,7 +294,7 @@
         </div>
     </div>
 
-    <div class="container space-around frame">
+    <div id=vocab class="container space-around frame">
         <span id="glosbeBuf" style="height: 10vh"></span>
         <span style="position: absolute; bottom: 0; font-size: x-small">
         Translations provided by <a href="https://glosbe.com/" ; target="_blank">Glosbe</a>.</span></div>
