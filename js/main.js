@@ -4,7 +4,7 @@
 // todo: web storage for things like show help first time.
 
 let linkArray;
-let prevSRStart, prevSREnd;
+// let prevSRStart, prevSREnd;
 
 // Prevent Android context menu so we can use the "long tap" to show word definitions.
 // From: https://stackoverflow.com/a/28748222/5025060
@@ -33,11 +33,11 @@ window.addEventListener("contextmenu", function(e) {
     return false;
 });*/
 
+// window.scrollTo(0,1);   // Tablet full screen mode
+
 // todo: TTS speed control(s)
 
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications
-
-// todo: Apply D.R.Y. here...
 
 // Reveal the <select> node when the button is clicked:
 document.getElementById('libraryLoadButton').addEventListener('click',
@@ -46,9 +46,18 @@ document.getElementById('libraryLoadButton').addEventListener('click',
     });
 
 document.getElementById('helpButton').addEventListener('click',
-    function () {
+    function (event) {
         document.getElementById('Help').style.display = 'inline-block';
-    });
+        // Click anywhere except Help button turns it off:
+        document.addEventListener('click',
+            function docClick(f) {
+                if (f.target.id != 'helpButton') {
+                    document.getElementById('Help').style.display = 'none';
+                    document.removeEventListener('click', docClick);
+                }
+            }
+        )
+    }, false);
 
 document.getElementById('helpCloseButton').addEventListener('click',
     function () {
@@ -168,15 +177,26 @@ rightFileColumn.addEventListener("dragover", keepItLocal, false);
 rightFileColumn.addEventListener("drop", fileDrop, false);
 rightFileColumn.addEventListener("paste", pasteToCol, false);
 
-document.getElementById('leftPara').addEventListener('DOMSubtreeModified', updateLineSpacing);
-document.getElementById('rightPara').addEventListener('DOMSubtreeModified', updateLineSpacing);
+// document.getElementById('leftPara').addEventListener('DOMSubtreeModified', updateLineSpacing);
+// document.getElementById('rightPara').addEventListener('DOMSubtreeModified', updateLineSpacing);
+
+let leftParaObserver = new MutationObserver(updateLineSpacing);
+leftParaObserver.observe(document.getElementById('leftPara'), {characterData: true});
+
+let rightParaObserver = new MutationObserver(updateLineSpacing);
+rightParaObserver.observe(document.getElementById('rightPara'), {characterData: true});
 
 function updateLineSpacing() {
-    prevSRStart = prevSREnd = 0;
+    // prevSRStart = prevSREnd = 0;
 
+    // First reset both columns to default line height so we can make our computation:
+    // var style = getComputedStyle(document.body);
+    // console.log("line height: " + style.getPropertyValue('line-height'));
+    // const defLineHeight = style.getPropertyValue('line-height');
+    const defLineHeight = getComputedStyle(document.body).getPropertyValue('line-height');
     // todo: 1.4 hard coded to match main.css; globalize somehow.
-    document.getElementById('leftPara').style.lineHeight = 1.4;
-    document.getElementById('rightPara').style.lineHeight = 1.4;
+    document.getElementById('leftPara').style.lineHeight = defLineHeight;
+    document.getElementById('rightPara').style.lineHeight = defLineHeight;
 
     let leftHeight = document.getElementById('leftPara').scrollHeight;
     let rightHeight = document.getElementById('rightPara').scrollHeight;
@@ -417,13 +437,13 @@ let readTextAloud = function () {
 let clickables = document.getElementsByClassName('clickable');
 
 for (let elNum = 0; elNum < clickables.length; elNum++) {
-    clickables[elNum].addEventListener('mousedown', lookupWord, false);
-    clickables[elNum].addEventListener('touchstart', lookupWord, false); // required for tablet
+    clickables[elNum].addEventListener('mousedown', lookupWord, {passive:true});
+    clickables[elNum].addEventListener('touchstart', lookupWord, {passive:true}); // required for tablet
 
-    clickables[elNum].addEventListener('mousemove', mouseMoved, false);
-    clickables[elNum].addEventListener('touchmove', mouseMoved, false); // tablet
+    clickables[elNum].addEventListener('mousemove', mouseMoved, {passive:true});
+    clickables[elNum].addEventListener('touchmove', mouseMoved, {passive:true}); // tablet
 
-    clickables[elNum].addEventListener('click', readTextAloud, false);
+    clickables[elNum].addEventListener('click', readTextAloud, {passive:true});
 
     clickables[elNum].addEventListener('mouseup', keepItLocal, false); // else touchscreen browser removes highlighting
 }
