@@ -4,34 +4,16 @@
 // todo: web storage for things like show help first time.
 
 let linkArray;
-// let prevSRStart, prevSREnd;
-
-// Prevent Android context menu so we can use the "long tap" to show word definitions.
-// From: https://stackoverflow.com/a/28748222/5025060
-/*window.oncontextmenu = function(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    return false;
-};*/
 
 // This prevents Chrome from opening a cut/paste dialog, but does not prevent
 // ..it from displaying a popup search link at bottom of screen.  No known
 // ..programmatic way of disabling that "feature," user must disable it from
-// ..Chrome's "privacy" settings menu:
-// window.addEventListener("contextmenu", function(e) { e.preventDefault(); });
+// ..Chrome's "privacy" settings menu.  NOTE: configuring the page as a "home page"
+// ..disables popup search.
 window.addEventListener("contextmenu", function(e) {
     e.preventDefault();
     return true;    // true = propagation continues
 });
-
-/*window.addEventListener("contextmenu", function(e) {
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    e.stopPropagation();
-    e.cancelBubble = true;
-    e.returnValue = false;
-    return false;
-});*/
 
 // window.scrollTo(0,1);   // Tablet full screen mode
 
@@ -181,10 +163,11 @@ rightFileColumn.addEventListener("paste", pasteToCol, false);
 // document.getElementById('rightPara').addEventListener('DOMSubtreeModified', updateLineSpacing);
 
 let leftParaObserver = new MutationObserver(updateLineSpacing);
-leftParaObserver.observe(document.getElementById('leftPara'), {characterData: true});
+// leftParaObserver.observe(document.getElementById('leftPara'), {characterData: true});
+leftParaObserver.observe(document.getElementById('leftPara'), {childList: true});
 
 let rightParaObserver = new MutationObserver(updateLineSpacing);
-rightParaObserver.observe(document.getElementById('rightPara'), {characterData: true});
+rightParaObserver.observe(document.getElementById('rightPara'), {childList: true});
 
 function updateLineSpacing() {
     // prevSRStart = prevSREnd = 0;
@@ -201,8 +184,8 @@ function updateLineSpacing() {
     let leftHeight = document.getElementById('leftPara').scrollHeight;
     let rightHeight = document.getElementById('rightPara').scrollHeight;
     let leftToRightRatio = leftHeight / rightHeight;
-    // console.log('left height: ' + leftHeight + ' right height: ' + rightHeight
-    //     + ', Ratio = ' + leftToRightRatio);
+    console.log('left height: ' + leftHeight + ' right height: ' + rightHeight
+        + ', Ratio = ' + leftToRightRatio);
 
     //todo: check for "edge" cases here (e.g., less that a screenful of text):
     if (leftToRightRatio < 1)
@@ -275,6 +258,8 @@ let lastY = window.clientY;
 
 // Set boolean if mouse moved a significant amount; otherwise simply absorb the event:
 function mouseMoved(ev) {
+    // if ((Math.abs(ev.clientX - lastX) > 50) || (Math.abs(ev.clientY - lastY) > 50))
+    // todo: calibrate this to screen dpi?
     if ((Math.abs(ev.clientX - lastX) > 2) || (Math.abs(ev.clientY - lastY) > 2))
         mouseWasMoved = true;
     lastX = ev.clientX;
@@ -287,6 +272,7 @@ function sleep(ms) {
 }
 
 let lookingUpWord = false;
+let wordLookedUp = false;
 let textWasRead = false;
 let xlation = '';
 
@@ -297,6 +283,7 @@ async function lookupWord(ev) {
     lookingUpWord = false;  // Not true until we have waited
     mouseWasMoved = false;
     textWasRead = false;    // Set here and recheck after sleep
+    wordLookedUp = false;
     // alert(ev.type);
 
     console.log('============ lookupWord: Event is: ' + ev.type);
@@ -309,29 +296,38 @@ async function lookupWord(ev) {
     let textSel = window.getSelection();
     if (!textSel.isCollapsed) {
         speakRange = textSel.getRangeAt(0);
+        console.log('lookupWord: collapsing selection: ' + speakRange.toString().trim() );
         speakRange.collapse(true);  // So we can get new selection (below)
     }
 
     if (speechSynthesis.pending || speechSynthesis.speaking)
         speechSynthesis.cancel();
 
-    await sleep(400);
+    // await sleep(400);
+    await sleep(700); // Android Chrome range change lag
 
     if (textWasRead)    // A short click occurred, so read text instead
         // ev.target.addEventListener('mousedown', lookupWord, false);
         return true;    // true = propagation continues
 
-    if (mouseWasMoved) {    // User is dragging over text, rather than long-clicking
+    if (ev.type === 'mousedown' && mouseWasMoved) {    // User is dragging over text, rather than long-clicking
+    // if (mouseWasMoved) {    // User is dragging over text, rather than long-clicking
+        // lookingUpWord = true;   // Tell other handlers we will handle this action exclusively
         console.log('lookupWord(): mouse was moved, abort.');
         mouseWasMoved = false;  // For next time
         // ev.target.addEventListener('mousedown', lookupWord, false);
         return true; // true = propagation continues
     }
-    lookingUpWord = true;   // Tell other handlers we will handle this action exclusively
 
+    wordLookedUp = true;
+
+    // Fails with Android: "Failed to execute 'getRangeAt' on 'Selection': 0 is not a valid index."
     textSel = window.getSelection();
     speakRange = textSel.getRangeAt(0);
     let node = textSel.anchorNode;
+
+/*    speakRange = savedRange;
+    let node = savedNode;*/
 
     // Find and include start of word containing clicked region:
     while (speakRange.startOffset !== 0) {                         // start of node
@@ -374,8 +370,13 @@ async function lookupWord(ev) {
 
 // todo: firefox TTS, see https://hacks.mozilla.org/2016/01/firefox-and-the-web-speech-api/
 //
-let readTextAloud = function () {
-    if (lookingUpWord) return true; // A long mouse click occurred, so look up word instead
+function readTextAloud() {
+    if (wordLookedUp) {     // A long mousedown occurred, so ignore following click event
+        wordLookedUp = false;
+        console.log('RTA skip');
+        return true;
+    }
+    console.log('RTA run');
     // readingTextAloud = true;
     textWasRead = true;
 
@@ -434,6 +435,15 @@ let readTextAloud = function () {
     // readingTextAloud = false;
 };
 
+
+function setLookupFlag(ev) {
+    // If we just looked up a word, ignore next click event:
+    if (wordLookedUp) {
+        wordLookedUp = false;
+        ev.stopPropagation();
+    }
+}
+
 let clickables = document.getElementsByClassName('clickable');
 
 for (let elNum = 0; elNum < clickables.length; elNum++) {
@@ -441,12 +451,30 @@ for (let elNum = 0; elNum < clickables.length; elNum++) {
     clickables[elNum].addEventListener('touchstart', lookupWord, {passive:true}); // required for tablet
 
     clickables[elNum].addEventListener('mousemove', mouseMoved, {passive:true});
-    clickables[elNum].addEventListener('touchmove', mouseMoved, {passive:true}); // tablet
+    // clickables[elNum].addEventListener('touchmove', mouseMoved, {passive:true}); // tablet
 
     clickables[elNum].addEventListener('click', readTextAloud, {passive:true});
 
-    clickables[elNum].addEventListener('mouseup', keepItLocal, false); // else touchscreen browser removes highlighting
+    // clickables[elNum].addEventListener('mouseup', keepItLocal, false); // else touchscreen browser removes highlighting
+    // clickables[elNum].addEventListener('mouseup', setLookupFlag, false);
 }
+
+/*// Adapted from https://stackoverflow.com/a/23699875/5025060:..
+let savedRange = null;
+let savedNode = null;
+
+document.addEventListener("selectionchange", HandleSelectionChange, false);
+
+function HandleSelectionChange() {
+    let sel = window.getSelection && window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+        savedRange = sel.getRangeAt(0);
+        savedNode = sel.anchorNode;
+        console.log("Range changed to: " + savedRange.toString().trim());
+    }
+}
+// ..*/
+
 // todo: when should I remove these listeners, if at all?
 
 
@@ -534,3 +562,26 @@ function getTranslation(prefix, toXlate) {
     });
     return false;
 }
+
+// Adapted from https://stackoverflow.com/a/41998497/5025060:
+//
+let isSyncingLeftScroll = false;
+let isSyncingRightScroll = false;
+let leftDiv = document.getElementById('leftColumn');
+let rightDiv = document.getElementById('rightColumn');
+
+leftDiv.onscroll = function() {
+    if (!isSyncingLeftScroll) {
+        isSyncingRightScroll = true;
+        rightDiv.scrollTop = this.scrollTop;
+    }
+    isSyncingLeftScroll = false;
+};
+
+rightDiv.onscroll = function () {
+    if (!isSyncingRightScroll) {
+        isSyncingLeftScroll = true;
+        leftDiv.scrollTop = this.scrollTop;
+    }
+    isSyncingRightScroll = false;
+};

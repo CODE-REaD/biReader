@@ -235,3 +235,434 @@ textarea {
         page-break-after: avoid;
     }
 }
+
+body {
+    /*color : #334455;*/
+    background-color: #aabbcc;
+    /*font-family: 'PT Sans', sans-serif;*/
+    /*font-family: Georgia, serif; */
+    font-family: andadaregular, serif;
+    font-size : 17px;
+    cursor : default;
+}
+
+a {
+    color: #556677;
+    text-shadow: 0 0 3px rgba(100, 187, 214, 0.31);
+}
+
+a:hover {
+    color: #778899;
+    text-shadow: 0 0 4px rgba(180, 237, 255, 0.31);
+}
+
+
+.title {
+    padding-top : 30px;
+    font-size: 26px;
+    text-align: center;
+}
+
+.subtitle {
+    font-size: 14px;
+    text-align: center;
+    padding-top: 20px;
+}
+
+
+.frame {
+    /*border: 3px solid rgb(150, 150, 150);*/
+    border: 1px solid #4272b2;
+    /*background-color : #283849;*/
+    /*color : #aabbcc;*/
+    background-color : #ffffeb;
+    color : #000000;
+    overflow: auto;
+    position: relative;
+}
+
+
+.clear {
+    clear: both;
+}
+
+.mid {
+    width: 910px;
+    height: 300px;
+    margin-top: 20px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.goethe {
+    width: 270px;
+    white-space: nowrap;
+    height: 300px;
+    float : left;
+    font-size: 10px;
+    padding: 5px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.hsize {
+    width: 30px;
+    height: 100px;
+    float: left;
+}
+
+
+.earth {
+    width: 440px;
+    height: 300px;
+    overflow: auto;
+}
+
+
+.left {
+    float : left;
+}
+
+
+
+.right {
+    float : right;
+}
+
+
+.mid.time.romanian {
+    height: auto;
+}
+
+.mid.time.floss {
+    height: auto;
+}
+
+.mid.time.floss img {
+    height: 220px;
+}
+
+.mid.time.romanian img {
+    height: 400px;
+}
+
+
+.dragscroll {
+    cursor : -webkit-grab;
+    cursor : -moz-grab;
+    cursor : -o-grab;
+    cursor : grab;
+}
+
+
+.dragscroll:active {
+    cursor : -webkit-grabbing;
+    cursor : -moz-grabbing;
+    cursor : -o-grabbing;
+    cursor : grabbing;
+}
+
+/*** from synscroll.cs ***/
+body {
+    /*color : #334455;*/
+    background-color: #aabbcc;
+    /*font-family: 'PT Sans', sans-serif;*/
+    /*font-family: Georgia, serif; */
+    font-family: andadaregular, serif;
+    font-size : 17px;
+    cursor : default;
+}
+
+/*a {
+    color: #556677;
+    text-shadow: 0 0 3px rgba(100, 187, 214, 0.31);
+}
+
+a:hover {
+    color: #778899;
+    text-shadow: 0 0 4px rgba(180, 237, 255, 0.31);
+}
+
+
+.title {
+    padding-top : 30px;
+    font-size: 26px;
+    text-align: center;
+}
+
+.subtitle {
+    font-size: 14px;
+    text-align: center;
+    padding-top: 20px;
+}
+*/
+
+.frame {
+    /*border: 3px solid rgb(150, 150, 150);*/
+    border: 1px solid #4272b2;
+    /*background-color : #283849;*/
+    /*color : #aabbcc;*/
+    background-color : #ffffeb;
+    color : #000000;
+    overflow: auto;
+    position: relative;
+}
+
+/*
+.clear {
+    clear: both;
+}
+
+.mid {
+    width: 910px;
+    height: 300px;
+    margin-top: 20px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.goethe {
+    width: 270px;
+    white-space: nowrap;
+    height: 300px;
+    float : left;
+    font-size: 10px;
+    padding: 5px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.hsize {
+    width: 30px;
+    height: 100px;
+    float: left;
+}
+
+
+.earth {
+    width: 440px;
+    height: 300px;
+    overflow: auto;
+}
+
+
+.left {
+    float : left;
+}
+
+
+
+.right {
+    float : right;
+}
+
+
+.mid.time.romanian {
+    height: auto;
+}
+
+.mid.time.floss {
+    height: auto;
+}
+
+.mid.time.floss img {
+    height: 220px;
+}
+
+.mid.time.romanian img {
+    height: 400px;
+}
+*/
+
+
+.dragscroll {
+    cursor : -webkit-grab;
+    cursor : -moz-grab;
+    cursor : -o-grab;
+    cursor : grab;
+}
+
+
+.dragscroll:active {
+    cursor : -webkit-grabbing;
+    cursor : -moz-grabbing;
+    cursor : -o-grabbing;
+    cursor : grabbing;
+}
+
+/***************** Begin crw CSS *****************/
+     /* *May* improve select on mobile */
+ select{
+     -webkit-appearance: menulist-textfield;
+ }
+
+.myColumn {
+    /*height: 80vh;*/
+    overflow: auto; /*causes scrollbars*/
+    /*float: left;*/
+    width: 48%;
+    /*margin-left: 3%;*/
+}
+
+.myColumn, #Help, #vocab {
+    border-radius: 1px;
+    margin: 4px;
+    box-shadow: 5px 5px 10px gray;
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+    text-rendering: optimizeLegibility;
+    -moz-font-feature-settings: "liga" 1, "kern" 1;
+    -ms-font-feature-settings: "liga" 1, "kern" 1;
+    -o-font-feature-settings: "liga" 1, "kern" 1;
+    -webkit-font-feature-settings: "liga" 1, "kern" 1;
+    font-feature-settings: "liga" 1, "kern" 1;
+}
+
+.myPara, .highlighted {
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    /*padding: 9px; NO GOOD: this gives overlap in highlight bg*/
+    margin: 9px;
+    /*color: transparent;*/
+    /*text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);*/
+    height: 80vh;
+}
+
+.highlighted {
+    font-style: italic;
+    color: red;
+    background: #d4d4d4;
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+::selection {
+    background: #b3d4fc;
+}
+
+::-moz-selection {
+    background: #b3d4fc;
+}
+
+.myColumnHeader, .myHeader {
+    float: left;
+    margin-left: 3%;
+    height: 3em;
+}
+
+.myColumnHeader {
+    width: 45%;
+}
+
+/*.myHeader, .myIntro {*/
+.myHeader, .myIntro {
+    /*float: left;  !*troublemaker*!*/
+    margin-left: 3%;
+    width: 94%;
+}
+
+.myButton {
+    position: relative;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1;
+    color: #428bca;
+    text-align: center;
+    /*white-space: nowrap;*/
+    vertical-align: top;
+    background-color: transparent;
+    border-radius: 4px;
+    display: block;
+    padding: 4px;
+    margin: 4px;
+    /*margin-bottom: 10px;*/
+    border: 2px solid #428bca;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    box-shadow: 1px 1px 7px gray;
+}
+
+.myButton:hover {
+    color: black;
+    background: yellow;
+}
+
+.bridgeButton, .myButton {
+    cursor: pointer;
+}
+
+.colInstructions {
+    color: #e7e7e7;
+    font-size: 219%;
+    white-space: pre-line;
+    font-family: sans-serif;
+    font-weight: bold;
+}
+
+/*from https://stackoverflow.com/a/9358802/5025060: */
+#leftFilePopup, #rightFilePopup {
+    z-index: 100;
+    position: absolute;
+    /*background-color: rgba(123, 123, 123, 0.8);*/
+    background-color: yellow;
+    color: red;
+    font-family: sans-serif;
+    font-size: 125%;
+    font-weight: bold;
+    display: none;
+    top: 10%;
+    width: 30%;
+}
+
+#leftFilePopup {
+    left: 10%;
+}
+
+#rightFilePopup {
+    left: 50%;
+}
+
+#leftFilePopup *, #rightFilePopup * {
+    font-size: initial;
+}
+
+#Help {
+    z-index: 102;
+    position: absolute;
+    background-color: white;
+    display: none;
+    top: 5%;
+    left: 5%;
+    width: 80%;
+    /*height: 80%; auto-adjust to content size */
+    padding: 5%;
+    box-shadow: 5px 5px 10px gray;
+}
+
+.vertContainer,
+.horizContainer,
+.container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.vertContainer {
+    flex-direction: column;
+    height: 100vh;
+}
+
+.horizContainer, #vocab {
+    flex-direction: row;
+    margin-left: 2%;
+    width: 96%
+}
+
+.horizElement {
+    margin-left: 2%;
+    width: 96%
+}
+
+.container.space-around {
+    justify-content: space-around;
+    margin-left: 4%;
+    width: 94%
+}
