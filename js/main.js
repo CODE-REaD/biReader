@@ -3,6 +3,37 @@
 // todo: store filenames as English and translate to native language for display.
 // todo: web storage for things like show help first time.
 
+
+function isMobileDevice() {
+    return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+};
+
+
+function launchFullscreen(element) {
+    if (isMobileDevice()) {
+        if (element.requestFullscreen) {
+            element.requestFullscreen();
+        } else if (element.mozRequestFullScreen) {
+            element.mozRequestFullScreen();
+        } else if (element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen();
+        } else if (element.msRequestFullscreen) {
+            element.msRequestFullscreen();
+        }
+        console.log('attempting landscape 1.');
+        if (document.fullscreenEnabled || document.mozFullScreenEnabled ||
+            document.webkitFullscreenEnabled || document.msFullscreenEnabled) {
+            console.log('fullscreen detected.');
+            setTimeout(function () {
+                console.log('attempting landscape 2');
+                // todo: when we exit, device is still in landscape; attempt to restore to portrait if that is
+                // ..how we started:
+                window.screen.orientation.lock("landscape");
+            }, 200);
+        }
+    }
+}
+
 let linkArray;
 
 // This prevents Chrome from opening a cut/paste dialog, but does not prevent
@@ -15,7 +46,10 @@ window.addEventListener("contextmenu", function(e) {
     return true;    // true = propagation continues
 });
 
-// window.scrollTo(0,1);   // Tablet full screen mode
+// Try to force landscape; neither this nor manifest seems to work:
+
+// document.documentElement.requestFullScreen();
+// document.requestFullScreen();
 
 // todo: TTS speed control(s)
 
@@ -65,6 +99,16 @@ document.getElementById('leftFileSelect').addEventListener('change', function ()
 
     // NB: set this BEFORE populating selectList, else first is set as default choice:
     rightList.size = (linkArray.length < 12 ? linkArray.length : 12);
+
+    // Try to deal w/mobile where size attribute doesn't cause dropdown.
+    // Adapted from https://stackoverflow.com/a/18180032/5025060:
+    let RFopt = document.createElement("option");
+    RFopt.disabled = 1;
+    RFopt.selected = 1;
+    RFopt.value = "";  // prevent rumored autofill of "choose one" by some browsers
+    RFopt.style = "font-weight: bold; font-size: 125%; color: red; background-color: yellow";
+    RFopt.text = "Select right-hand file:";
+    rightList.appendChild(RFopt);
 
     // Create and append the right-file choice options
     // See also, Option object at http://www.javascriptkit.com/jsref/select.shtml#section2
@@ -436,13 +480,13 @@ function readTextAloud() {
 };
 
 
-function setLookupFlag(ev) {
+/*function setLookupFlag(ev) {
     // If we just looked up a word, ignore next click event:
     if (wordLookedUp) {
         wordLookedUp = false;
         ev.stopPropagation();
     }
-}
+}*/
 
 let clickables = document.getElementsByClassName('clickable');
 
@@ -502,6 +546,17 @@ request.onreadystatechange = function () { // Define event listener
 
         // NB: set this BEFORE populating selectList, else first is set as default choice:
         selectList.size = (linkArray.length < 12 ? linkArray.length : 12);
+
+        // Try to deal w/mobile where size attribute doesn't cause dropdown.
+        // Adapted from https://stackoverflow.com/a/18180032/5025060:
+
+        let option = document.createElement("option");
+        option.disabled = 1;
+        option.selected = 1;
+        option.value = "";  // prevent rumored autofill of "choose one" by some browsers
+        option.style = "font-weight: bold; font-size: 125%; color: red; background-color: yellow";
+        option.text = "Select left-hand file:";
+        selectList.appendChild(option);
 
         // Create and append the file choice options
         // See also, Option object at http://www.javascriptkit.com/jsref/select.shtml#section2
@@ -585,3 +640,25 @@ rightDiv.onscroll = function () {
     }
     isSyncingRightScroll = false;
 };
+
+
+// document.getElementsByTagName("body")[0].requestFullscreen();
+// "Failed to execute 'requestFullscreen' on 'Element': API can only be initiated by a user gesture.":
+// document.getElementsByTagName("body")[0].webkitRequestFullScreen();
+
+// window.screen.lockOrientation('landscape'); "not a function"
+
+// Logs error: "Uncaught (in promise) DOMException: The page needs to be fullscreen in order to call screen.orientation.lock()."
+/*screen.orientation.lock('landscape');
+
+// From: https://stackoverflow.com/a/31967828/5025060 (doesn't work):
+if (document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen) {
+    console.log('fullscreen detected.');
+    setTimeout(function(){
+        console.log('attempting landscape');
+        window.screen.orientation.lock("landscape");
+    }    , 200);
+}*/
+
+// window.scrollTo(0,1);   // Tablet full screen mode
+

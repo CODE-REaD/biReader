@@ -9,7 +9,7 @@
     <!-- Chrome: allow "home screen" on tablet: -->
     <meta name="mobile-web-app-capable" content="yes">
 
-    <!--<link rel="manifest" href="site.webmanifest">-->
+    <link rel="manifest" href="site.webmanifest">
     <!--<link rel="apple-touch-icon" href="icon.png">-->
     <!-- Place favicon.ico in the root directory -->
 
@@ -67,6 +67,8 @@
 
 <div class="vertContainer">
 
+    <button onclick="launchFullscreen(document.documentElement);" >Launch Fullscreen</button>
+
     <!--todo: use "ribbon" rather than buttons here (background-color=black?):-->
     <div id="topRowButtons" class="horizContainer">
         <button id="helpButton" class="myButton">Help</button>
@@ -85,12 +87,10 @@
     <div class="horizContainer">
         <!--Filled in at runtime:-->
         <div id="leftFilePopup">
-            Select left-hand file:
             <select id="leftFileSelect">
             </select>
         </div>
         <div id="rightFilePopup">
-            Select right-hand file:
             <select id="rightFileSelect">
             </select>
         </div>
