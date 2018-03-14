@@ -72,7 +72,6 @@
     <!--todo: use "ribbon" rather than buttons here (background-color=black?):-->
     <div id="topRowButtons" class="horizContainer">
         <button id="helpButton" class="myButton">Help</button>
-        <button id="ttsSpeedButton" class="myButton">Speech Speed</button>
         <button id="libraryLoadButton" class="myButton">Load Files from Online Library</button>
 
         <label for="leftFileChoice" class="myButton">Load left file from disc</label>
@@ -81,7 +80,7 @@
         <label for="rightFileChoice" class="myButton">Load right file from disc</label>
         <input type="file" id="rightFileChoice" style="display: none"/>
 
-        <button id="saveFileButton" class="myButton">Save to Files</button>
+        <!--<button id="saveFileButton" class="myButton">Save to Files</button>-->
     </div>
 
     <div class="horizContainer">
@@ -96,6 +95,18 @@
         </div>
     </div>
 
+    <div>
+    <label for="speakSpeed">Speaking rate</label>
+    <input id="speakSpeed" type="range" min="0.1" max="8" value="0.8" step="0.3">
+        <span id="currentSpeakSpeed"></span>
+    </div>
+
+    <div>
+    <label for="textSize">Text size</label>
+    <input id="textSize" type="range" min="2" max="80" value="17" step="1">
+        <span id="currentTextSize"></span>
+    </div>
+
     <div class="horizContainer">
         <div id=leftColumnHeader class="myColumnHeader">
             <h3 id=leftTitle></h3>
@@ -106,7 +117,7 @@
         </div>
     </div>
 
-    <div class="horizContainer">
+    <div class="horizContainer" id="textColumns">
         <!--<div id=leftColumn class="myColumn syncscroll frame" name="sync1">-->
         <div id=leftColumn class="myColumn frame">
             <p id=leftPara class="clickable myPara">
@@ -126,9 +137,9 @@
         </div>
     </div>
 
-    <div id=vocab class="container space-around frame">
-        <span id="glosbeBuf" style="height: 10vh"></span>
-        <span style="position: absolute; bottom: 0; font-size: x-small">
+    <div id=vocab class="container frame">
+        <span id="glosbeBuf" style="height: 10vh; margin: 10px"></span>
+        <span style="position: absolute; bottom: 0; right: 5px; font-size: x-small">
         Translations provided by <a href="https://glosbe.com/" ; target="_blank">Glosbe</a>.</span></div>
 </div>
 

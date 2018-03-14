@@ -4,6 +4,9 @@
 // todo: web storage for things like show help first time.
 
 
+const defLineHeight= "1.4";    // Baseline
+document.body.style.lineHeight = defLineHeight;
+
 function isMobileDevice() {
     return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
 };
@@ -41,7 +44,7 @@ let linkArray;
 // ..programmatic way of disabling that "feature," user must disable it from
 // ..Chrome's "privacy" settings menu.  NOTE: configuring the page as a "home page"
 // ..disables popup search.
-window.addEventListener("contextmenu", function(e) {
+window.addEventListener("contextmenu", function (e) {
     e.preventDefault();
     return true;    // true = propagation continues
 });
@@ -51,7 +54,24 @@ window.addEventListener("contextmenu", function(e) {
 // document.documentElement.requestFullScreen();
 // document.requestFullScreen();
 
-// todo: TTS speed control(s)
+let currentSpeakSpd = "0.8";
+
+document.getElementById('speakSpeed').addEventListener('input',
+    function () {
+        let speakSlider = document.getElementById('speakSpeed');
+        currentSpeakSpd = speakSlider.value;
+        document.getElementById('currentSpeakSpeed').textContent = currentSpeakSpd;
+    });
+
+let currentTextSize = "17";
+
+document.getElementById('textSize').addEventListener('input',
+    function () {
+        currentTextSize = document.getElementById('textSize').value;
+        document.getElementById('currentTextSize').innerHTML = currentTextSize + "px";
+        document.getElementById('textColumns').style.fontSize = currentTextSize + "px";
+    }
+);
 
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications
 
@@ -127,7 +147,7 @@ document.getElementById('leftFileSelect').addEventListener('change', function ()
     document.getElementById('rightFilePopup').style.display = 'inline-block';
 
     if (leftlibFilePath.length)
-        // libFileOK = false;
+    // libFileOK = false;
         getFileFromLibrary('leftPara', leftlibFilePath, 'leftTitle');
 
     /*        getFileFromLibrary('leftPara', 'http://bridge.code-read.com/library/' + leftlibFilePath);
@@ -140,8 +160,8 @@ document.getElementById('rightFileSelect').addEventListener('change', function (
     let rightlibFilePath = rightSel.options[rightSel.selectedIndex].text;  // Right-hand file
     if (rightlibFilePath.length)
         getFileFromLibrary('rightPara', rightlibFilePath, 'rightTitle');
-/*        if (getFileFromLibrary('rightPara', 'http://bridge.code-read.com/library/' + rightlibFilePath))
-            document.getElementById('rightTitle').textContent = rightlibFilePath;*/
+    /*        if (getFileFromLibrary('rightPara', 'http://bridge.code-read.com/library/' + rightlibFilePath))
+                document.getElementById('rightTitle').textContent = rightlibFilePath;*/
 
     document.getElementById('leftFilePopup').style.display = 'none';
     document.getElementById('rightFilePopup').style.display = 'none';
@@ -220,7 +240,8 @@ function updateLineSpacing() {
     // var style = getComputedStyle(document.body);
     // console.log("line height: " + style.getPropertyValue('line-height'));
     // const defLineHeight = style.getPropertyValue('line-height');
-    const defLineHeight = getComputedStyle(document.body).getPropertyValue('line-height');
+
+    // const defLineHeight = getComputedStyle(document.body).getPropertyValue('line-height');
     // todo: 1.4 hard coded to match main.css; globalize somehow.
     document.getElementById('leftPara').style.lineHeight = defLineHeight;
     document.getElementById('rightPara').style.lineHeight = defLineHeight;
@@ -332,15 +353,15 @@ async function lookupWord(ev) {
 
     console.log('============ lookupWord: Event is: ' + ev.type);
 
-/*    if (ev.type === 'touchstart') {
-        // Temporarily squelch the pending mousedown:
-        ev.target.addEventListener('mousedown', keepItLocal, false);
-    }*/
+    /*    if (ev.type === 'touchstart') {
+            // Temporarily squelch the pending mousedown:
+            ev.target.addEventListener('mousedown', keepItLocal, false);
+        }*/
 
     let textSel = window.getSelection();
     if (!textSel.isCollapsed) {
         speakRange = textSel.getRangeAt(0);
-        console.log('lookupWord: collapsing selection: ' + speakRange.toString().trim() );
+        console.log('lookupWord: collapsing selection: ' + speakRange.toString().trim());
         speakRange.collapse(true);  // So we can get new selection (below)
     }
 
@@ -351,11 +372,11 @@ async function lookupWord(ev) {
     await sleep(700); // Android Chrome range change lag
 
     if (textWasRead)    // A short click occurred, so read text instead
-        // ev.target.addEventListener('mousedown', lookupWord, false);
+    // ev.target.addEventListener('mousedown', lookupWord, false);
         return true;    // true = propagation continues
 
     if (ev.type === 'mousedown' && mouseWasMoved) {    // User is dragging over text, rather than long-clicking
-    // if (mouseWasMoved) {    // User is dragging over text, rather than long-clicking
+        // if (mouseWasMoved) {    // User is dragging over text, rather than long-clicking
         // lookingUpWord = true;   // Tell other handlers we will handle this action exclusively
         console.log('lookupWord(): mouse was moved, abort.');
         mouseWasMoved = false;  // For next time
@@ -370,8 +391,8 @@ async function lookupWord(ev) {
     speakRange = textSel.getRangeAt(0);
     let node = textSel.anchorNode;
 
-/*    speakRange = savedRange;
-    let node = savedNode;*/
+    /*    speakRange = savedRange;
+        let node = savedNode;*/
 
     // Find and include start of word containing clicked region:
     while (speakRange.startOffset !== 0) {                         // start of node
@@ -464,7 +485,7 @@ function readTextAloud() {
         }
     });
 
-    speakMsg.rate = 0.8; // todo: make this a user setting
+    speakMsg.rate = currentSpeakSpd;    // todo: different languages respond to same rate differently (e.g., en vs fr)
     speechSynthesis.speak(speakMsg);
 
     // workaround for Chrome 15 second limit on online TTS,
@@ -491,13 +512,13 @@ function readTextAloud() {
 let clickables = document.getElementsByClassName('clickable');
 
 for (let elNum = 0; elNum < clickables.length; elNum++) {
-    clickables[elNum].addEventListener('mousedown', lookupWord, {passive:true});
-    clickables[elNum].addEventListener('touchstart', lookupWord, {passive:true}); // required for tablet
+    clickables[elNum].addEventListener('mousedown', lookupWord, {passive: true});
+    clickables[elNum].addEventListener('touchstart', lookupWord, {passive: true}); // required for tablet
 
-    clickables[elNum].addEventListener('mousemove', mouseMoved, {passive:true});
+    clickables[elNum].addEventListener('mousemove', mouseMoved, {passive: true});
     // clickables[elNum].addEventListener('touchmove', mouseMoved, {passive:true}); // tablet
 
-    clickables[elNum].addEventListener('click', readTextAloud, {passive:true});
+    clickables[elNum].addEventListener('click', readTextAloud, {passive: true});
 
     // clickables[elNum].addEventListener('mouseup', keepItLocal, false); // else touchscreen browser removes highlighting
     // clickables[elNum].addEventListener('mouseup', setLookupFlag, false);
@@ -625,7 +646,7 @@ let isSyncingRightScroll = false;
 let leftDiv = document.getElementById('leftColumn');
 let rightDiv = document.getElementById('rightColumn');
 
-leftDiv.onscroll = function() {
+leftDiv.onscroll = function () {
     if (!isSyncingLeftScroll) {
         isSyncingRightScroll = true;
         rightDiv.scrollTop = this.scrollTop;
@@ -640,25 +661,4 @@ rightDiv.onscroll = function () {
     }
     isSyncingRightScroll = false;
 };
-
-
-// document.getElementsByTagName("body")[0].requestFullscreen();
-// "Failed to execute 'requestFullscreen' on 'Element': API can only be initiated by a user gesture.":
-// document.getElementsByTagName("body")[0].webkitRequestFullScreen();
-
-// window.screen.lockOrientation('landscape'); "not a function"
-
-// Logs error: "Uncaught (in promise) DOMException: The page needs to be fullscreen in order to call screen.orientation.lock()."
-/*screen.orientation.lock('landscape');
-
-// From: https://stackoverflow.com/a/31967828/5025060 (doesn't work):
-if (document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen) {
-    console.log('fullscreen detected.');
-    setTimeout(function(){
-        console.log('attempting landscape');
-        window.screen.orientation.lock("landscape");
-    }    , 200);
-}*/
-
-// window.scrollTo(0,1);   // Tablet full screen mode
 

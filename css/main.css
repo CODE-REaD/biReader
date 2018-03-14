@@ -13,7 +13,7 @@
 html {
     /*color: #222;*/
     font-size: 1em;
-    line-height: 1.4;
+    /*line-height: 1.4;*/
 }
 
 /*
@@ -281,6 +281,7 @@ a:hover {
     position: relative;
 }
 
+/*
 
 .clear {
     clear: both;
@@ -346,6 +347,7 @@ a:hover {
     height: 400px;
 }
 
+*/
 
 .dragscroll {
     cursor : -webkit-grab;
@@ -362,7 +364,7 @@ a:hover {
     cursor : grabbing;
 }
 
-/*** from synscroll.cs ***/
+/*** from synscroll.css ***/
 body {
     /*color : #334455;*/
     background-color: #aabbcc;
@@ -417,7 +419,8 @@ body {
     border-radius: 1px;
     margin: 4px;
     box-shadow: 5px 5px 10px gray;
-    text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+    /*text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);*/ /* causes jank on large tablet */
+    font-weight: bold;
     text-rendering: optimizeLegibility;
     -moz-font-feature-settings: "liga" 1, "kern" 1;
     -ms-font-feature-settings: "liga" 1, "kern" 1;
@@ -430,7 +433,7 @@ body {
     word-wrap: break-word;
     white-space: pre-wrap;
     /*padding: 9px; NO GOOD: this gives overlap in highlight bg*/
-    margin: 9px;
+    margin: 10px;
     /*color: transparent;*/
     /*text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);*/
     height: 80vh;
