@@ -6,6 +6,7 @@
     <title>Language Bridge PoC</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <!-- Chrome: allow "home screen" on tablet: -->
     <meta name="mobile-web-app-capable" content="yes">
 
@@ -28,8 +29,43 @@
     your browser</a> to improve your experience and security.</p>
 <![endif]-->
 
+<!--Popup control panel:-->
+<dialog id=controlsDialog class="modal">
+    <div>
+        <label for="speakSpeed">Speaking rate:</label>
+        <input id="speakSpeed" class=lbSlider type="range" min="0.1" max="8" value="0.8" step="0.3">
+        <span id="currentSpeakSpeed"></span>
+    </div>
+<br>
+    <div>
+        <label for="textSize">Text size:</label>
+        <input id="textSize" class=lbSlider type="range" min="2" max="80" value="17" step="1">
+        <span id="currentTextSize"></span>
+    </div>
+    <br>
+    <button onclick="launchFullscreen(document.documentElement);">
+        Go fullscreen landscape
+    </button>
+    <br><br>
+    <button id="closeControlsButton">Done</button>
+</dialog>
+
+<dialog id="fullScreenDialog" class="modal">
+    For best performance with mobile devices, try full screen landscape mode:
+    <br>
+    <br>
+    <button onclick="launchFullscreen(document.documentElement);">
+        Go fullscreen landscape
+    </button>
+    <br>
+    <br>
+    <button id=noFullScreenButton>No thanks</button>
+</dialog>
+
+
 <div id=Help class="frame">
-    <h2>Language Bridge Proof of Concept</h2>
+    <h2>Language Bridge Proof of Concept v.<span id="bridgeVersion"></span></h2>
+
     <h3 style="color: red;">Works best with Google Chrome's "Add to Home screen" option.
     </h3>
 
@@ -67,11 +103,10 @@
 
 <div class="vertContainer">
 
-    <button onclick="launchFullscreen(document.documentElement);" >Launch Fullscreen</button>
-
     <!--todo: use "ribbon" rather than buttons here (background-color=black?):-->
     <div id="topRowButtons" class="horizContainer">
         <button id="helpButton" class="myButton">Help</button>
+        <button id="controlsButton" class="myButton">Controls</button>
         <button id="libraryLoadButton" class="myButton">Load Files from Online Library</button>
 
         <label for="leftFileChoice" class="myButton">Load left file from disc</label>
@@ -95,17 +130,7 @@
         </div>
     </div>
 
-    <div>
-    <label for="speakSpeed">Speaking rate</label>
-    <input id="speakSpeed" type="range" min="0.1" max="8" value="0.8" step="0.3">
-        <span id="currentSpeakSpeed"></span>
-    </div>
 
-    <div>
-    <label for="textSize">Text size</label>
-    <input id="textSize" type="range" min="2" max="80" value="17" step="1">
-        <span id="currentTextSize"></span>
-    </div>
 
     <div class="horizContainer">
         <div id=leftColumnHeader class="myColumnHeader">

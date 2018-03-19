@@ -2,15 +2,39 @@
 
 // todo: store filenames as English and translate to native language for display.
 // todo: web storage for things like show help first time.
+// todo: embedded version number, so we can tell what release we are running (link to VCS?)
+// todo: pinch zoom to resize text
 
+const defLineHeight = "1.4";    // Default, baseline line height
 
-const defLineHeight= "1.4";    // Baseline
+const release = "0.2";          // "Semantic version" for end users
+document.getElementById('bridgeVersion').innerHTML = release;
+
 document.body.style.lineHeight = defLineHeight;
+
+let controlsDialog = document.querySelector('#controlsDialog');
+
+document.getElementById('controlsButton').addEventListener('click',
+    function () {
+        controlsDialog.showModal();
+    }
+);
+
+document.querySelector('#closeControlsButton').onclick = function() {
+    controlsDialog.close();
+};
+
+if (isMobileDevice())
+    document.querySelector('#fullScreenDialog').showModal();
+    // document.getElementById('fullScreen').style.display = 'inline-block';
 
 function isMobileDevice() {
     return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
-};
+}
 
+document.querySelector('#noFullScreenButton').onclick = function() {
+    document.querySelector('#fullScreenDialog').close();
+};
 
 function launchFullscreen(element) {
     if (isMobileDevice()) {
@@ -27,6 +51,8 @@ function launchFullscreen(element) {
         if (document.fullscreenEnabled || document.mozFullScreenEnabled ||
             document.webkitFullscreenEnabled || document.msFullscreenEnabled) {
             console.log('fullscreen detected.');
+            document.querySelector('#fullScreenDialog').close();
+            // document.getElementById('fullScreen').style.display = 'none';
             setTimeout(function () {
                 console.log('attempting landscape 2');
                 // todo: when we exit, device is still in landscape; attempt to restore to portrait if that is
@@ -55,21 +81,43 @@ window.addEventListener("contextmenu", function (e) {
 // document.requestFullScreen();
 
 let currentSpeakSpd = "0.8";
+let settingSpeed = false;
+
+document.getElementById('currentSpeakSpeed').textContent = currentSpeakSpd;
 
 document.getElementById('speakSpeed').addEventListener('input',
     function () {
+        if (speechSynthesis.pending || speechSynthesis.speaking)
+            speechSynthesis.cancel();
         let speakSlider = document.getElementById('speakSpeed');
         currentSpeakSpd = speakSlider.value;
         document.getElementById('currentSpeakSpeed').textContent = currentSpeakSpd;
+        // return true; // propagation continues
     });
 
-let currentTextSize = "17";
+// document.getElementById('speakSpeed').addEventListener('keyup',
+document.getElementById('speakSpeed').addEventListener('change',
+    function () {
+        console.log('got keyup.');
+        if (speechSynthesis.pending || speechSynthesis.speaking)
+            speechSynthesis.cancel();
+        // todo: internationalize:
+        let sampleSpeakMsg = new SpeechSynthesisUtterance("I am now speaking at rate " + currentSpeakSpd);
+        sampleSpeakMsg.rate = currentSpeakSpd;
+        speechSynthesis.speak(sampleSpeakMsg);
+        // return false;
+    });
+
+// let currentTextSize = "17";
+
+document.getElementById('currentTextSize').innerHTML =
+    document.getElementById('textSize').value + "px";
 
 document.getElementById('textSize').addEventListener('input',
     function () {
-        currentTextSize = document.getElementById('textSize').value;
-        document.getElementById('currentTextSize').innerHTML = currentTextSize + "px";
-        document.getElementById('textColumns').style.fontSize = currentTextSize + "px";
+        const textSize = document.getElementById('textSize').value;
+        document.getElementById('currentTextSize').innerHTML = textSize + "px";
+        document.getElementById('textColumns').style.fontSize = textSize + "px";
     }
 );
 
@@ -82,12 +130,12 @@ document.getElementById('libraryLoadButton').addEventListener('click',
     });
 
 document.getElementById('helpButton').addEventListener('click',
-    function (event) {
+    function () {
         document.getElementById('Help').style.display = 'inline-block';
         // Click anywhere except Help button turns it off:
         document.addEventListener('click',
             function docClick(f) {
-                if (f.target.id != 'helpButton') {
+                if (f.target.id !== 'helpButton') {
                     document.getElementById('Help').style.display = 'none';
                     document.removeEventListener('click', docClick);
                 }
@@ -107,8 +155,6 @@ let libFileOK = false; // Global flag for library file load result
 document.getElementById('leftFileSelect').addEventListener('change', function () {
     leftSel = document.getElementById('leftFileSelect');
     let leftlibFilePath = leftSel.options[leftSel.selectedIndex].text;  // Left-hand file
-    let rightlibFilePath = '';
-
     let libFileName = leftlibFilePath.replace(/\.[a-z][a-z]$/, "");
 
     // Select right-hand file:
@@ -123,8 +169,8 @@ document.getElementById('leftFileSelect').addEventListener('change', function ()
     // Try to deal w/mobile where size attribute doesn't cause dropdown.
     // Adapted from https://stackoverflow.com/a/18180032/5025060:
     let RFopt = document.createElement("option");
-    RFopt.disabled = 1;
-    RFopt.selected = 1;
+    RFopt.disabled = true;
+    RFopt.selected = true;
     RFopt.value = "";  // prevent rumored autofill of "choose one" by some browsers
     RFopt.style = "font-weight: bold; font-size: 125%; color: red; background-color: yellow";
     RFopt.text = "Select right-hand file:";
@@ -143,16 +189,11 @@ document.getElementById('leftFileSelect').addEventListener('change', function ()
         }
     });
 
-    // Now that user has selected lefthand file, show righthand file menu:
+    // Now that user has selected lefthand file, expose righthand file menu:
     document.getElementById('rightFilePopup').style.display = 'inline-block';
 
     if (leftlibFilePath.length)
-    // libFileOK = false;
         getFileFromLibrary('leftPara', leftlibFilePath, 'leftTitle');
-
-    /*        getFileFromLibrary('leftPara', 'http://bridge.code-read.com/library/' + leftlibFilePath);
-            if (libFileOK)
-                document.getElementById('leftTitle').textContent = leftlibFilePath;*/
 });
 
 document.getElementById('rightFileSelect').addEventListener('change', function () {
@@ -182,7 +223,7 @@ function getFileFromLibrary(contentElement, fileName, titleElement) {
     };
     request.onload = function () {
         libFileOK = true;
-    }
+    };
     return request.send(null);
 }
 
@@ -190,7 +231,7 @@ function getFileFromLibrary(contentElement, fileName, titleElement) {
 // the file to leftPara:
 document.getElementById('leftFileChoice').addEventListener('change',
     function () {
-        var fr = new FileReader();
+        const fr = new FileReader();
         fr.onload = function () {
             document.getElementById('leftPara').textContent = this.result;
         };
@@ -201,7 +242,7 @@ document.getElementById('leftFileChoice').addEventListener('change',
 
 document.getElementById('rightFileChoice').addEventListener('change',
     function () {
-        var fr = new FileReader();
+        const fr = new FileReader();
         fr.onload = function () {
             document.getElementById('rightPara').textContent = this.result;
         };
@@ -211,46 +252,37 @@ document.getElementById('rightFileChoice').addEventListener('change',
     }
 );
 
-var leftFileColumn = document.getElementById("leftColumn"); // use column rather than para as para isn't inflated before a file is loaded
+const leftFileColumn = document.getElementById("leftColumn"); // use column rather than para as para isn't inflated before a file is loaded
 leftFileColumn.addEventListener("dragenter", keepItLocal, false);
 leftFileColumn.addEventListener("dragover", keepItLocal, false);
 leftFileColumn.addEventListener("drop", fileDrop, false);
 leftFileColumn.addEventListener("paste", pasteToCol, false);
 
-var rightFileColumn = document.getElementById("rightColumn");
+const rightFileColumn = document.getElementById("rightColumn");
 rightFileColumn.addEventListener("dragenter", keepItLocal, false);
 rightFileColumn.addEventListener("dragover", keepItLocal, false);
 rightFileColumn.addEventListener("drop", fileDrop, false);
 rightFileColumn.addEventListener("paste", pasteToCol, false);
 
-// document.getElementById('leftPara').addEventListener('DOMSubtreeModified', updateLineSpacing);
-// document.getElementById('rightPara').addEventListener('DOMSubtreeModified', updateLineSpacing);
-
 let leftParaObserver = new MutationObserver(updateLineSpacing);
-// leftParaObserver.observe(document.getElementById('leftPara'), {characterData: true});
 leftParaObserver.observe(document.getElementById('leftPara'), {childList: true});
 
 let rightParaObserver = new MutationObserver(updateLineSpacing);
 rightParaObserver.observe(document.getElementById('rightPara'), {childList: true});
 
+// Configure line spacing so that left and right panels display the same percentage of
+// their text (aids in scrolling and synchronization of content:
+//
 function updateLineSpacing() {
-    // prevSRStart = prevSREnd = 0;
-
     // First reset both columns to default line height so we can make our computation:
-    // var style = getComputedStyle(document.body);
-    // console.log("line height: " + style.getPropertyValue('line-height'));
-    // const defLineHeight = style.getPropertyValue('line-height');
-
-    // const defLineHeight = getComputedStyle(document.body).getPropertyValue('line-height');
-    // todo: 1.4 hard coded to match main.css; globalize somehow.
     document.getElementById('leftPara').style.lineHeight = defLineHeight;
     document.getElementById('rightPara').style.lineHeight = defLineHeight;
 
     let leftHeight = document.getElementById('leftPara').scrollHeight;
     let rightHeight = document.getElementById('rightPara').scrollHeight;
     let leftToRightRatio = leftHeight / rightHeight;
-    console.log('left height: ' + leftHeight + ' right height: ' + rightHeight
-        + ', Ratio = ' + leftToRightRatio);
+    // console.log('left height: ' + leftHeight + ' right height: ' + rightHeight
+    //     + ', Ratio = ' + leftToRightRatio);
 
     //todo: check for "edge" cases here (e.g., less that a screenful of text):
     if (leftToRightRatio < 1)
@@ -302,11 +334,11 @@ function pasteToCol(ev) {
             console.log('pasteToCol: error: source ID is: ' + this.id.toString());
             return;
     }
-    updateLineSpacing();
+    // updateLineSpacing();
 }
 
 function handleFiles(files, filePara, fileTitle) {
-    var fr = new FileReader();
+    const fr = new FileReader();
     fr.onload = function () {
         document.getElementById(filePara).textContent = this.result;
         updateLineSpacing();
@@ -323,7 +355,6 @@ let lastY = window.clientY;
 
 // Set boolean if mouse moved a significant amount; otherwise simply absorb the event:
 function mouseMoved(ev) {
-    // if ((Math.abs(ev.clientX - lastX) > 50) || (Math.abs(ev.clientY - lastY) > 50))
     // todo: calibrate this to screen dpi?
     if ((Math.abs(ev.clientX - lastX) > 2) || (Math.abs(ev.clientY - lastY) > 2))
         mouseWasMoved = true;
@@ -336,10 +367,15 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function touchMoved() {
+    console.log('touchmoved.');
+    touchMove = true;
+}
+
 let lookingUpWord = false;
 let wordLookedUp = false;
 let textWasRead = false;
-let xlation = '';
+let touchMove = false;
 
 async function lookupWord(ev) {
     // todo: some languages such as Japanese and Chinese do not use word separation characters
@@ -349,14 +385,8 @@ async function lookupWord(ev) {
     mouseWasMoved = false;
     textWasRead = false;    // Set here and recheck after sleep
     wordLookedUp = false;
-    // alert(ev.type);
 
     console.log('============ lookupWord: Event is: ' + ev.type);
-
-    /*    if (ev.type === 'touchstart') {
-            // Temporarily squelch the pending mousedown:
-            ev.target.addEventListener('mousedown', keepItLocal, false);
-        }*/
 
     let textSel = window.getSelection();
     if (!textSel.isCollapsed) {
@@ -368,31 +398,29 @@ async function lookupWord(ev) {
     if (speechSynthesis.pending || speechSynthesis.speaking)
         speechSynthesis.cancel();
 
-    // await sleep(400);
     await sleep(700); // Android Chrome range change lag
 
     if (textWasRead)    // A short click occurred, so read text instead
-    // ev.target.addEventListener('mousedown', lookupWord, false);
         return true;    // true = propagation continues
 
     if (ev.type === 'mousedown' && mouseWasMoved) {    // User is dragging over text, rather than long-clicking
-        // if (mouseWasMoved) {    // User is dragging over text, rather than long-clicking
-        // lookingUpWord = true;   // Tell other handlers we will handle this action exclusively
         console.log('lookupWord(): mouse was moved, abort.');
         mouseWasMoved = false;  // For next time
-        // ev.target.addEventListener('mousedown', lookupWord, false);
         return true; // true = propagation continues
+    }
+
+    // Prevent spurious calls on touch screens
+    if (touchMove) {
+        // speakRange.collapse(true);
+        touchMove = false;
+        return true;
     }
 
     wordLookedUp = true;
 
-    // Fails with Android: "Failed to execute 'getRangeAt' on 'Selection': 0 is not a valid index."
     textSel = window.getSelection();
     speakRange = textSel.getRangeAt(0);
     let node = textSel.anchorNode;
-
-    /*    speakRange = savedRange;
-        let node = savedNode;*/
 
     // Find and include start of word containing clicked region:
     while (speakRange.startOffset !== 0) {                         // start of node
@@ -408,8 +436,6 @@ async function lookupWord(ev) {
     while (speakRange.endOffset < node.length) {                // end of node
         speakRange.setEnd(node, speakRange.endOffset + 1);      // look ahead 1 char
         searchStr = speakRange.toString().slice(-2);            // Last 2 chars
-        // if ((searchStr.search(/\W/) != -1) && (searchStr.search(/\-/) === -1)) { // end of word
-        // if (searchStr.search(/\p{White_Space}/u) != -1) {    // end of word (international)
         if (searchStr.search(/[\r\n\s.,:;。、"'\]\)}]/) !== -1) {    // end of word (international)
             speakRange.setEnd(node, speakRange.endOffset - 1); // back 1 char
             break;
@@ -421,17 +447,11 @@ async function lookupWord(ev) {
     console.log('lookupWord: ' + speakStr);
 
     getTranslation("from=fra&dest=eng&phrase=", speakStr);
-    // alert(speakStr + " translated: " + xlation);
-    // console.log(speakStr + " translated: " + xlation);
-
-    // https://glosbe.com/gapi/translate?from=pol&dest=eng&format=json&phrase=witaj&pretty=true
 
     let speakMsg = new SpeechSynthesisUtterance(speakStr);
+    speakMsg.rate = currentSpeakSpd
     speechSynthesis.speak(speakMsg);
-
-    // ev.target.addEventListener('mousedown', lookupWord, false);
-    // lookingUpWord = false;
-};
+}
 
 // todo: firefox TTS, see https://hacks.mozilla.org/2016/01/firefox-and-the-web-speech-api/
 //
@@ -441,8 +461,6 @@ function readTextAloud() {
         console.log('RTA skip');
         return true;
     }
-    console.log('RTA run');
-    // readingTextAloud = true;
     textWasRead = true;
 
     // Derived from https://stackoverflow.com/a/9304990/5025060:
@@ -497,17 +515,7 @@ function readTextAloud() {
             else speechSynthesis.resume();
         }, 14000);
     }
-    // readingTextAloud = false;
-};
-
-
-/*function setLookupFlag(ev) {
-    // If we just looked up a word, ignore next click event:
-    if (wordLookedUp) {
-        wordLookedUp = false;
-        ev.stopPropagation();
-    }
-}*/
+}
 
 let clickables = document.getElementsByClassName('clickable');
 
@@ -522,31 +530,14 @@ for (let elNum = 0; elNum < clickables.length; elNum++) {
 
     // clickables[elNum].addEventListener('mouseup', keepItLocal, false); // else touchscreen browser removes highlighting
     // clickables[elNum].addEventListener('mouseup', setLookupFlag, false);
+
+    clickables[elNum].addEventListener('touchmove', touchMoved, {passive: true}); // tablet
 }
-
-/*// Adapted from https://stackoverflow.com/a/23699875/5025060:..
-let savedRange = null;
-let savedNode = null;
-
-document.addEventListener("selectionchange", HandleSelectionChange, false);
-
-function HandleSelectionChange() {
-    let sel = window.getSelection && window.getSelection();
-    if (sel && sel.rangeCount > 0) {
-        savedRange = sel.getRangeAt(0);
-        savedNode = sel.anchorNode;
-        console.log("Range changed to: " + savedRange.toString().trim());
-    }
-}
-// ..*/
-
-// todo: when should I remove these listeners, if at all?
-
 
 // Preload library file list to <select>:
 //
-var request = new XMLHttpRequest(); // Create new request
-var el = document.createElement('html');
+let request = new XMLHttpRequest(); // Create new request
+const el = document.createElement('html');
 
 request.open("GET", "http://bridge.code-read.com/library/");
 request.onreadystatechange = function () { // Define event listener
@@ -570,12 +561,11 @@ request.onreadystatechange = function () { // Define event listener
 
         // Try to deal w/mobile where size attribute doesn't cause dropdown.
         // Adapted from https://stackoverflow.com/a/18180032/5025060:
-
         let option = document.createElement("option");
-        option.disabled = 1;
-        option.selected = 1;
+        option.disabled = true;
+        option.selected = true;
         option.value = "";  // prevent rumored autofill of "choose one" by some browsers
-        option.style = "font-weight: bold; font-size: 125%; color: red; background-color: yellow";
+        option.style = 'font-weight: bold; font-size: 125%; color: red; background-color: yellow';
         option.text = "Select left-hand file:";
         selectList.appendChild(option);
 
@@ -604,7 +594,7 @@ speechSynthesis.onvoiceschanged = function () {
     vListEl.insertAdjacentHTML("beforeend", "<ul>");
     voiceList.forEach(function (listMem) {
         vListEl.insertAdjacentHTML("beforeend", "<li>" + listMem);
-    })
+    });
     vListEl.insertAdjacentHTML("beforeend", "</ul>");
 };
 
@@ -622,24 +612,17 @@ function getTranslation(prefix, toXlate) {
                     $('#glosbeBuf').html(toXlate + ': ' + JSON.stringify(json.tuc[0].meanings[0].text));
             else
                 $('#glosbeBuf').html(toXlate + ': Not found.');
-            // xlated = JSON.stringify(json);
-            // xlation = JSON.stringify(json);
         } else {
-            // $.getJSON("http://glosbe.com/gapi/translate?from=eng&dest=rus&format=json&phrase=hello&pretty=true" + "?callback=?", function (json) {
             $.getJSON("https://glosbe.com/gapi/translate?format=json&" + toXlate + "&callback=?", function (json) {
                 console.log(json);
-                // $('#glosbeBuf').html('<h2 class="loading">Nothing found.</h2><img id="thePoster" src=' + json.posters[0].image.url + ' />');
                 $('#glosbeBuf').html('<h3>' + JSON.stringify(json) + '</h3>');
             });
         }
-
-        // https://glosbe.com/gapi/translate?from=fra&dest=eng&format=json&phrase=avec&pretty=true
-
     });
     return false;
 }
 
-// Adapted from https://stackoverflow.com/a/41998497/5025060:
+// Column synchronization code adapted from https://stackoverflow.com/a/41998497/5025060:
 //
 let isSyncingLeftScroll = false;
 let isSyncingRightScroll = false;
@@ -662,3 +645,4 @@ rightDiv.onscroll = function () {
     isSyncingRightScroll = false;
 };
 
+// End of main.js

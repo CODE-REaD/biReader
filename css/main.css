@@ -98,26 +98,6 @@ textarea {
 }
 
 /* ==========================================================================
-   Author's custom styles
-   ========================================================================== */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* ==========================================================================
    Helper classes
    ========================================================================== */
 
@@ -281,81 +261,12 @@ a:hover {
     position: relative;
 }
 
-/*
-
-.clear {
-    clear: both;
-}
-
-.mid {
-    width: 910px;
-    height: 300px;
-    margin-top: 20px;
-    margin-right: auto;
-    margin-left: auto;
-}
-
-.goethe {
-    width: 270px;
-    white-space: nowrap;
-    height: 300px;
-    float : left;
-    font-size: 10px;
-    padding: 5px;
-    overflow-x: hidden;
-    overflow-y: auto;
-}
-
-.hsize {
-    width: 30px;
-    height: 100px;
-    float: left;
-}
-
-
-.earth {
-    width: 440px;
-    height: 300px;
-    overflow: auto;
-}
-
-
-.left {
-    float : left;
-}
-
-
-
-.right {
-    float : right;
-}
-
-
-.mid.time.romanian {
-    height: auto;
-}
-
-.mid.time.floss {
-    height: auto;
-}
-
-.mid.time.floss img {
-    height: 220px;
-}
-
-.mid.time.romanian img {
-    height: 400px;
-}
-
-*/
-
 .dragscroll {
     cursor : -webkit-grab;
     cursor : -moz-grab;
     cursor : -o-grab;
     cursor : grab;
 }
-
 
 .dragscroll:active {
     cursor : -webkit-grabbing;
@@ -364,7 +275,7 @@ a:hover {
     cursor : grabbing;
 }
 
-/*** from synscroll.css ***/
+/*** from syncscroll.css ***/
 body {
     /*color : #334455;*/
     background-color: #aabbcc;
@@ -584,4 +495,69 @@ body {
     justify-content: space-around;
     margin-left: 4%;
     width: 94%
+}
+
+.modal {
+    /*font-size : 17px;*/
+    /* arbitrary styling */
+    /*background-color: white;*/
+
+    /*line-height: 3;*/
+    width: 50vw; /* avoid jank due to default --fit-content */
+
+    border: 1px;
+    border-radius: 5px;
+    box-shadow: 5px 5px 10px gray;
+
+    /*box-shadow: 2px 2px 2px rgba(0,0,0,0.2);*/
+    /*height:200px;*/
+    /*width:300px;*/
+
+    /* change position to fixed if you want to prevent the dialog from scrolling away, and center it */
+/*    position:fixed;
+    top:50%;
+    left:50%;
+    margin-left: -150px;
+    margin-top:-100px;*/
+}
+
+.modal::backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.3);
+}
+
+.lbSlider {
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    /*width: 100%; !* Full-width *!*/
+    height: 25px; /* Specified height */
+    /*background: #d3d3d3; !* Grey background *!*/
+    /*outline: none; !* Remove outline *!*/
+    /*opacity: 0.7; !* Set transparency (for mouse-over effects on hover) *!*/
+    /*-webkit-transition: .2s; !* 0.2 seconds transition on hover *!*/
+    /*transition: opacity .2s;*/
+}
+
+/*.slider:hover {
+    opacity: 1;
+}*/
+
+.lbSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+.lbSlider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: #4CAF50;
+    cursor: pointer;
 }
