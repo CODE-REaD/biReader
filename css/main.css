@@ -409,6 +409,10 @@ body {
     background: yellow;
 }
 
+.rightButton {
+    float: right;
+}
+
 .bridgeButton, .myButton {
     cursor: pointer;
 }
@@ -507,7 +511,7 @@ body {
 
     border: 1px;
     border-radius: 5px;
-    box-shadow: 5px 5px 10px gray;
+    box-shadow: 9px 9px 20px gray;
 
     /*box-shadow: 2px 2px 2px rgba(0,0,0,0.2);*/
     /*height:200px;*/
@@ -532,9 +536,15 @@ body {
 
 .lbSlider {
     -webkit-appearance: none;  /* Override default CSS styles */
+    /*width: 70%;*/
+    width: 50%;
     appearance: none;
+    margin-top: 8px;
     /*width: 100%; !* Full-width *!*/
-    height: 25px; /* Specified height */
+    height: 8px; /* Specified height */
+    background: #d3d3d3;
+    float: right;
+
     /*background: #d3d3d3; !* Grey background *!*/
     /*outline: none; !* Remove outline *!*/
     /*opacity: 0.7; !* Set transparency (for mouse-over effects on hover) *!*/
@@ -553,6 +563,7 @@ body {
     height: 25px;
     background: #4CAF50;
     cursor: pointer;
+    border-radius: 50%;
 }
 
 .lbSlider::-moz-range-thumb {
@@ -560,4 +571,5 @@ body {
     height: 25px;
     background: #4CAF50;
     cursor: pointer;
+    border-radius: 50%;
 }

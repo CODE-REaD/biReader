@@ -20,19 +20,35 @@ document.getElementById('controlsButton').addEventListener('click',
     }
 );
 
-document.querySelector('#closeControlsButton').onclick = function() {
+document.querySelector('#closeControlsButton').onclick = function () {
     controlsDialog.close();
 };
 
-if (isMobileDevice())
+if (isMobileDevice() &&
+    localStorage["showFSprompt"] !== "doNotShow")
     document.querySelector('#fullScreenDialog').showModal();
-    // document.getElementById('fullScreen').style.display = 'inline-block';
+
+// document.getElementById('fullScreen').style.display = 'inline-block';
 
 function isMobileDevice() {
     return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
 }
 
-document.querySelector('#noFullScreenButton').onclick = function() {
+document.querySelector('#noFullScreenButton').onclick = function () {
+    document.querySelector('#fullScreenDialog').close();
+};
+
+// Checkbox was changed:
+document.querySelector('#FSPromptCB').onchange = function () {
+    if ($(this).checked)
+        localStorage["showFSprompt"] = "doNotShow";
+    else
+        localStorage["showFSprompt"] = "Show";
+};
+
+document.querySelector('#noFSpromptButton').onclick = function () {
+    // Disable full screen prompt:
+    localStorage["showFSprompt"] = "doNotShow";
     document.querySelector('#fullScreenDialog').close();
 };
 
@@ -96,6 +112,7 @@ document.getElementById('speakSpeed').addEventListener('input',
     });
 
 // document.getElementById('speakSpeed').addEventListener('keyup',
+// todo: change event doesn't trigger sample if user returned slider to original rate
 document.getElementById('speakSpeed').addEventListener('change',
     function () {
         console.log('got keyup.');
@@ -113,6 +130,8 @@ document.getElementById('speakSpeed').addEventListener('change',
 document.getElementById('currentTextSize').innerHTML =
     document.getElementById('textSize').value + "px";
 
+// document.getElementById('textSize').addEventListener('change',
+// todo: fix slow performance on some tablets:
 document.getElementById('textSize').addEventListener('input',
     function () {
         const textSize = document.getElementById('textSize').value;
