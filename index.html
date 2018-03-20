@@ -36,7 +36,7 @@
         <span id="currentSpeakSpeed"></span>
         <input id="speakSpeed" class=lbSlider type="range" min="0.1" max="8" value="0.8" step="0.3">
     </div>
-<br>
+    <br>
     <div>
         <label for="textSize">Text size: </label>
         <span id="currentTextSize"></span>
@@ -46,13 +46,16 @@
     <!--todo: bold font on/off toggle here-->
     <!--todo: change landscape button to a toggle here:-->
     <!--todo: only offer this button on mobile devices:-->
-    <button onclick="launchFullscreen(document.documentElement);">
-        Go fullscreen landscape
-    </button>
-    <br><br>
-    <label for="FSPromptCB"><input id="FSPromptCB" type="checkbox"> Full screen landscape prompt at startup</label>
-    <br><br>
-    <button id="closeControlsButton">Done</button>
+    <div id="fullScreenControls">
+        <button onclick="launchFullscreen(document.documentElement);">
+            Go fullscreen landscape
+        </button>
+        <br><br>
+        <label for="FSPromptCB"><input id="FSPromptCB" type="checkbox"> Full screen landscape prompt at startup</label>
+        <br><br>
+    </div>
+    <label for="boldCB"><input id="boldCB" type="checkbox"> Bold font</label>
+    <button id="closeControlsButton" class=rightButton>Done</button>
 </dialog>
 
 <dialog id="fullScreenDialog" class="modal">
@@ -75,28 +78,28 @@
     <h3 style="color: red;">Works best with Google Chrome's "Add to Home screen" option.
     </h3>
 
-        You may provide texts of the same article in different languages by pasting them
-        to the two panels, or drag-and-drop local files to the panels, or click on the "load"
-        buttons to select files from your local disc. Or click on "Load Files from Online Library" to
-        choose an existing pairing from the online library.
-        <!--
-                todo: update this description and show it when the user opens the file selection dialogue:
-                    The files should contain <strong>plain text,
-                    using UTF-8 encoding</strong>,
-                    of the same article or story
-                    but written in two different languages (e.g., left = English and right = German).
-                    Text should consist of paragraphs separated by double returns (control characters
-                    CR,LF,CR,LF, which is 0D, 0A, 0D, 0A when shown as hexadecimal codes).
-        -->
-        Language Bridge will attempt to present the two texts
-        as equal height, synchronously scrolling panels, and to pronounce sentences
-        in their native language
-        when you click on them or a series of sentences when you click-and-drag over them.
-        It will also attempt to show a definition of a word if you long-click (tablet: long-tap)
-        on it (PoC: French to English only).
-        <br><br>
-        PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
-        input as no input validity checks are yet in place.
+    You may provide texts of the same article in different languages by pasting them
+    to the two panels, or drag-and-drop local files to the panels, or click on the "load"
+    buttons to select files from your local disc. Or click on "Load Files from Online Library" to
+    choose an existing pairing from the online library.
+    <!--
+            todo: update this description and show it when the user opens the file selection dialogue:
+                The files should contain <strong>plain text,
+                using UTF-8 encoding</strong>,
+                of the same article or story
+                but written in two different languages (e.g., left = English and right = German).
+                Text should consist of paragraphs separated by double returns (control characters
+                CR,LF,CR,LF, which is 0D, 0A, 0D, 0A when shown as hexadecimal codes).
+    -->
+    Language Bridge will attempt to present the two texts
+    as equal height, synchronously scrolling panels, and to pronounce sentences
+    in their native language
+    when you click on them or a series of sentences when you click-and-drag over them.
+    It will also attempt to show a definition of a word if you long-click (tablet: long-tap)
+    on it (PoC: French to English only).
+    <br><br>
+    PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
+    input as no input validity checks are yet in place.
     <br><br>
     <button id="helpCloseButton" class="bridgeButton">Done</button>
     <span id="vList">
@@ -135,7 +138,6 @@
             </select>
         </div>
     </div>
-
 
 
     <div class="horizContainer">

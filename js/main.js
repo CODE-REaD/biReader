@@ -12,6 +12,16 @@ document.getElementById('bridgeVersion').innerHTML = release;
 
 document.body.style.lineHeight = defLineHeight;
 
+if (localStorage['fontWeight'] == null)
+    localStorage['fontWeight'] == 'bold'; // default to bold
+
+if (localStorage['fontWeight'] === 'bold')
+    document.getElementById('boldCB').checked = true;
+
+document.getElementById('leftColumn').style.fontWeight = localStorage['fontWeight'];
+document.getElementById('rightColumn').style.fontWeight = localStorage['fontWeight'];
+document.getElementById('vocab').style.fontWeight = localStorage['fontWeight'];
+
 let controlsDialog = document.querySelector('#controlsDialog');
 
 document.getElementById('controlsButton').addEventListener('click',
@@ -24,11 +34,21 @@ document.querySelector('#closeControlsButton').onclick = function () {
     controlsDialog.close();
 };
 
-if (isMobileDevice() &&
-    localStorage["showFSprompt"] !== "doNotShow")
-    document.querySelector('#fullScreenDialog').showModal();
+if (isMobileDevice()) {
+    // This element will be empty unless mobile, so conditional listener:
+    document.querySelector('#FSPromptCB').onchange = function () {
+        if ($(this).checked)
+            localStorage["showFSprompt"] = "doNotShow";
+        else
+            localStorage["showFSprompt"] = "Show";
+    };
+    // Prompt at startup if mobile (FS requires user interaction):
+    if (localStorage["showFSprompt"] !== "doNotShow")
+        document.querySelector('#fullScreenDialog').showModal();
+}
+else
+    document.getElementById('fullScreenControls').innerHTML = ''; // Only show opts for mobile
 
-// document.getElementById('fullScreen').style.display = 'inline-block';
 
 function isMobileDevice() {
     return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
@@ -38,12 +58,15 @@ document.querySelector('#noFullScreenButton').onclick = function () {
     document.querySelector('#fullScreenDialog').close();
 };
 
-// Checkbox was changed:
-document.querySelector('#FSPromptCB').onchange = function () {
-    if ($(this).checked)
-        localStorage["showFSprompt"] = "doNotShow";
+document.querySelector('#boldCB').onchange = function () {
+    if (document.querySelector('#boldCB').checked)
+        localStorage["fontWeight"] = "bold";
     else
-        localStorage["showFSprompt"] = "Show";
+        localStorage["fontWeight"] = "normal";
+
+    document.getElementById('leftColumn').style.fontWeight = localStorage["fontWeight"];
+    document.getElementById('rightColumn').style.fontWeight = localStorage["fontWeight"];
+    document.getElementById('vocab').style.fontWeight = localStorage['fontWeight'];
 };
 
 document.querySelector('#noFSpromptButton').onclick = function () {
