@@ -251,10 +251,7 @@ a:hover {
 
 
 .frame {
-    /*border: 3px solid rgb(150, 150, 150);*/
     border: 1px solid #4272b2;
-    /*background-color : #283849;*/
-    /*color : #aabbcc;*/
     background-color : #ffffeb;
     color : #000000;
     overflow: auto;
@@ -267,43 +264,6 @@ a:hover {
     cursor : -o-grab;
     cursor : grab;
 }
-
-.dragscroll:active {
-    cursor : -webkit-grabbing;
-    cursor : -moz-grabbing;
-    cursor : -o-grabbing;
-    cursor : grabbing;
-}
-
-/*** from syncscroll.css ***/
-body {
-    /*color : #334455;*/
-    background-color: #aabbcc;
-    /*font-family: 'PT Sans', sans-serif;*/
-    /*font-family: Georgia, serif; */
-    font-family: andadaregular, serif;
-    font-size : 17px;
-    cursor : default;
-}
-
-.frame {
-    /*border: 3px solid rgb(150, 150, 150);*/
-    border: 1px solid #4272b2;
-    /*background-color : #283849;*/
-    /*color : #aabbcc;*/
-    background-color : #ffffeb;
-    color : #000000;
-    overflow: auto;
-    position: relative;
-}
-
-.dragscroll {
-    cursor : -webkit-grab;
-    cursor : -moz-grab;
-    cursor : -o-grab;
-    cursor : grab;
-}
-
 
 .dragscroll:active {
     cursor : -webkit-grabbing;
@@ -358,11 +318,14 @@ body {
 }
 
 ::selection {
-    background: #b3d4fc;
+    /*background: #b3d4fc;*/
+    background: #c5ffff;
 }
 
 ::-moz-selection {
-    background: #b3d4fc;
+    /*background: #b3d4fc;*/
+    background: #c5ffff;
+
 }
 
 .myColumnHeader, .myHeader {
@@ -501,60 +464,60 @@ body {
     width: 94%
 }
 
+/*********** Modal styles *************/
+/* The Modal (background) */
 .modal {
-    /*font-size : 17px;*/
-    /* arbitrary styling */
-    /*background-color: white;*/
-
-    /*line-height: 3;*/
-    width: 50vw; /* avoid jank due to default --fit-content */
-
-    border: 1px;
-    border-radius: 5px;
-    box-shadow: 9px 9px 20px gray;
-
-    /*box-shadow: 2px 2px 2px rgba(0,0,0,0.2);*/
-    /*height:200px;*/
-    /*width:300px;*/
-
-    /* change position to fixed if you want to prevent the dialog from scrolling away, and center it */
-/*    position:fixed;
-    top:50%;
-    left:50%;
-    margin-left: -150px;
-    margin-top:-100px;*/
-}
-
-.modal::backdrop {
-    position: fixed;
-    top: 0;
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
     left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0,0,0,0.3);
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
+
+/* Modal Content */
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 5px;
+    box-shadow: 8px 8px 10px gray;
+    width: 80%;
+}
+
+/* The Close Button */
+.modal-close {
+    color: #aaaaaa;
+    float: right;
+    line-height: 11px;
+    font-size: 55px;
+    font-weight: bold;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/********* Slider styles ***********/
 
 .lbSlider {
     -webkit-appearance: none;  /* Override default CSS styles */
-    /*width: 70%;*/
     width: 50%;
     appearance: none;
     margin-top: 8px;
-    /*width: 100%; !* Full-width *!*/
     height: 8px; /* Specified height */
     background: #d3d3d3;
     float: right;
-
-    /*background: #d3d3d3; !* Grey background *!*/
-    /*outline: none; !* Remove outline *!*/
-    /*opacity: 0.7; !* Set transparency (for mouse-over effects on hover) *!*/
-    /*-webkit-transition: .2s; !* 0.2 seconds transition on hover *!*/
-    /*transition: opacity .2s;*/
 }
-
-/*.slider:hover {
-    opacity: 1;
-}*/
 
 .lbSlider::-webkit-slider-thumb {
     -webkit-appearance: none;

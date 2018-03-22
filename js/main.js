@@ -7,44 +7,57 @@
 
 const defLineHeight = "1.4";    // Default, baseline line height
 
-const release = "0.2";          // "Semantic version" for end users
+const release = "0.3";          // "Semantic version" for end users
 document.getElementById('bridgeVersion').innerHTML = release;
 
 document.body.style.lineHeight = defLineHeight;
 
 if (localStorage['fontWeight'] == null)
-    localStorage['fontWeight'] == 'bold'; // default to bold
+    localStorage['fontWeight'] = 'bold'; // default to bold
 
 if (localStorage['fontWeight'] === 'bold')
     document.getElementById('boldCB').checked = true;
+
+if (localStorage['showFSprompt'] === 'Show')
+    document.getElementById('FSPromptCB').checked = true;
+else
+    document.getElementById('FSPromptCB').checked = false;
 
 document.getElementById('leftColumn').style.fontWeight = localStorage['fontWeight'];
 document.getElementById('rightColumn').style.fontWeight = localStorage['fontWeight'];
 document.getElementById('vocab').style.fontWeight = localStorage['fontWeight'];
 
+
 let controlsDialog = document.querySelector('#controlsDialog');
 
 document.getElementById('controlsButton').addEventListener('click',
     function () {
-        controlsDialog.showModal();
+        // controlsDialog.showModal();
+        controlsDialog.style.display = 'block';
     }
 );
 
-document.querySelector('#closeControlsButton').onclick = function () {
-    controlsDialog.close();
+// document.querySelector('#closeControlsButton').onclick = function () {
+document.querySelector('#closeControls').onclick = function () {
+    if (speechSynthesis.pending || speechSynthesis.speaking)
+        speechSynthesis.cancel();
+    // controlsDialog.close();
+    controlsDialog.style.display = 'none';
 };
 
 if (isMobileDevice()) {
     // This element will be empty unless mobile, so conditional listener:
     document.querySelector('#FSPromptCB').onchange = function () {
-        if ($(this).checked)
-            localStorage["showFSprompt"] = "doNotShow";
-        else
+        if (this.checked)
             localStorage["showFSprompt"] = "Show";
+        else
+            localStorage["showFSprompt"] = "doNotShow";
     };
     // Prompt at startup if mobile (FS requires user interaction):
     if (localStorage["showFSprompt"] !== "doNotShow")
-        document.querySelector('#fullScreenDialog').showModal();
+    // document.querySelector('#fullScreenDialog').showModal();
+    // document.querySelector('#fullScreenDialog').display = 'block';
+        document.getElementById('fullScreenDialog').style.display = 'block';
 }
 else
     document.getElementById('fullScreenControls').innerHTML = ''; // Only show opts for mobile
@@ -55,9 +68,17 @@ function isMobileDevice() {
 }
 
 document.querySelector('#noFullScreenButton').onclick = function () {
-    document.querySelector('#fullScreenDialog').close();
+    // document.querySelector('#fullScreenDialog').close();
+    document.querySelector('#fullScreenDialog').style.display = 'none';
 };
 
+document.querySelector('#noFSpromptButton').onclick = function () {
+    // Disable full screen prompt:
+    localStorage["showFSprompt"] = "doNotShow";
+    document.querySelector('#fullScreenDialog').style.display = 'none';
+};
+
+// Toggle bold/normal font:
 document.querySelector('#boldCB').onchange = function () {
     if (document.querySelector('#boldCB').checked)
         localStorage["fontWeight"] = "bold";
@@ -67,12 +88,6 @@ document.querySelector('#boldCB').onchange = function () {
     document.getElementById('leftColumn').style.fontWeight = localStorage["fontWeight"];
     document.getElementById('rightColumn').style.fontWeight = localStorage["fontWeight"];
     document.getElementById('vocab').style.fontWeight = localStorage['fontWeight'];
-};
-
-document.querySelector('#noFSpromptButton').onclick = function () {
-    // Disable full screen prompt:
-    localStorage["showFSprompt"] = "doNotShow";
-    document.querySelector('#fullScreenDialog').close();
 };
 
 function launchFullscreen(element) {
@@ -86,14 +101,14 @@ function launchFullscreen(element) {
         } else if (element.msRequestFullscreen) {
             element.msRequestFullscreen();
         }
-        console.log('attempting landscape 1.');
+        // console.log('attempting landscape 1.');
         if (document.fullscreenEnabled || document.mozFullScreenEnabled ||
             document.webkitFullscreenEnabled || document.msFullscreenEnabled) {
-            console.log('fullscreen detected.');
-            document.querySelector('#fullScreenDialog').close();
-            // document.getElementById('fullScreen').style.display = 'none';
+            // console.log('fullscreen detected.');
+            // document.querySelector('#fullScreenDialog').close();
+            document.querySelector('#fullScreenDialog').style.display = 'none';
             setTimeout(function () {
-                console.log('attempting landscape 2');
+                // console.log('attempting landscape 2');
                 // todo: when we exit, device is still in landscape; attempt to restore to portrait if that is
                 // ..how we started:
                 window.screen.orientation.lock("landscape");
@@ -114,41 +129,56 @@ window.addEventListener("contextmenu", function (e) {
     return true;    // true = propagation continues
 });
 
-// Try to force landscape; neither this nor manifest seems to work:
+///////// Change speech rate:
 
-// document.documentElement.requestFullScreen();
-// document.requestFullScreen();
-
-let currentSpeakSpd = "0.8";
-let settingSpeed = false;
+let currentSpeakSpd = 1;
+let lastSpeakSpd = null;
+let sameSpeakSpd = false;
 
 document.getElementById('currentSpeakSpeed').textContent = currentSpeakSpd;
+document.getElementById('speakSpeed').value = currentSpeakSpd;
 
+// (Next several functions) adjust numeric indicator as user moves slider, but only
+// speak a sample when user releases the slider.  Special logic to speak sample if
+// user releases slider at original location (no 'change' event fires if so):
+
+// Adjust numeric indicator:
 document.getElementById('speakSpeed').addEventListener('input',
     function () {
         if (speechSynthesis.pending || speechSynthesis.speaking)
             speechSynthesis.cancel();
-        let speakSlider = document.getElementById('speakSpeed');
-        currentSpeakSpd = speakSlider.value;
+        currentSpeakSpd = document.getElementById('speakSpeed').value;
         document.getElementById('currentSpeakSpeed').textContent = currentSpeakSpd;
-        // return true; // propagation continues
+        if (currentSpeakSpd === lastSpeakSpd)
+            sameSpeakSpd = true;
+        else
+            sameSpeakSpd = false;  // combine with "keyup" listener to trigger sample speech
+        // console.log('user set same value');
     });
 
-// document.getElementById('speakSpeed').addEventListener('keyup',
-// todo: change event doesn't trigger sample if user returned slider to original rate
-document.getElementById('speakSpeed').addEventListener('change',
-    function () {
-        console.log('got keyup.');
-        if (speechSynthesis.pending || speechSynthesis.speaking)
-            speechSynthesis.cancel();
-        // todo: internationalize:
-        let sampleSpeakMsg = new SpeechSynthesisUtterance("I am now speaking at rate " + currentSpeakSpd);
-        sampleSpeakMsg.rate = currentSpeakSpd;
-        speechSynthesis.speak(sampleSpeakMsg);
-        // return false;
-    });
+// Speak a sample when user releases slider at different location:
+document.getElementById('speakSpeed').addEventListener('change', speakSample);
 
-// let currentTextSize = "17";
+// Speak a sample when user releases slider at same location:
+document.getElementById('speakSpeed').addEventListener('mouseup', speakIfNewSpd);
+document.getElementById('speakSpeed').addEventListener('touchend', speakIfNewSpd);
+
+function speakIfNewSpd() {
+    if (sameSpeakSpd) {
+        speakSample();
+        sameSpeakSpd = false;
+    }
+}
+
+function speakSample() {
+    // todo: internationalize:
+    let sampleSpeakMsg = new SpeechSynthesisUtterance("I am now speaking at rate " + currentSpeakSpd);
+    sampleSpeakMsg.rate = currentSpeakSpd;
+    speechSynthesis.speak(sampleSpeakMsg);
+    lastSpeakSpd = currentSpeakSpd;
+}
+
+////////// Change font size
 
 document.getElementById('currentTextSize').innerHTML =
     document.getElementById('textSize').value + "px";
@@ -162,6 +192,7 @@ document.getElementById('textSize').addEventListener('input',
         document.getElementById('textColumns').style.fontSize = textSize + "px";
     }
 );
+
 
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications
 
