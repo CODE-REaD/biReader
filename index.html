@@ -24,25 +24,13 @@
     <!--<script src="js/syncscroll.js"></script>-->
 </head>
 <body>
-<!--[if lte IE 9]>
+<!--[if IE]>
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
     your browser</a> to improve your experience and security.</p>
 <![endif]-->
 
-<!-- The Modal -->
-<!--<div id="myModal" class="modal">
-
-    &lt;!&ndash; Modal content &ndash;&gt;
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <p>Some text in the Modal..</p>
-    </div>
-
-</div>-->
-
-
 <!--Popup control panel:-->
-<div id=controlsDialog class="modal">
+<div id="controlsBackground" class="modal">
     <div class="modal-content">
         <div>
             <label for="speakSpeed">Speaking rate: </label>
@@ -127,7 +115,6 @@
 </div>
 
 <!--todo: make "responsive" (use CSS formulae?):-->
-
 <div class="vertContainer">
 
     <!--todo: use "ribbon" rather than buttons here (background-color=black?):-->
@@ -145,7 +132,7 @@
         <!--<button id="saveFileButton" class="myButton">Save to Files</button>-->
     </div>
 
-    <div class="horizContainer">
+    <div class="horizContainer modal" id="fileChooserModal">
         <!--Filled in at runtime:-->
         <div id="leftFilePopup">
             <select id="leftFileSelect">
@@ -196,6 +183,8 @@
 
 
 <!--<script src="js/vendor/modernizr-3.5.0.min.js"></script>-->
+
+<script src="js/iexplorer-test.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"
         integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>

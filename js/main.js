@@ -7,7 +7,7 @@
 
 const defLineHeight = "1.4";    // Default, baseline line height
 
-const release = "0.3";          // "Semantic version" for end users
+const release = "0.4";          // "Semantic version" for end users
 document.getElementById('bridgeVersion').innerHTML = release;
 
 document.body.style.lineHeight = defLineHeight;
@@ -27,22 +27,28 @@ document.getElementById('leftColumn').style.fontWeight = localStorage['fontWeigh
 document.getElementById('rightColumn').style.fontWeight = localStorage['fontWeight'];
 document.getElementById('vocab').style.fontWeight = localStorage['fontWeight'];
 
-
-let controlsDialog = document.querySelector('#controlsDialog');
+let controlsBackground = document.querySelector('#controlsBackground');
 
 document.getElementById('controlsButton').addEventListener('click',
     function () {
-        // controlsDialog.showModal();
-        controlsDialog.style.display = 'block';
-    }
+        controlsBackground.style.display = 'block';
+
+        // Clicking anywhere outside the control panel closes it:
+        document.addEventListener('click',
+            function docClick(f) {
+                if (f.target.id === 'controlsBackground') {
+                    controlsBackground.style.display = 'none';
+                    document.removeEventListener('click', docClick);
+                }
+            }
+        )
+    }, false
 );
 
-// document.querySelector('#closeControlsButton').onclick = function () {
 document.querySelector('#closeControls').onclick = function () {
     if (speechSynthesis.pending || speechSynthesis.speaking)
         speechSynthesis.cancel();
-    // controlsDialog.close();
-    controlsDialog.style.display = 'none';
+    controlsBackground.style.display = 'none';
 };
 
 if (isMobileDevice()) {
@@ -160,10 +166,10 @@ document.getElementById('speakSpeed').addEventListener('input',
 document.getElementById('speakSpeed').addEventListener('change', speakSample);
 
 // Speak a sample when user releases slider at same location:
-document.getElementById('speakSpeed').addEventListener('mouseup', speakIfNewSpd);
-document.getElementById('speakSpeed').addEventListener('touchend', speakIfNewSpd);
+document.getElementById('speakSpeed').addEventListener('mouseup', speakIfSameSpd);
+document.getElementById('speakSpeed').addEventListener('touchend', speakIfSameSpd);
 
-function speakIfNewSpd() {
+function speakIfSameSpd() {
     if (sameSpeakSpd) {
         speakSample();
         sameSpeakSpd = false;
@@ -193,14 +199,25 @@ document.getElementById('textSize').addEventListener('input',
     }
 );
 
-
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications
 
 // Reveal the <select> node when the button is clicked:
 document.getElementById('libraryLoadButton').addEventListener('click',
     function () {
-        document.getElementById('leftFilePopup').style.display = 'inline-block';
-    });
+        document.getElementById('fileChooserModal').style.display = 'block';
+        document.getElementById('leftFilePopup').style.display = 'block';
+
+        // Clicking anywhere outside the file chooser closes it:
+        document.addEventListener('click',
+            function docClick(f) {
+                if (f.target.id === 'fileChooserModal') {
+                    fileChooserModal.style.display = 'none';
+                    document.removeEventListener('click', docClick);
+                }
+            }
+        )
+    }, false
+);
 
 document.getElementById('helpButton').addEventListener('click',
     function () {
@@ -263,7 +280,8 @@ document.getElementById('leftFileSelect').addEventListener('change', function ()
     });
 
     // Now that user has selected lefthand file, expose righthand file menu:
-    document.getElementById('rightFilePopup').style.display = 'inline-block';
+    // document.getElementById('rightFilePopup').style.display = 'inline-block';
+    document.getElementById('rightFilePopup').style.display = 'block';
 
     if (leftlibFilePath.length)
         getFileFromLibrary('leftPara', leftlibFilePath, 'leftTitle');
@@ -279,6 +297,7 @@ document.getElementById('rightFileSelect').addEventListener('change', function (
 
     document.getElementById('leftFilePopup').style.display = 'none';
     document.getElementById('rightFilePopup').style.display = 'none';
+    document.getElementById('fileChooserModal').style.display = 'none';
 
     leftSel.value = "";  // Else we won't trigger again on current choice
 });
@@ -437,7 +456,10 @@ function mouseMoved(ev) {
 }
 
 function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    // return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(function (resolve) {
+        return setTimeout(resolve, ms)
+    });
 }
 
 function touchMoved() {
@@ -617,7 +639,7 @@ request.onreadystatechange = function () { // Define event listener
     // If the request is complete and was successful
     if (request.readyState === 4 && request.status === 200) {
         el.innerHTML = request.responseText;
-        let libraryLinks = el.getElementsByTagName('a'); // Live NodeList of your anchor elements
+        let libraryLinks = el.getElementsByTagName('a'); // Live NodeList of anchor elements
         linkArray = []; // global
         let libFileName = '';
         for (let linkInd = 5; linkInd < libraryLinks.length; linkInd++) {
