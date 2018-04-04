@@ -25,7 +25,7 @@ else
 
 document.getElementById('leftColumn').style.fontWeight = localStorage['fontWeight'];
 document.getElementById('rightColumn').style.fontWeight = localStorage['fontWeight'];
-document.getElementById('vocab').style.fontWeight = localStorage['fontWeight'];
+// document.getElementById('vocab').style.fontWeight = localStorage['fontWeight'];
 
 let controlsBackground = document.querySelector('#controlsBackground');
 
@@ -93,7 +93,7 @@ document.querySelector('#boldCB').onchange = function () {
 
     document.getElementById('leftColumn').style.fontWeight = localStorage["fontWeight"];
     document.getElementById('rightColumn').style.fontWeight = localStorage["fontWeight"];
-    document.getElementById('vocab').style.fontWeight = localStorage['fontWeight'];
+    // document.getElementById('vocab').style.fontWeight = localStorage['fontWeight'];
 };
 
 function launchFullscreen(element) {
@@ -284,14 +284,15 @@ document.getElementById('leftFileSelect').addEventListener('change', function ()
     document.getElementById('rightFilePopup').style.display = 'block';
 
     if (leftlibFilePath.length)
-        getFileFromLibrary('leftPara', leftlibFilePath, 'leftTitle');
+        // getFileFromLibrary('leftPara', leftlibFilePath, 'leftTitle');
+        getFileFromLibrary('leftPara', leftlibFilePath, 'leftColumnHeader');
 });
 
 document.getElementById('rightFileSelect').addEventListener('change', function () {
     let rightSel = document.getElementById('rightFileSelect');
     let rightlibFilePath = rightSel.options[rightSel.selectedIndex].text;  // Right-hand file
     if (rightlibFilePath.length)
-        getFileFromLibrary('rightPara', rightlibFilePath, 'rightTitle');
+        getFileFromLibrary('rightPara', rightlibFilePath, 'rightColumnHeader');
     /*        if (getFileFromLibrary('rightPara', 'http://bridge.code-read.com/library/' + rightlibFilePath))
                 document.getElementById('rightTitle').textContent = rightlibFilePath;*/
 
@@ -309,6 +310,7 @@ function getFileFromLibrary(contentElement, fileName, titleElement) {
     request.onreadystatechange = function () { // Define event listener
         // If the request is complete and was successful
         if (request.readyState === 4 && request.status === 200) {
+            // document.getElementById(contentElement).parentElement.textContent = request.responseText;
             document.getElementById(contentElement).textContent = request.responseText;
             document.getElementById(titleElement).textContent = fileName;
         }
@@ -328,7 +330,7 @@ document.getElementById('leftFileChoice').addEventListener('change',
             document.getElementById('leftPara').textContent = this.result;
         };
         fr.readAsText(this.files[0]);
-        document.getElementById('leftTitle').textContent = this.files[0].name;
+        document.getElementById('leftColumnHeader').textContent = this.files[0].name;
     }
 );
 
@@ -339,7 +341,7 @@ document.getElementById('rightFileChoice').addEventListener('change',
             document.getElementById('rightPara').textContent = this.result;
         };
         fr.readAsText(this.files[0]);
-        document.getElementById('rightTitle').textContent = this.files[0].name;
+        document.getElementById('rightColumnHeader').textContent = this.files[0].name;
         // updateLineSpacing();
     }
 );
@@ -397,10 +399,10 @@ function fileDrop(ev) {
 
     switch (this.id.toString()) {
         case 'leftColumn':
-            handleFiles(files, 'leftPara', 'leftTitle');
+            handleFiles(files, 'leftPara', 'leftColumnHeader');
             break;
         case 'rightColumn':
-            handleFiles(files, 'rightPara', 'rightTitle');
+            handleFiles(files, 'rightPara', 'rightColumnHeader');
             break;
         default:
             console.log('fileDrop: error: source ID is: ' + this.id.toString());
@@ -416,11 +418,11 @@ function pasteToCol(ev) {
     switch (this.id.toString()) {
         case 'leftColumn':
             document.getElementById('leftPara').textContent = pastedData;
-            document.getElementById('leftTitle').textContent = "(pasted)";
+            document.getElementById('leftColumnHeader').textContent = "(pasted)";
             break;
         case 'rightColumn':
             document.getElementById('rightPara').textContent = pastedData;
-            document.getElementById('rightTitle').textContent = "(pasted)";
+            document.getElementById('rightColumnHeader').textContent = "(pasted)";
             break;
         default:
             console.log('pasteToCol: error: source ID is: ' + this.id.toString());

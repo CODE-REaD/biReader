@@ -16,29 +16,6 @@ html {
     /*line-height: 1.4;*/
 }
 
-/*
- * Remove text-shadow in selection highlight:
- * https://twitter.com/miketaylr/status/12228805301
- *
- * Vendor-prefixed and regular ::selection selectors cannot be combined:
- * https://stackoverflow.com/a/16982510/7133471
- *
- * Customize the background color to match your design.
- */
-
-/*
-::-moz-selection {
-    background: #b3d4fc;
-    text-shadow: none;
-}
-*/
-
-/*
-::selection {
-    background: #b3d4fc;
-    text-shadow: none;
-}
-*/
 
 /*
  * A better looking default horizontal rule
@@ -218,7 +195,8 @@ textarea {
 
 body {
     /*color : #334455;*/
-    background-color: #aabbcc;
+    /*background-color: #aabbcc;*/
+    background-color: #b5c3b7;
     /*font-family: 'PT Sans', sans-serif;*/
     /*font-family: Georgia, serif; */
     font-family: andadaregular, serif;
@@ -251,7 +229,8 @@ a:hover {
 
 
 .frame {
-    border: 1px solid #4272b2;
+    /*border: 1px solid #4272b2;*/
+    border: 0;
     background-color : #ffffeb;
     color : #000000;
     overflow: auto;
@@ -287,11 +266,11 @@ a:hover {
 }
 
 .myColumn, #Help, #vocab {
-    border-radius: 1px;
-    margin: 4px;
+    border-radius: 3px;
+    /*margin: 4px;*/
     box-shadow: 5px 5px 10px gray;
     /*text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);*/ /* causes jank on large tablet */
-    font-weight: bold;
+    /*font-weight: bold;*/
     text-rendering: optimizeLegibility;
     -moz-font-feature-settings: "liga" 1, "kern" 1;
     -ms-font-feature-settings: "liga" 1, "kern" 1;
@@ -300,11 +279,16 @@ a:hover {
     font-feature-settings: "liga" 1, "kern" 1;
 }
 
+#Help, #vocab {
+    font-family: sans-serif;
+    font-weight: normal;
+}
+
 .myPara, .highlighted {
     word-wrap: break-word;
     white-space: pre-wrap;
     /*padding: 9px; NO GOOD: this gives overlap in highlight bg*/
-    margin: 10px;
+    margin: .5em;
     /*color: transparent;*/
     /*text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);*/
     height: 80vh;
@@ -328,39 +312,44 @@ a:hover {
 
 }
 
-.myColumnHeader, .myHeader {
-    float: left;
-    margin-left: 3%;
-    height: 3em;
-}
-
 .myColumnHeader {
-    width: 45%;
+    float: left;
+    /*margin-left: .5em;*/
+    width: 48%;
+    height: 2em;
+    font-family: sans-serif;
+    font-size: .8em;
+    font-weight: bold;
+    color: #428bca;
+    background-color: #9dbfb8;
+    text-align: center;
+    border-radius: 6px 6px 0 0;
 }
 
-/*.myHeader, .myIntro {*/
-.myHeader, .myIntro {
+.myIntro {
     /*float: left;  !*troublemaker*!*/
     margin-left: 3%;
     width: 94%;
 }
 
 .myButton {
-    position: relative;
-    font-size: 17px;
+    /*position: relative;*/
+    font-family: sans-serif;
+    font-size: .9em;
     font-weight: 400;
-    line-height: 1;
+    /*line-height: 1;*/
     color: #428bca;
-    text-align: center;
+    /*text-align: center;*/
     /*white-space: nowrap;*/
-    vertical-align: top;
+    /*vertical-align: top;*/
     background-color: transparent;
-    border-radius: 4px;
-    display: block;
-    padding: 4px;
+    border-radius: 10px;
+    /*display: block;*/
+    padding: 7px;
     margin: 4px;
     /*margin-bottom: 10px;*/
-    border: 2px solid #428bca;
+    /*border: 2px solid #428bca;*/
+    border: 0;
     -webkit-transition: all 0.5s;
     -moz-transition: all 0.5s;
     -o-transition: all 0.5s;
@@ -382,10 +371,13 @@ a:hover {
 
 .colInstructions {
     color: #e7e7e7;
-    font-size: 219%;
+    font-size: 2em;
     white-space: pre-line;
     font-family: sans-serif;
     font-weight: bold;
+    /*margin: 10%;*/
+    /*text-align: center;*/
+
 }
 
 /*from https://stackoverflow.com/a/9358802/5025060: */
@@ -412,6 +404,11 @@ a:hover {
 
 #rightFilePopup {
     left: 60%;
+}
+
+#topRowButtons {
+    height: 4em; /* keep text within buttons */
+    align-items: center;
 }
 
 /*#leftFilePopup *, #rightFilePopup * {
@@ -491,14 +488,16 @@ a:hover {
     border: 1px solid #888;
     border-radius: 5px;
     box-shadow: 8px 8px 10px gray;
-    width: 80%;
+    width: 90%;
+    font-family: sans-serif;
 }
 
 /* The Close Button */
 .modal-close {
     color: #aaaaaa;
     float: right;
-    line-height: 11px;
+    /*line-height: 11px;*/
+    line-height: .8em;
     font-size: 55px;
     font-weight: bold;
 }
@@ -514,7 +513,7 @@ a:hover {
 
 .lbSlider {
     -webkit-appearance: none;  /* Override default CSS styles */
-    width: 50%;
+    width: 80%;
     appearance: none;
     margin-top: 8px;
     height: 8px; /* Specified height */
@@ -538,4 +537,17 @@ a:hover {
     background: #4CAF50;
     cursor: pointer;
     border-radius: 50%;
+}
+
+.rangeLabel {
+    font-family: sans-serif;
+    font-weight: bold;
+    margin-left: .3em;
+    margin-right: .3em;
+}
+
+/*****/
+
+.lbCheckbox {
+    cursor: pointer;
 }
