@@ -7,7 +7,7 @@
 
 const defLineHeight = "1.4";    // Default, baseline line height
 
-const release = "0.4";          // "Semantic version" for end users
+const release = "0.5";          // "Semantic version" for end users
 document.getElementById('bridgeVersion').innerHTML = release;
 
 document.body.style.lineHeight = defLineHeight;
