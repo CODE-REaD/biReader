@@ -1,16 +1,22 @@
-# biReader
-JavaScript code to read two files in parallel.  Proof-of-concept.
-You may provide texts of the same article in different languages by pasting them
-        to the two panels, or drag-and-drop local files to the panels, or click on the "load"
-        buttons to select files from your local disc. Or click on "Load File from Online Library" to
-        choose an existing pairing from the online library.
+Welcome to [biReader](http://bireader.com), your parallel reading resource.  
+  
+**Features:**
 
-Language Bridge will attempt to present the two texts
-        as equal height, synchronously scrolling panels, and to pronounce sentences
-        in their native language
-        when you click on them or a series of sentences when you click-and-drag over them.
-        It will also attempt to pronounce and then show a definition of a word if you long-click on it (PoC:
-        French to English only).
-        <br><br>
-        PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
-        input as no input validity checks are yet in place.
+*   Synchronized reading of left and right panes
+*   Click on or tap a sentence to hear it read aloud
+*   Long-click or long-tap a word to see its definition
+*   Adjustable font size, weight, and speaking speed
+*   To load content:
+
+*   Select texts from online library
+*   Select files from local storage
+*   Drag-and-drop files, or
+*   Paste text to right and/or left pane
+
+**Requirements:**  
+
+A recent release of Chrome, Firefox, Safari, or Edge on:
+
+*   Desktop (Windows, Mac, Linux)
+*   Tablet (Android, iPad)
+*   Phone (Android, iPhone)
