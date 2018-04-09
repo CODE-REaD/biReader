@@ -1,9 +1,31 @@
+/*
+biReader - your parallel reading resource.
+Copyright (C) 2018 Carson Wilson
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 "use strict";
 
 // todo: store filenames as English and translate to native language for display.
 // todo: web storage for things like show help first time.
 // todo: embedded version number, so we can tell what release we are running (link to VCS?)
 // todo: pinch zoom to resize text
+// todo: default to bold font on high density screens only
+// todo: store current font, reading speed between sessions (web storage, same as 'bold' setting)
+// todo: filename.info contains source information, display with "info" control
+// todo: save word definitions locally (web storage) so we don't repeatedly look them up at Glosbe
 
 const defLineHeight = "1.4";    // Default, baseline line height
 

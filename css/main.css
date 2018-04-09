@@ -1,11 +1,20 @@
-/*! HTML5 Boilerplate v6.0.1 | MIT License | https://html5boilerplate.com/ */
-
 /*
- * What follows is the result of much research on cross-browser styling.
- * Credit left inline and big thanks to Nicolas Gallagher, Jonathan Neal,
- * Kroc Camen, and the H5BP dev community and team.
- */
+biReader - your parallel reading resource.
+Copyright (C) 2018 Carson Wilson
 
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* ==========================================================================
    Base styles: opinionated defaults
    ========================================================================== */
@@ -257,13 +266,27 @@ a:hover {
      -webkit-appearance: menulist-textfield;
  }
 
+
 .myColumn {
-    /*height: 80vh;*/
     overflow: auto; /*causes scrollbars*/
-    /*float: left;*/
-    width: 48%;
-    /*margin-left: 3%;*/
     border-radius: 0 0 3px 3px;
+}
+
+.myColumnHeader {
+    float: left;
+    height: 2em;
+    font-family: sans-serif;
+    font-size: .8em;
+    font-weight: bold;
+    color: #428bca;
+    background-color: #9dbfb8;
+    text-align: center;
+    border-radius: 6px 6px 0 0;
+    box-shadow: 5px 5px 10px gray;
+}
+
+.myColumn, .myColumnHeader {
+    width: 49%;
 }
 
 .myColumn, #Help, #vocab {
@@ -311,27 +334,6 @@ a:hover {
 ::-moz-selection {
     background: #c5ffff;
 }
-
-.myColumnHeader {
-    float: left;
-    /*margin-left: .5em;*/
-    width: 48%;
-    height: 2em;
-    font-family: sans-serif;
-    font-size: .8em;
-    font-weight: bold;
-    color: #428bca;
-    background-color: #9dbfb8;
-    text-align: center;
-    border-radius: 6px 6px 0 0;
-    box-shadow: 5px 5px 10px gray;
-}
-
-/*.myIntro {
-    !*float: left;  !*troublemaker*!*!
-    margin-left: 3%;
-    width: 94%;
-}*/
 
 .myButton {
     /*position: relative;*/
