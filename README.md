@@ -20,3 +20,5 @@ A recent release of Chrome, Firefox, Safari, or Edge on:
 *   Desktop (Windows, Mac, Linux)
 *   Tablet (Android, iPad)
 *   Phone (Android, iPhone)
+
+Testing courtesy of [BrowserStack](http://browserstack.com/)
