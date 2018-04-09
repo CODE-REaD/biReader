@@ -21,4 +21,5 @@ A recent release of Chrome, Firefox, Safari, or Edge on:
 *   Tablet (Android, iPad)
 *   Phone (Android, iPhone)
 
-Testing courtesy of [BrowserStack](http://browserstack.com/)
+Testing courtesy of [![BrowserStack](https://github.com/code-read/biReader/blob/master/img/browserstack-logo-600x315.png)(http://browserstack.com/)
+
