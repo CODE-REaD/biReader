@@ -293,6 +293,8 @@ a:hover {
     /*color: transparent;*/
     /*text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);*/
     height: 80vh;
+
+    /*display: inline-block; // (not) possible fix for Safari selection highlighting, 4/07/18, after https://stackoverflow.com/a/42663876/5025060*/
 }
 
 .highlighted {
@@ -303,14 +305,11 @@ a:hover {
 }
 
 ::selection {
-    /*background: #b3d4fc;*/
     background: #c5ffff;
 }
 
 ::-moz-selection {
-    /*background: #b3d4fc;*/
     background: #c5ffff;
-
 }
 
 .myColumnHeader {
@@ -328,11 +327,11 @@ a:hover {
     box-shadow: 5px 5px 10px gray;
 }
 
-.myIntro {
-    /*float: left;  !*troublemaker*!*/
+/*.myIntro {
+    !*float: left;  !*troublemaker*!*!
     margin-left: 3%;
     width: 94%;
-}
+}*/
 
 .myButton {
     /*position: relative;*/
@@ -424,7 +423,7 @@ a:hover {
     font-weight: bold;
 }
 
-#Help {
+#Help, .splash {
     z-index: 102;
     position: absolute;
     background-color: white;
@@ -435,6 +434,8 @@ a:hover {
     /*height: 80%; auto-adjust to content size */
     padding: 5%;
     box-shadow: 5px 5px 10px gray;
+    height: 90vh;
+    overflow: auto; // scroll
 }
 
 .vertContainer,
@@ -452,7 +453,8 @@ a:hover {
 .horizContainer, #vocab {
     flex-direction: row;
     margin-left: 2%;
-    width: 96%
+    /*width: 96%*/
+    width: 96vw;
 }
 
 .horizElement {
@@ -472,7 +474,8 @@ a:hover {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
-    padding-top: 100px; /* Location of the box */
+    /*padding-top: 100px; !* Location of the box *!*/
+    padding-top: 5%; /* Location of the box */
     left: 0;
     top: 0;
     width: 100%; /* Full width */
@@ -487,7 +490,7 @@ a:hover {
 .modal-content {
     background-color: #fefefe;
     margin: auto;
-    padding: 20px;
+    padding: 1%;
     border: 1px solid #888;
     border-radius: 5px;
     box-shadow: 8px 8px 10px gray;
@@ -516,7 +519,7 @@ a:hover {
 
 .lbSlider {
     -webkit-appearance: none;  /* Override default CSS styles */
-    width: 80%;
+    width: 75%;
     appearance: none;
     margin-top: 8px;
     height: 8px; /* Specified height */

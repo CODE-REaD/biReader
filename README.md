@@ -1,4 +1,4 @@
-# ParallelReader3
+# biReader
 JavaScript code to read two files in parallel.  Proof-of-concept.
 You may provide texts of the same article in different languages by pasting them
         to the two panels, or drag-and-drop local files to the panels, or click on the "load"

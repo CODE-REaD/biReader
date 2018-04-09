@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Language Bridge PoC</title>
+    <title>biReader: your parallel reading resource</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -29,19 +29,64 @@
     your browser</a> to improve your experience and security.</p>
 <![endif]-->
 
+<!--biReader splash screen-->
+<div id="biReaderSplash" class="modal">
+    <!--<div class="modal-content" style="background-color: #3a768f">-->
+    <div class="modal-content" style="font-size: 1.1em;">
+        <div style="text-align:center; width:100%">
+            <img src="img/bireader2f.png"
+                 style="width: 80%; max-width: 705px; min-width: 8rem;">
+        </div>
+        <div style="margin-left: 10%; margin-right: 10%; margin-top: 2%; overflow: auto; height: 66vh">
+            Welcome to <a href="http://bireader.com">biReader</a>, your parallel reading resource.<br>
+            <br>
+            <b>Features:</b>
+            <ul>
+                <li>Synchronized reading of left and right panes</li>
+                <li>Click on or tap a sentence to hear it read aloud</li>
+                <li>Long-click or long-tap a word to see its definition</li>
+                <li>Adjustable font size, weight, and speaking speed</li>
+                <li>To load content:</li>
+                <ul>
+                    <li>Select texts from online library</li>
+                    <li>Select files from local storage</li>
+                    <li>Drag-and-drop files, or</li>
+                    <li>Paste text to right and/or left pane</li>
+                </ul>
+            </ul>
+            <b>Requirements:</b><br>
+            <ul>
+            A recent release of Chrome, Firefox, Safari, or Edge on:<ul>
+                <li>Desktop (Windows, Mac, Linux)</li>
+                <li>Tablet (Android, iPad)</li>
+                <li>Phone (Android, iPhone)</li>
+            </ul>
+            </ul>
+            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere
+            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere
+            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere
+        </div>
+        <span id=closeSplash class="modal-close">&times;</span>
+        <button id=noSplashButton>Do not show this again</button>
+
+        <br>
+
+    </div>
+</div>
+
 <!--Popup control panel:-->
 <div id="controlsBackground" class="modal">
     <div class="modal-content">
         <div>
             <label for="speakSpeed">Speaking rate:</label>
             <span id="currentSpeakSpeed" class="rangeLabel"></span>
-            <input id="speakSpeed" class=lbSlider type="range" min="0.1" max="8" step="0.1">
+            <input id="speakSpeed" class=lbSlider type="range" min="0.1" max="5" step="0.1">
         </div>
         <br>
         <div>
             <label for="textSize">Text size:</label>
             <span id="currentTextSize" class="rangeLabel"></span>
-            <input id="textSize" class=lbSlider type="range" min="2" max="80" value="17" step="1">
+            <input id="textSize" class=lbSlider type="range" min="7" max="50" value="17" step="1">
         </div>
         <br>
         <!--todo: bold font on/off toggle here-->
