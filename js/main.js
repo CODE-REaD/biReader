@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 const defLineHeight = "1.4";    // Default, baseline line height
 
-const release = "0.6";          // "Semantic version" for end users
+const release = "0.7";          // "Semantic version" for end users
 document.getElementById('bridgeVersion').innerHTML = release;
 
 document.body.style.lineHeight = defLineHeight;
