@@ -363,6 +363,17 @@ a:hover {
     background: yellow;
 }
 
+/* button moves "down" when clicked: */
+.myButton:active {
+    transform: translateY(6px);
+}
+
+/* button changes after click: */
+.myButton:active {
+    color: black;
+    background: red;
+}
+
 .rightButton {
     float: right;
 }

@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 // todo: store filenames as English and translate to native language for display.
 // todo: web storage for things like show help first time.
-// todo: embedded version number, so we can tell what release we are running (link to VCS?)
 // todo: pinch zoom to resize text
 // todo: default to bold font on high density screens only
 // todo: store current font, reading speed between sessions (web storage, same as 'bold' setting)
@@ -38,6 +37,44 @@ if (localStorage['fontWeight'] == null)
 if (localStorage['fontWeight'] === 'bold')
     document.getElementById('boldCB').checked = true;
 
+let buttonClickSound = document.getElementById("buttonClick");
+
+function makeClick() {
+    buttonClickSound.play();
+}
+
+
+
+// Splash screen:
+
+if (localStorage["showSplash"] !== "doNotShow") {
+    document.getElementById('biReaderSplash').style.display = 'block';
+    document.getElementById('splashCB').checked = true;
+} else {
+    document.getElementById('biReaderSplash').style.display = 'none';
+    document.getElementById('splashCB').checked = false;
+}
+
+document.querySelector('#closeSplash').onclick = function () {
+    makeClick();
+    document.getElementById('biReaderSplash').style.display = 'none';
+};
+
+document.querySelector('#noSplashButton').onclick = function () {
+    makeClick();
+    // Disable splash screen:
+    localStorage["showSplash"] = "doNotShow";
+    document.getElementById('biReaderSplash').style.display = 'none';
+};
+
+document.querySelector('#splashCB').onchange = function () {
+    makeClick();
+    if (this.checked)
+        localStorage["showSplash"] = "Show";
+    else
+        localStorage["showSplash"] = "doNotShow";
+};
+
 // noinspection RedundantIfStatementJS
 if (localStorage['showFSprompt'] === 'Show')
     document.getElementById('FSPromptCB').checked = true;
@@ -46,14 +83,12 @@ else
 
 document.getElementById('leftColumn').style.fontWeight = localStorage['fontWeight'];
 document.getElementById('rightColumn').style.fontWeight = localStorage['fontWeight'];
-// document.getElementById('vocab').style.fontWeight = localStorage['fontWeight'];
-
-document.getElementById('biReaderSplash').style.display = 'block';
 
 let controlsBackground = document.querySelector('#controlsBackground');
 
 document.getElementById('controlsButton').addEventListener('click',
     function () {
+        makeClick();
         controlsBackground.style.display = 'block';
 
         // Clicking anywhere outside the control panel closes it:
@@ -69,13 +104,10 @@ document.getElementById('controlsButton').addEventListener('click',
 );
 
 document.querySelector('#closeControls').onclick = function () {
+    makeClick();
     if (speechSynthesis.pending || speechSynthesis.speaking)
         speechSynthesis.cancel();
     controlsBackground.style.display = 'none';
-};
-
-document.querySelector('#closeSplash').onclick = function () {
-    document.getElementById('biReaderSplash').style.display = 'none';
 };
 
 if (isMobileDevice()) {
@@ -88,24 +120,24 @@ if (isMobileDevice()) {
     };
     // Prompt at startup if mobile (FS requires user interaction):
     if (localStorage["showFSprompt"] !== "doNotShow")
-    // document.querySelector('#fullScreenDialog').showModal();
-    // document.querySelector('#fullScreenDialog').display = 'block';
         document.getElementById('fullScreenDialog').style.display = 'block';
 }
 else
     document.getElementById('fullScreenControls').innerHTML = ''; // Only show opts for mobile
-
 
 function isMobileDevice() {
     return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
 }
 
 document.querySelector('#noFullScreenButton').onclick = function () {
+    makeClick();
     // document.querySelector('#fullScreenDialog').close();
     document.querySelector('#fullScreenDialog').style.display = 'none';
 };
 
+// Full screen prompt:
 document.querySelector('#noFSpromptButton').onclick = function () {
+    makeClick();
     // Disable full screen prompt:
     localStorage["showFSprompt"] = "doNotShow";
     document.querySelector('#fullScreenDialog').style.display = 'none';
@@ -113,6 +145,7 @@ document.querySelector('#noFSpromptButton').onclick = function () {
 
 // Toggle bold/normal font:
 document.querySelector('#boldCB').onchange = function () {
+    makeClick();
     if (document.querySelector('#boldCB').checked)
         localStorage["fontWeight"] = "bold";
     else
@@ -120,14 +153,13 @@ document.querySelector('#boldCB').onchange = function () {
 
     document.getElementById('leftColumn').style.fontWeight = localStorage["fontWeight"];
     document.getElementById('rightColumn').style.fontWeight = localStorage["fontWeight"];
-    // document.getElementById('vocab').style.fontWeight = localStorage['fontWeight'];
 };
 
 function launchFullscreen(element) {
     if (isMobileDevice()) {
         if (element.requestFullscreen) {
             element.requestFullscreen();
-        // } else if (element.mozRequestFullScreen) {
+            // } else if (element.mozRequestFullScreen) {
         } else if (element.getAttribute('mozRequestFullScreen')) {
             element.mozRequestFullScreen();
         } else if (element.getAttribute('webkitRequestFullscreen')) {
@@ -135,14 +167,10 @@ function launchFullscreen(element) {
         } else if (element.getAttribute('msRequestFullscreen')) {
             element.msRequestFullscreen();
         }
-        // console.log('attempting landscape 1.');
         if (document.fullscreenEnabled || document.mozFullScreenEnabled ||
             document.webkitFullscreenEnabled || document.msFullscreenEnabled) {
-            // console.log('fullscreen detected.');
-            // document.querySelector('#fullScreenDialog').close();
             document.querySelector('#fullScreenDialog').style.display = 'none';
             setTimeout(function () {
-                // console.log('attempting landscape 2');
                 // todo: when we exit, device is still in landscape; attempt to restore to portrait if that is
                 // ..how we started:
                 window.screen.orientation.lock("landscape");
@@ -188,7 +216,6 @@ document.getElementById('speakSpeed').addEventListener('input',
             sameSpeakSpd = true;
         else
             sameSpeakSpd = false;  // combine with "keyup" listener to trigger sample speech
-        // console.log('user set same value');
     });
 
 // Speak a sample when user releases slider at different location:
@@ -234,6 +261,7 @@ document.getElementById('textSize').addEventListener('input',
 let fileChooserModal = document.querySelector('#fileChooserModal');
 document.getElementById('libraryLoadButton').addEventListener('click',
     function () {
+        makeClick();
         document.getElementById('fileChooserModal').style.display = 'block';
         document.getElementById('leftFilePopup').style.display = 'block';
 
@@ -252,6 +280,7 @@ document.getElementById('libraryLoadButton').addEventListener('click',
 
 document.getElementById('helpButton').addEventListener('click',
     function () {
+        makeClick();
         document.getElementById('Help').style.display = 'inline-block';
         // Click anywhere except Help button turns it off:
         document.addEventListener('click',
@@ -266,6 +295,7 @@ document.getElementById('helpButton').addEventListener('click',
 
 document.getElementById('helpCloseButton').addEventListener('click',
     function () {
+        makeClick();
         document.getElementById('Help').style.display = 'none';
     });
 
@@ -274,6 +304,7 @@ let libFileOK = false; // Global flag for library file load result
 
 // Load a file when a library selection is made.
 document.getElementById('leftFileSelect').addEventListener('change', function () {
+    makeClick();
     leftSel = document.getElementById('leftFileSelect');
     let leftlibFilePath = leftSel.options[leftSel.selectedIndex].text;  // Left-hand file
     let libFileName = leftlibFilePath.replace(/\.[a-z][a-z]$/, "");
@@ -316,17 +347,16 @@ document.getElementById('leftFileSelect').addEventListener('change', function ()
     document.getElementById('rightFilePopup').style.display = 'block';
 
     if (leftlibFilePath.length)
-        // getFileFromLibrary('leftPara', leftlibFilePath, 'leftTitle');
+    // getFileFromLibrary('leftPara', leftlibFilePath, 'leftTitle');
         getFileFromLibrary('leftPara', leftlibFilePath, 'leftColumnHeader');
 });
 
 document.getElementById('rightFileSelect').addEventListener('change', function () {
+    makeClick();
     let rightSel = document.getElementById('rightFileSelect');
     let rightlibFilePath = rightSel.options[rightSel.selectedIndex].text;  // Right-hand file
     if (rightlibFilePath.length)
         getFileFromLibrary('rightPara', rightlibFilePath, 'rightColumnHeader');
-    /*        if (getFileFromLibrary('rightPara', 'http://bridge.code-read.com/library/' + rightlibFilePath))
-                document.getElementById('rightTitle').textContent = rightlibFilePath;*/
 
     document.getElementById('leftFilePopup').style.display = 'none';
     document.getElementById('rightFilePopup').style.display = 'none';
@@ -460,7 +490,6 @@ function pasteToCol(ev) {
             console.log('pasteToCol: error: source ID is: ' + this.id.toString());
             return;
     }
-    // updateLineSpacing();
 }
 
 function handleFiles(files, filePara, fileTitle) {
@@ -472,8 +501,6 @@ function handleFiles(files, filePara, fileTitle) {
     fr.readAsText(files[0]);
     document.getElementById(fileTitle).textContent = files[0].name;
 }
-
-// .. apply D.R.Y. above
 
 let mouseWasMoved = false;
 let lastX = window.clientX;
@@ -582,8 +609,6 @@ async function lookupWord(ev) {
     speechSynthesis.speak(speakMsg);
 }
 
-// todo: firefox TTS, see https://hacks.mozilla.org/2016/01/firefox-and-the-web-speech-api/
-//
 function readTextAloud(ev) {
     if (wordLookedUp) {     // A long mousedown occurred, so ignore following click event
         wordLookedUp = false;
@@ -619,13 +644,7 @@ function readTextAloud(ev) {
     }
 
     // todo: Safari 11.0.3 correctly speaks the text, but does not highlight the selection.
-
-    // This code snippet works with Safari: https://stackoverflow.com/a/33195028/5025060 (but only with <input> element)
-/*    let elem = ev.target;
-    if (elem.setSelectionRange) {
-        elem.focus();
-        elem.setSelectionRange(speakRange.startOffset + 1, speakRange.endOffset - 1);
-    }*/
+    // ..see https://stackoverflow.com/questions/49758168/how-to-highlight-desktop-safari-text-selection-in-div-after-range-setstart-r
 
     let speakStr = speakRange.toString().trim();
     let speakMsg = new SpeechSynthesisUtterance(speakStr);
@@ -725,7 +744,7 @@ request.send(null); // Send the request now
 // "...the voice list is loaded async to the page. An onvoiceschanged
 // event is fired when they are loaded":
 let voiceList = [];
-// speechSynthesis.onvoiceschanged = function () {
+
 function doVoices() {
     // let ssVoices = this.getVoices();
     let ssVoices = speechSynthesis.getVoices();
@@ -742,11 +761,10 @@ function doVoices() {
 
 // Workaround for Safari, adapted from https://stackoverflow.com/a/28217250/5025060:
 //
-if ('onvoiceschanged' in speechSynthesis) {
-    // console.log('onvoiceschanged defined by browser');
+if ('onvoiceschanged' in speechSynthesis) {     // trigger on event
     speechSynthesis.onvoiceschanged = doVoices;
 } else {
-    doVoices();
+    doVoices();                                 // just run once at startup
 }
 
 function getTranslation(prefix, toXlate) {
