@@ -23,7 +23,6 @@ html {
     /*line-height: 1.4;*/
 }
 
-
 /*
  * A better looking default horizontal rule
  */
@@ -118,9 +117,9 @@ textarea {
 }
 
 @media print,
-       (-webkit-min-device-pixel-ratio: 1.25),
-       (min-resolution: 1.25dppx),
-       (min-resolution: 120dpi) {
+(-webkit-min-device-pixel-ratio: 1.25),
+(min-resolution: 1.25dppx),
+(min-resolution: 120dpi) {
     /* Style adjustments for high resolution devices */
 }
 
@@ -135,8 +134,9 @@ textarea {
     *:before,
     *:after {
         background: transparent !important;
-        color: #000 !important; /* Black prints faster:
-                                   http://www.sanbeiji.com/archives/953 */
+        color: #000 !important;
+        /* Black prints faster:
+                                          http://www.sanbeiji.com/archives/953 */
         box-shadow: none !important;
         text-shadow: none !important;
     }
@@ -158,7 +158,6 @@ textarea {
      * Don't show links that are fragment identifiers,
      * or use the `javascript:` pseudo protocol
      */
-
     a[href^="#"]:after,
     a[href^="javascript:"]:after {
         content: "";
@@ -167,6 +166,7 @@ textarea {
     pre {
         white-space: pre-wrap !important;
     }
+
     pre,
     blockquote {
         border: 1px solid #999;
@@ -177,7 +177,6 @@ textarea {
      * Printing Tables:
      * http://css-discuss.incutio.com/wiki/Printing_Tables
      */
-
     thead {
         display: table-header-group;
     }
@@ -207,8 +206,8 @@ body {
     /*font-family: 'PT Sans', sans-serif;*/
     /*font-family: Georgia, serif; */
     font-family: andadaregular, serif;
-    font-size : 17px;
-    cursor : default;
+    font-size: 17px;
+    cursor: default;
 }
 
 a {
@@ -221,9 +220,8 @@ a:hover {
     text-shadow: 0 0 4px rgba(180, 237, 255, 0.31);
 }
 
-
 .title {
-    padding-top : 30px;
+    padding-top: 30px;
     font-size: 26px;
     text-align: center;
 }
@@ -234,40 +232,38 @@ a:hover {
     padding-top: 20px;
 }
 
-
 .frame {
     /*border: 1px solid #4272b2;*/
     border: 0;
-    background-color : #ffffeb;
-    color : #000000;
+    background-color: #ffffeb;
+    color: #000000;
     overflow: auto;
     position: relative;
 }
 
 .dragscroll {
-    cursor : -webkit-grab;
-    cursor : -moz-grab;
-    cursor : -o-grab;
-    cursor : grab;
+    cursor: -webkit-grab;
+    cursor: -moz-grab;
+    /*cursor : -o-grab;*/
+    cursor: grab;
 }
 
 .dragscroll:active {
-    cursor : -webkit-grabbing;
-    cursor : -moz-grabbing;
-    cursor : -o-grabbing;
-    cursor : grabbing;
+    cursor: -webkit-grabbing;
+    cursor: -moz-grabbing;
+    /*cursor : -o-grabbing;*/
+    cursor: grabbing;
 }
 
 /***************** Begin crw CSS *****************/
-     /* *May* improve select on mobile */
- select{
-     -webkit-appearance: menulist-textfield;
- }
-
+/* *May* improve select on mobile */
+select {
+    -webkit-appearance: menulist-textfield;
+}
 
 .myColumn {
     overflow: auto; /*causes scrollbars*/
-    border-radius: 0 0 3px 3px;
+    /*border-radius: 0 0 3px 3px; causes jank with Chrome mobile 64.0.3282,137, 2018*/
 }
 
 .myColumnHeader {
@@ -280,7 +276,15 @@ a:hover {
     background-color: #9dbfb8;
     text-align: center;
     border-radius: 6px 6px 0 0;
-    box-shadow: 5px 5px 10px gray;
+    -webkit-transition: all 0.2s;
+    -moz-transition: all 0.2s;
+    -o-transition: all 0.2s;
+    box-shadow: 5px 5px 10px gray; /* may cause jank with Chrome mobile 64.0.3282,137, 2018 */
+}
+
+.myColumnHeader:hover {
+    color: red;
+    background-color: white;
 }
 
 .myColumn, .myColumnHeader {
@@ -289,7 +293,7 @@ a:hover {
 
 .myColumn, #Help, #vocab {
     /*margin: 4px;*/
-    box-shadow: 5px 5px 10px gray;
+    box-shadow: 5px 5px 10px gray; /* causes major jank with Chrome mobile 64.0.3282,137, 2018 */
     /*text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);*/ /* causes jank on large tablet */
     /*font-weight: bold;*/
     text-rendering: optimizeLegibility;
@@ -303,7 +307,9 @@ a:hover {
 #Help, #vocab {
     font-family: sans-serif;
     font-weight: normal;
-    border-radius: 3px;
+    border-radius: 6px;
+    background-color: white;
+    box-shadow: 5px 5px 10px gray;
 }
 
 .myPara, .highlighted {
@@ -344,7 +350,7 @@ a:hover {
     /*white-space: nowrap;*/
     /*vertical-align: top;*/
     /*background-color: transparent;*/
-    background-color: rgba(255,255,255,0.4);
+    background-color: rgba(255, 255, 255, 0.4);
     border-radius: 5px;
     /*display: block;*/
     padding: 7px;
@@ -352,15 +358,15 @@ a:hover {
     /*margin-bottom: 10px;*/
     /*border: 2px solid #428bca;*/
     border: 0;
-    -webkit-transition: all 0.5s;
-    -moz-transition: all 0.5s;
-    -o-transition: all 0.5s;
+    -webkit-transition: all 0.2s;
+    -moz-transition: all 0.2s;
+    -o-transition: all 0.2s;
     box-shadow: 4px 4px 11px gray;
 }
 
 .myButton:hover {
     color: black;
-    background: yellow;
+    background: white;
 }
 
 /* button moves "down" when clicked: */
@@ -369,7 +375,50 @@ a:hover {
 }
 
 /* button changes after click: */
-.myButton:active {
+.myButton:focus {
+    color: black;
+    background: red;
+}
+
+.iconButton {
+    /*position: relative;*/
+    /*font-family: -webkit-pictograph;*/
+    /*font-family: fas;*/
+    font-size: 2em;
+    font-weight: bold;
+    line-height: 1;
+    /*color: #428bca;*/
+    color: white;
+    /*text-align: center;*/
+    /*white-space: nowrap;*/
+    /*vertical-align: top;*/
+    background-color: transparent;
+    border-radius: 5px;
+    /*display: block;*/
+    padding: 7px;
+    margin: 4px;
+    /*margin-bottom: 10px;*/
+    /*border: 2px solid #428bca;*/
+    border: 0;
+    -webkit-transition: all 0.2s;
+    -moz-transition: all 0.2s;
+    -o-transition: all 0.2s;
+    text-shadow: 4px 4px 9px #334455
+}
+
+.iconButton:hover {
+    color: red;
+    /*background: white;*/
+}
+
+/* button moves "down" when clicked: */
+.iconButton:active {
+    /*transform: translateY(6px);*/
+    transform: translate(3px, 3px);
+}
+
+/* button changes after click: */
+.iconButton:focus {
     color: black;
     background: red;
 }
@@ -434,7 +483,7 @@ a:hover {
     font-weight: bold;
 }
 
-#Help, .splash {
+#Info, .splash {
     z-index: 102;
     position: absolute;
     background-color: white;
@@ -446,7 +495,24 @@ a:hover {
     padding: 5%;
     box-shadow: 5px 5px 10px gray;
     height: 90vh;
-    overflow: auto; // scroll
+    overflow: auto;
+}
+
+#Help, #Info, .splash {
+    z-index: 102;
+    position: absolute;
+    background-color: white;
+    display: none;
+    /*
+    top: 5%;
+    left: 5%;
+    */
+    width: 80%;
+    /*height: 80%; auto-adjust to content size */
+    padding: 5%;
+    box-shadow: 5px 5px 10px gray;
+    /*height: 90vh;*/
+    overflow: auto;
 }
 
 .vertContainer,
@@ -492,8 +558,8 @@ a:hover {
     width: 100%; /* Full width */
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    background-color: rgb(0, 0, 0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
     margin-left: 0;
 }
 
@@ -529,7 +595,7 @@ a:hover {
 /********* Slider styles ***********/
 
 .lbSlider {
-    -webkit-appearance: none;  /* Override default CSS styles */
+    -webkit-appearance: none; /* Override default CSS styles */
     width: 75%;
     appearance: none;
     margin-top: 8px;
@@ -563,8 +629,58 @@ a:hover {
     margin-right: .3em;
 }
 
-/*****/
-
 .lbCheckbox {
     cursor: pointer;
+}
+
+/* Animations */
+
+.animate-topleft {
+    position: relative;
+    animation: animatetopleft 0.4s
+}
+
+@keyframes animatetopleft {
+    from {
+        top: -300px;
+        left: -300px;
+        opacity: 0
+    }
+    to {
+        left: 0;
+        top: 0;
+        opacity: 1
+    }
+}
+
+.animate-top {
+    position: relative;
+    animation: animatetop 0.4s
+}
+
+@keyframes animatetop {
+    from {
+        top: -300px;
+        opacity: 0
+    }
+    to {
+        top: 0;
+        opacity: 1
+    }
+}
+
+.animate-left {
+    position: relative;
+    animation: animateleft 0.4s
+}
+
+@keyframes animateleft {
+    from {
+        left: -300px;
+        opacity: 0
+    }
+    to {
+        left: 0;
+        opacity: 1
+    }
 }

@@ -35,15 +35,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/andadaFont.css">
+    <link rel="stylesheet" href="css/fontawesome-all.css">
 
+    <!--<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">-->
 
     <!--<script src="js/syncscroll.js"></script>-->
 </head>
 <body>
-<!--[if IE]>
-<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
-    your browser</a> to improve your experience and security.</p>
-<![endif]-->
 
 <audio preload="auto" id="buttonClick">
     <source src="audio/click1a.ogg" type="audio/ogg">
@@ -68,13 +66,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 <li>Click or tap a sentence to hear it read aloud</li>
                 <li>Long-click or long-tap a word to see its definition</li>
                 <li>Adjustable font size, weight, and speaking speed</li>
-                <li>To load content:</li>
-                <ul>
-                    <li>Select texts from online library</li>
-                    <li>Select files from local storage</li>
-                    <li>Drag-and-drop files, or</li>
-                    <li>Paste text to right and/or left pane</li>
-                </ul>
+                <li>To load content:
+                    <ul>
+                        <li>Select texts from online library</li>
+                        <li>Select files from local storage</li>
+                        <li>Drag-and-drop files, or</li>
+                        <li>Paste text to right and/or left pane</li>
+                    </ul>
+                </li>
             </ul>
             <b>Requirements:</b><br>
             <ul>
@@ -162,7 +161,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         </div>
         <label for="boldCB"><input id="boldCB" type="checkbox" class="lbCheckbox"> Bold font</label>
         &nbsp;&nbsp;
-        <label for="splashCB"><input id="splashCB" type="checkbox" class="lbCheckbox"> Show splash screen at startup</label>
+        <label for="splashCB"><input id="splashCB" type="checkbox" class="lbCheckbox"> Show splash screen at
+            startup</label>
         <span id=closeControls class="modal-close">&times;</span>
     </div>
 </div>
@@ -182,11 +182,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </div>
 </div>
 
+<div id=Help class="frame animate-topleft">
+    <h2>biReader</h2>
 
-<div id=Help class="frame">
-    <h2>biReader v.<span id="bridgeVersion"></span></h2>
-
-    <h3 style="color: red;">Mobile works best with Google Chrome's "Add to Home screen" option.
+    <h3 style="color: red">Mobile works best with Google Chrome's "Add to Home screen" option.
         Desktop works best with Chrome or Firefox.
     </h3>
 
@@ -214,26 +213,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     input as no input validity checks are yet in place.
     <br><br>
     <button id="helpCloseButton" class="bridgeButton">Done</button>
+</div>
+
+<div id=Info class="frame">
+    <h2>biReader version&nbsp;<span id="bridgeVersion"></span></h2>
+    <hr>
+    Your language:&nbsp;
+    <span id="userLang"></span>
+    <hr>
     <span id="vList">
-        <hr>
         Voices currently supported by your browser:
     </span>
+    <hr>
+    Source URL:
+    <span id="fileURL"></span>
+    <span id=closeInfo class="modal-close">&times;</span>
 </div>
+
+<input type="file" id="leftFileChoice" style="display: none"/>
+
+<input type="file" id="rightFileChoice" style="display: none"/>
 
 <!--todo: make "responsive" (use CSS formulae?):-->
 <div class="vertContainer">
 
-    <!--todo: use "ribbon" rather than buttons here (background-color=black?):-->
+    <!--todo: if landscape, show buttons on left side of screen rather than top:-->
     <div id="topRowButtons" class="horizContainer">
-        <button id="helpButton" class="myButton">Help</button>
-        <button id="controlsButton" class="myButton">Controls</button>
-        <button id="libraryLoadButton" class="myButton">Load Files from Online Library</button>
-
-        <label for="leftFileChoice" class="myButton">Load left file from disc</label>
-        <input type="file" id="leftFileChoice" style="display: none"/>
-
-        <label for="rightFileChoice" class="myButton">Load right file from disc</label>
-        <input type="file" id="rightFileChoice" style="display: none"/>
+        <!--<button id="libraryLoadButton" class="myButton" title="Load Files from Online Library">Load Files from Online Library</button>-->
+        <!--<button id="controlsButton" class="myButton">Controls</button>-->
+        <!--<button id="infoButton" class="iconButton" title="Information">i</button>-->
+        <!--<button id="helpButton" class="iconButton" title="Help">?</button>-->
+        <i id="libraryLoadButton" title="Load files from online library" class="iconButton fas fa-book"></i>
+        <i id="controlsButton" title="Settings" class="iconButton fas fa-cogs"></i>
+        <i id="infoButton" title="Information" class="iconButton fas fa-info"></i>
+        <i id="helpButton" title="Help" class="iconButton fas fa-question"></i>
+        <!--<button id="helpButton" class="iconButton" title="Help">?</button>-->
+        <!--<img src="img/helpButton1.png" height="28" width="20" id="helpButton" title="Help" class="iconButton">-->
     </div>
 
     <div class="horizContainer modal" id="fileChooserModal">
@@ -250,15 +265,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
 
     <div class="horizContainer">
-        <div id=leftColumnHeader class="myColumnHeader">
-        </div>
+        <!--        <div id=leftColumnHeader class="myColumnHeader">
+                </div>-->
+        <label id=leftColumnHeader class="myColumnHeader" for="leftFileChoice" title="Load left file from disc">
+            Load left file from disc
+        </label>
 
-        <div id=rightColumnHeader class="myColumnHeader">
-        </div>
+        <!--<div id=rightColumnHeader class="myColumnHeader">-->
+        <label id=rightColumnHeader class=myColumnHeader for="rightFileChoice" title="Load right file from disc">
+            Load right file from disc</label>
     </div>
 
     <div class="horizContainer" id="textColumns">
-        <!--<div id=leftColumn class="myColumn syncscroll frame" name="sync1">-->
         <div id=leftColumn class="myColumn frame">
             <p id=leftPara class="clickable myPara">
                 <span class=colInstructions>
@@ -267,7 +285,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             </p>
         </div>
 
-        <!--<div id=rightColumn class="myColumn syncscroll frame" name="sync1">-->
         <div id=rightColumn class="myColumn frame">
             <p id=rightPara class="clickable myPara">
                 <span class=colInstructions>
