@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 /*jslint devel: true */
 /*global speechSynthesis*/
 
-"use strict";   /*jshint -W097 */
+"use strict";
+/*jshint -W097 */
 
 // todo: store filenames as English and translate to native language for display.
 // todo: web storage for things like show help first time.
@@ -37,6 +38,10 @@ document.body.style.lineHeight = defLineHeight;
 
 let userLanguage = window.navigator.language; // Returns value like 'en-US'
 document.getElementById("userLang").textContent = userLanguage;
+
+// Detected language of l/r frames:
+let leftLanguage = userLanguage;
+let rightLanguage = userLanguage;
 
 if (localStorage.fontWeight === null)
     localStorage.fontWeight = "bold"; // default to bold
@@ -251,6 +256,7 @@ function speakIfSameSpd() {
         sameSpeakSpd = false;
     }
 }
+
 /* global SpeechSynthesisUtterance */
 function speakSample() {
     // todo: internationalize:
@@ -466,18 +472,39 @@ rightFileColumn.addEventListener("dragover", keepItLocal, false);
 rightFileColumn.addEventListener("drop", fileDrop, false);
 rightFileColumn.addEventListener("paste", pasteToCol, false);
 
-let leftParaObserver = new MutationObserver(updateLineSpacing);
+let leftParaObserver = new MutationObserver(textEval);
 leftParaObserver.observe(document.getElementById("leftPara"), {childList: true});
 
-let rightParaObserver = new MutationObserver(updateLineSpacing);
+let rightParaObserver = new MutationObserver(textEval);
 rightParaObserver.observe(document.getElementById("rightPara"), {childList: true});
 
-// Configure line spacing so that left and right panels display the same percentage of
-// their text (aids in scrolling and synchronization of content:
-// todo: this never matches exactly, I think due to browser rounding and/or font rendering vs
-// todo: dot pitch of screen.  E.g., line-height 1.686 displays same as 1.68.  Possibly add
-// todo: workaround to onscroll routines to resync when scrolling reaches start/end of article.
-function updateLineSpacing() {
+function textEval(mutationsList) {
+
+    // console.log(`wholeText: ${mutationsList[0].addedNodes[0].wholeText}`);
+    // console.log(`target: ${mutationsList[0].target.id}`);
+
+    let textSample = mutationsList[0].addedNodes[0].wholeText.substr(0, 100);
+    let nodeName = mutationsList[0].target.id;
+
+    // Detect and store language of new text:
+    /* global guessLanguage */
+    guessLanguage.info(textSample, function (languageInfo) {
+        if (languageInfo[0] === "unknown") {
+            console.log(`${nodeName} does not contain enough text to determine the source language.`);
+        } else {
+            console.log(`Detected language of ${nodeName} is ${languageInfo[2]} [${languageInfo[0]}].`);
+            if (nodeName === "leftPara") leftLanguage = languageInfo[0];
+            else if (nodeName === "rightPara") rightLanguage = languageInfo[0];
+        }
+    });
+
+    // Configure line spacing so that left and right panels display the same percentage of
+    // their text (aids in scrolling and synchronization of content:
+    // todo: this never matches exactly, I think due to browser rounding and/or font rendering vs
+    // todo: dot pitch of screen.  E.g., line-height 1.686 displays same as 1.68.  Possibly add
+    // todo: workaround to onscroll routines to resync when scrolling reaches start/end of article.
+
+    // Reformat display to match length of new text:
     // First reset both columns to default line height so we can make our computation:
     document.getElementById("leftPara").style.lineHeight = defLineHeight;
     document.getElementById("rightPara").style.lineHeight = defLineHeight;
@@ -549,7 +576,7 @@ function handleFiles(files, filePara, fileTitle) {
     const fr = new FileReader();
     fr.onload = function () {
         document.getElementById(filePara).textContent = this.result;
-        updateLineSpacing();
+        textEval();
     };
     fr.readAsText(files[0]);
     document.getElementById(fileTitle).textContent = files[0].name;
@@ -657,12 +684,49 @@ async function lookupWord(ev) { // jshint ignore:line
 
     console.log("lookupWord: " + speakStr);
 
-    getTranslation("from=fra&dest=eng&phrase=", speakStr);
+    // getTranslation("from=fra&dest=eng&phrase=", speakStr);
+    let sourceLang;
+    if (this.id.toString() === "leftPara")
+        sourceLang = leftLanguage;
+    else if (this.id.toString() === "rightPara")
+        sourceLang = rightLanguage;
+
+    /* global iso2to3 */
+    let sourceLangISO6393 = iso2to3[sourceLang];
+    let shortUserLanguage = userLanguage.split(/-/)[0];
+    let destLangISO6393 = iso2to3[shortUserLanguage];
+
+    getTranslation(`from=${sourceLangISO6393}&dest=${destLangISO6393}&phrase=`, speakStr);
 
     let speakMsg = new SpeechSynthesisUtterance(speakStr);
+    speakMsg.lang = sourceLang;
     speakMsg.rate = currentSpeakSpd;
+
     speechSynthesis.speak(speakMsg);
 }
+
+let clickables = document.getElementsByClassName("clickable");
+
+for (let elNum = 0; elNum < clickables.length; elNum++) {
+    // noinspection JSUnresolvedFunction
+    clickables[elNum].addEventListener("mousedown", lookupWord, {passive: true});
+    clickables[elNum].addEventListener("touchstart", lookupWord, {passive: true}); // required for tablet
+
+    clickables[elNum].addEventListener("mousemove", mouseMoved, {passive: true});
+    // clickables[elNum].addEventListener("touchmove", mouseMoved, {passive:true}); // tablet
+
+    // noinspection JSUnresolvedFunction
+    clickables[elNum].addEventListener("click", readTextAloud, {passive: true});
+
+    // clickables[elNum].addEventListener("mouseup", keepItLocal, false); // else touchscreen browser removes highlighting
+    // clickables[elNum].addEventListener("mouseup", setLookupFlag, false);
+
+    // tablet: monitor touch movement to prevent tap handling
+    clickables[elNum].addEventListener("touchmove", touchMoved, {passive: true});
+}
+
+// Preload library file list to <select>:
+//
 
 // A sentence was short-clicked; read it aloud:
 function readTextAloud(ev) {
@@ -705,17 +769,10 @@ function readTextAloud(ev) {
     let speakStr = speakRange.toString().trim();
     let speakMsg = new SpeechSynthesisUtterance(speakStr);
 
-    // todo: Bad for performance: run once after new file load: for proof-of-concept code only:
-    // (Actually, this MAY be a requirement if languages are mixed within a document):
-    /* global guessLanguage */
-    guessLanguage.info(speakStr, function (languageInfo) {
-        if (languageInfo[0] === "unknown") {
-            console.log("Not enough text has been provided to determine the source language.");
-        } else {
-            console.log("Detected language of provided text is " + languageInfo[2] + " [" + languageInfo[0] + "].");
-            speakMsg.lang = languageInfo[0];
-        }
-    });
+    if (ev.currentTarget.id.toString() === "leftPara")
+        speakMsg.lang = leftLanguage;
+    else if (ev.currentTarget.id.toString() === "rightPara")
+        speakMsg.lang = rightLanguage;
 
     speakMsg.rate = currentSpeakSpd;    // todo: different languages respond to same rate differently (e.g., en vs fr)
     speechSynthesis.speak(speakMsg);
@@ -731,28 +788,6 @@ function readTextAloud(ev) {
     }
 }
 
-let clickables = document.getElementsByClassName("clickable");
-
-for (let elNum = 0; elNum < clickables.length; elNum++) {
-    // noinspection JSUnresolvedFunction
-    clickables[elNum].addEventListener("mousedown", lookupWord, {passive: true});
-    clickables[elNum].addEventListener("touchstart", lookupWord, {passive: true}); // required for tablet
-
-    clickables[elNum].addEventListener("mousemove", mouseMoved, {passive: true});
-    // clickables[elNum].addEventListener("touchmove", mouseMoved, {passive:true}); // tablet
-
-    // noinspection JSUnresolvedFunction
-    clickables[elNum].addEventListener("click", readTextAloud, {passive: true});
-
-    // clickables[elNum].addEventListener("mouseup", keepItLocal, false); // else touchscreen browser removes highlighting
-    // clickables[elNum].addEventListener("mouseup", setLookupFlag, false);
-
-    // tablet: monitor touch movement to prevent tap handling
-    clickables[elNum].addEventListener("touchmove", touchMoved, {passive: true});
-}
-
-// Preload library file list to <select>:
-//
 let request = new XMLHttpRequest(); // Create new request
 const el = document.createElement("html");
 
@@ -867,8 +902,8 @@ let rightDiv = document.getElementById("rightColumn");
 leftDiv.onscroll = function () {
     if (!isSyncingLeftScroll) {
         isSyncingRightScroll = true;
-/*        console.log('rst = ' + rightDiv.scrollTop);
-        console.log('lst = ' + leftDiv.scrollTop)*/
+        /*        console.log('rst = ' + rightDiv.scrollTop);
+                console.log('lst = ' + leftDiv.scrollTop)*/
         rightDiv.scrollTop = this.scrollTop;
     }
     isSyncingLeftScroll = false;
