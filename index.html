@@ -53,10 +53,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 <div id="biReaderSplash" class="modal">
     <!--<div class="modal-content" style="background-color: #3a768f">-->
     <div class="modal-content" style="font-size: 1.1em;">
-        <div style="text-align:center; width:100%">
-            <img src="img/bireader2f.png"
-                 style="width: 80%; max-width: 705px; min-width: 8rem;">
-        </div>
+        <!--<div style="text-align:center; width:100%">-->
+        <img src="img/bireader2f.png" style="width: 40%;
+            max-width: 705px;min-width: 12rem;margin-left: 6%;">
+        <!--</div>-->
         <div style="margin-left: 6%; margin-right: 6%; margin-top: 2%; overflow: auto; height: 60vh">
             Welcome to <a href="http://bireader.com">biReader</a>, your parallel reading resource.<br>
             <br>
@@ -77,7 +77,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             </ul>
             <b>Requirements:</b><br>
             <ul>
-                A recent release of Chrome, Firefox, Safari, or Edge running on:
+                A recent release of Chrome, Firefox, or Edge running on:
                 <ul>
                     <li>Desktop (Windows, Mac, Linux)</li>
                     <li>Tablet (Android, iPad)</li>
@@ -182,52 +182,81 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </div>
 </div>
 
-<div id=Help class="frame animate-topleft">
-    <h2>biReader</h2>
+<div id=Help class="modal">
+    <div class="modal-content">
+        <h2>biReader</h2>
 
-    <h3 style="color: red">Mobile works best with Google Chrome's "Add to Home screen" option.
-        Desktop works best with Chrome or Firefox.
-    </h3>
+        <h3 style="color: red">Mobile works best with Google Chrome's "Add to Home screen" option.
+            Desktop works best with Chrome or Firefox.
+        </h3>
 
-    You may provide texts of the same article in different languages by pasting them
-    to the two panels, or drag-and-drop local files to the panels, or click on the "load"
-    buttons to select files from your local disc. Or click on "Load Files from Online Library" to
-    choose an existing pairing from the online library.
-    <!--
-            todo: update this description and show it when the user opens the file selection dialogue:
-                The files should contain <strong>plain text,
-                using UTF-8 encoding</strong>,
-                of the same article or story
-                but written in two different languages (e.g., left = English and right = German).
-                Text should consist of paragraphs separated by double returns (control characters
-                CR,LF,CR,LF, which is 0D, 0A, 0D, 0A when shown as hexadecimal codes).
-    -->
-    Language Bridge will attempt to present the two texts
-    as equal height, synchronously scrolling panels, and to pronounce sentences
-    in their native language
-    when you click on them or a series of sentences when you click-and-drag over them.
-    It will also attempt to show a definition of a word if you long-click (tablet: long-tap)
-    on it (PoC: French to English only).
-    <br><br>
-    PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
-    input as no input validity checks are yet in place.
-    <br><br>
-    <button id="helpCloseButton" class="bridgeButton">Done</button>
+        You may provide texts of the same article in different languages by pasting them
+        to the two panels, or drag-and-drop local files to the panels, or click on the "load"
+        buttons to select files from your local disc. Or click on "Load Files from Online Library" to
+        choose an existing pairing from the online library.
+        <!--
+                todo: update this description and show it when the user opens the file selection dialogue:
+                    The files should contain <strong>plain text,
+                    using UTF-8 encoding</strong>,
+                    of the same article or story
+                    but written in two different languages (e.g., left = English and right = German).
+                    Text should consist of paragraphs separated by double returns (control characters
+                    CR,LF,CR,LF, which is 0D, 0A, 0D, 0A when shown as hexadecimal codes).
+        -->
+        Language Bridge will attempt to present the two texts
+        as equal height, synchronously scrolling panels, and to pronounce sentences
+        in their native language
+        when you click on them or a series of sentences when you click-and-drag over them.
+        It will also attempt to show a definition of a word if you long-click (tablet: long-tap)
+        on it (PoC: French to English only).
+        <br><br>
+        PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
+        input as no input validity checks are yet in place.
+        <br><br>
+        <!--<button id="helpCloseButton" class="bridgeButton">Done</button>-->
+        <i id="helpCloseButton" title="Close Help Screen"
+           class="bridgeButton modal-close iconButton fas fa-window-close"></i>
+    </div>
 </div>
 
-<div id=Info class="frame">
-    <h2>biReader version&nbsp;<span id="bridgeVersion"></span></h2>
-    <hr>
-    Your language:&nbsp;
-    <span id="userLang"></span>
-    <hr>
-    <span id="vList">
+
+<!--<div class="md-modal md-effect-1" id="modal-1">
+    <div class="md-content">
+        <h3>Modal Dialog</h3>
+        <div>
+            <p>This is a modal window. You can do the following things with it:</p>
+            <ul>
+                <li><strong>Read:</strong> modal windows will probably tell you something important so don't forget to
+                    read what they say.
+                </li>
+                <li><strong>Look:</strong> a modal window enjoys a certain kind of attention; just look at it and
+                    appreciate its presence.
+                </li>
+                <li><strong>Close:</strong> click on the button below to close the modal.</li>
+            </ul>
+            <button class="md-close">Close me!</button>
+        </div>
+    </div>
+</div>-->
+
+<div id=Info class="md-modal md-effect-1">
+    <div class="md-content">
+        <h2>biReader version&nbsp;<span id="bridgeVersion"></span></h2>
+        <hr>
+        Your language:&nbsp;
+        <span id="userLang"></span>
+        <hr>
         Voices currently supported by your browser:
+        <span id="vList">
     </span>
-    <hr>
-    Source URL:
-    <span id="fileURL"></span>
-    <span id=closeInfo class="modal-close">&times;</span>
+        <hr>
+        Source URL:
+        <span id="fileURL"></span>
+        <!--<span id=closeInfo class="modal-close">&times;</span>-->
+        <i id="closeInfo" title="Close Info Screen" class="modal-close iconButton fas fa-window-close"></i>
+        <!--Keep close button within modal:-->
+        <br><br><br><br>
+    </div>
 </div>
 
 <input type="file" id="leftFileChoice" style="display: none"/>
@@ -239,16 +268,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <!--todo: if landscape, show buttons on left side of screen rather than top:-->
     <div id="topRowButtons" class="horizContainer">
-        <!--<button id="libraryLoadButton" class="myButton" title="Load Files from Online Library">Load Files from Online Library</button>-->
-        <!--<button id="controlsButton" class="myButton">Controls</button>-->
-        <!--<button id="infoButton" class="iconButton" title="Information">i</button>-->
-        <!--<button id="helpButton" class="iconButton" title="Help">?</button>-->
-        <i id="libraryLoadButton" title="Load files from online library" class="iconButton fas fa-book"></i>
+        <i id="libraryLoadButton" title="Load files from online library"
+           class="iconButton fas fa-cloud-download-alt"></i>
         <i id="controlsButton" title="Settings" class="iconButton fas fa-cogs"></i>
         <i id="infoButton" title="Information" class="iconButton fas fa-info"></i>
         <i id="helpButton" title="Help" class="iconButton fas fa-question"></i>
-        <!--<button id="helpButton" class="iconButton" title="Help">?</button>-->
-        <!--<img src="img/helpButton1.png" height="28" width="20" id="helpButton" title="Help" class="iconButton">-->
     </div>
 
     <div class="horizContainer modal" id="fileChooserModal">
@@ -299,16 +323,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             <span class="colInstructions">Long-click a word for definition here.</span>
         </span>
         <span style="position: absolute; bottom: 0; right: 5px; font-size: x-small">
-        Translations provided by <a href="https://glosbe.com/" ; target="_blank">Glosbe</a>.</span></div>
+        Translations provided by <a href="https://glosbe.com/" target="_blank">Glosbe</a>.</span></div>
 </div>
 
+<div class="md-overlay"></div>
 
 <!--<script src="js/vendor/modernizr-3.5.0.min.js"></script>-->
 
 <script src="js/iexplorer-test.js"></script>
 
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"
-        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<!--<script src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>-->
+<script src="js/vendor/jquery-3.2.1.min.js"></script>
 <script src="js/guessLang/_languageData.js"></script>
 <script src="js/guessLang/guessLanguage.js"></script>
 <script src="js/ISOmap.js"></script>

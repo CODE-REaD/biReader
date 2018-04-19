@@ -307,11 +307,13 @@ document.getElementById("helpButton").addEventListener("click",
     function () {
         makeClick();
         document.getElementById("Help").style.display = "inline-block";
+        // document.getElementById("Help").style.top = "10%";
         // Click anywhere except Help button turns it off:
         document.addEventListener("click",
             function docClick(f) {
                 if (f.target.id !== "helpButton") {
                     document.getElementById("Help").style.display = "none";
+                    // document.getElementById("Help").style.top = "-100%";
                     document.removeEventListener("click", docClick);
                 }
             }
@@ -321,19 +323,23 @@ document.getElementById("helpButton").addEventListener("click",
 document.getElementById("helpCloseButton").addEventListener("click",
     function () {
         makeClick();
-        document.getElementById("Help").style.display = "none";
+        document.getElementById("Help").style.top = "-100%";
+        // document.getElementById("Help").style.display = "none";
     });
 
 // Info popup:
 document.getElementById("infoButton").addEventListener("click",
     function () {
         makeClick();
-        document.getElementById("Info").style.display = "inline-block";
+        // document.getElementById("Info").style.display = "inline-block";
+        // document.getElementById("Info").style.top = "10%";
+        document.getElementById("Info").classList.add("md-show");
         // Click anywhere except Info button turns it off:
         document.addEventListener("click",
             function docClick(f) {
                 if (f.target.id !== "infoButton") {
-                    document.getElementById("Info").style.display = "none";
+                    document.getElementById("Info").classList.remove("md-show");
+                    // document.getElementById("Info").style.top = "-100%";
                     document.removeEventListener("click", docClick);
                 }
             }
@@ -343,7 +349,7 @@ document.getElementById("infoButton").addEventListener("click",
 // document.querySelector("#closeInfo").onclick = function () {
 document.getElementById("closeInfo").onclick = function () {
     makeClick();
-    document.getElementById("Info").style.display = "none";
+    document.getElementById("Info").classList.remove("md-show");
 };
 
 let leftSel = null;
@@ -483,7 +489,8 @@ function textEval(mutationsList) {
     // console.log(`wholeText: ${mutationsList[0].addedNodes[0].wholeText}`);
     // console.log(`target: ${mutationsList[0].target.id}`);
 
-    let textSample = mutationsList[0].addedNodes[0].wholeText.substr(0, 100);
+    let fullText = mutationsList[0].addedNodes[0].wholeText;
+    let textSample = fullText.substr(fullText.length / 4, 100);
     let nodeName = mutationsList[0].target.id;
 
     // Detect and store language of new text:
@@ -725,9 +732,6 @@ for (let elNum = 0; elNum < clickables.length; elNum++) {
     clickables[elNum].addEventListener("touchmove", touchMoved, {passive: true});
 }
 
-// Preload library file list to <select>:
-//
-
 // A sentence was short-clicked; read it aloud:
 function readTextAloud(ev) {
     if (wordLookedUp) {     // A long mousedown occurred, so ignore following click event
@@ -846,26 +850,36 @@ request.send(null); // Send the request now
 // event is fired when they are loaded":
 let voiceList = [];
 
+// todo: firefox TTS, see https://hacks.mozilla.org/2016/01/firefox-and-the-web-speech-api/
+
 function doVoices() {
     // let ssVoices = this.getVoices();
     let ssVoices = speechSynthesis.getVoices();
+
     for (let voiceInd = 0; voiceInd < ssVoices.length; voiceInd++)
         voiceList[voiceInd] = ssVoices[voiceInd].name + " (" + ssVoices[voiceInd].lang + ")";
 
-    let vListEl = document.getElementById("vList");
-    vListEl.insertAdjacentHTML("beforeend", "<ul>");
+    let vList = "<ul>"
     voiceList.forEach(function (listMem) {
-        vListEl.insertAdjacentHTML("beforeend", "<li>" + listMem);
+        vList += "<li>" + listMem;
     });
-    vListEl.insertAdjacentHTML("beforeend", "</ul>");
+    vList += "</ul>";
+    document.getElementById("vList").innerHTML = vList;
 }
 
-// Workaround for Safari voice list, adapted from https://stackoverflow.com/a/28217250/5025060:
+// Workaround for Safari and Firefox voice lists,
+// adapted from https://stackoverflow.com/a/28217250/5025060 and
+// http://mdn.github.io/web-speech-api/speak-easy-synthesis/
 //
+doVoices();
 if ("onvoiceschanged" in speechSynthesis) {     // trigger on event
     speechSynthesis.onvoiceschanged = doVoices;
-} else {
-    doVoices();                                 // just run once at startup
+}
+
+window.onload = function () {
+    if (voiceList.length < 2)
+    // todo: change to modal with "do not show again" option:
+        alert(`Notice: this browser does not have access to any foreign language voices.  If you wish to have foreign language texts spoken to you, we recommend Google Chrome or Microsoft Edge on desktops or Chrome, Edge, or Firefox on phones and tablets.`);
 }
 
 function getTranslation(prefix, toXlate) {
