@@ -29,10 +29,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 // todo: filename.info contains source information, display with "info" control
 // todo: save word definitions locally (web storage) so we don't repeatedly look them up at Glosbe
 
+const release = "0.7";          // "Semantic version" for end users
+
 const defLineHeight = "1.4";    // Default, baseline line height
 
-const release = "0.7";          // "Semantic version" for end users
-document.getElementById("bridgeVersion").innerHTML = release;
+document.getElementById("brVersion").innerHTML = release;
 
 document.body.style.lineHeight = defLineHeight;
 
@@ -57,124 +58,9 @@ function makeClick() {
     buttonClickSound.play();
 }
 
-// Splash screen:
-if (localStorage.showSplash !== "doNotShow") {
-    document.getElementById("biReaderSplash").style.display = "block";
-    document.getElementById("splashCB").checked = true;
-} else {
-    document.getElementById("biReaderSplash").style.display = "none";
-    document.getElementById("splashCB").checked = false;
-}
-
-document.querySelector("#closeSplash").onclick = function () {
-    makeClick();
-    document.getElementById("biReaderSplash").style.display = "none";
-};
-
-document.querySelector("#noSplashButton").onclick = function () {
-    makeClick();
-    // Disable splash screen:
-    localStorage.showSplash = "doNotShow";
-    document.getElementById("biReaderSplash").style.display = "none";
-};
-
-document.querySelector("#splashCB").onchange = function () {
-    makeClick();
-    if (this.checked)
-        localStorage.showSplash = "Show";
-    else
-        localStorage.showSplash = "doNotShow";
-};
-
-// noinspection RedundantIfStatementJS
-if (localStorage.showFSprompt === "Show")
-    document.getElementById("FSPromptCB").checked = true;
-else
-    document.getElementById("FSPromptCB").checked = false;
-
-document.getElementById("leftColumn").style.fontWeight = localStorage.fontWeight;
-document.getElementById("rightColumn").style.fontWeight = localStorage.fontWeight;
-
-// Controls:
-let controlsBackground = document.querySelector("#controlsBackground");
-
-document.getElementById("controlsButton").addEventListener("click",
-    function () {
-        makeClick();
-        controlsBackground.style.display = "block";
-
-        // Clicking anywhere outside the control panel closes it:
-        document.addEventListener("click",
-            function docClick(f) {
-                if (f.target.id === "controlsBackground") {
-                    controlsBackground.style.display = "none";
-                    document.removeEventListener("click", docClick);
-                }
-            }
-        );
-    }, false
-);
-
-document.querySelector("#closeControls").onclick = function () {
-    makeClick();
-    if (speechSynthesis.pending || speechSynthesis.speaking)
-        speechSynthesis.cancel();
-    controlsBackground.style.display = "none";
-};
-
-if (isMobileDevice()) {
-    // This element will be empty unless mobile, so conditional listener:
-    document.querySelector("#FSPromptCB").onchange = function () {
-        if (this.checked)
-            localStorage.showFSprompt = "Show";
-        else
-            localStorage.showFSprompt = "doNotShow";
-    };
-    // Prompt at startup if mobile (FS requires user interaction):
-    if (localStorage.showFSprompt !== "doNotShow")
-        document.getElementById("fullScreenDialog").style.display = "block";
-}
-else {
-    document.getElementById("fullScreenControls").innerHTML = ""; // Only show opts for mobile
-    // These cause jank with Chrome mobile 64.0.3282,137, 2018, so define for nonmobile only:
-    /*
-        document.getElementById("leftColumnHeader").style.boxShadow = "5px 5px 10px gray";
-        document.getElementById("rightColumnHeader").style.boxShadow = "5px 5px 10px gray";
-        document.getElementById("leftColumn").style.boxShadow = "5px 5px 10px gray";
-        document.getElementById("rightColumn").style.boxShadow = "5px 5px 10px gray";
-    */
-    document.getElementById("leftColumn").style.borderRadius = "0 0 6px 6px";
-    document.getElementById("rightColumn").style.borderRadius = "0 0 6px 6px";
-}
-
 function isMobileDevice() {
     return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf("IEMobile") !== -1);
 }
-
-document.querySelector("#noFullScreenButton").onclick = function () {
-    makeClick();
-    document.querySelector("#fullScreenDialog").style.display = "none";
-};
-
-// Full screen prompt:
-document.querySelector("#noFSpromptButton").onclick = function () {
-    makeClick();
-    // Disable full screen prompt:
-    localStorage.showFSprompt = "doNotShow";
-    document.querySelector("#fullScreenDialog").style.display = "none";
-};
-
-// Toggle bold/normal font:
-document.querySelector("#boldCB").onchange = function () {
-    makeClick();
-    if (document.querySelector("#boldCB").checked)
-        localStorage.fontWeight = "bold";
-    else
-        localStorage.fontWeight = "normal";
-
-    document.getElementById("leftColumn").style.fontWeight = localStorage.fontWeight;
-    document.getElementById("rightColumn").style.fontWeight = localStorage.fontWeight;
-};
 
 function launchFullscreen(element) {
     if (isMobileDevice()) {
@@ -193,7 +79,8 @@ function launchFullscreen(element) {
         }
         if (document.fullscreenEnabled || document.mozFullScreenEnabled ||
             document.webkitFullscreenEnabled || document.msFullscreenEnabled) {
-            document.querySelector("#fullScreenDialog").style.display = "none";
+            // document.querySelector("#fullScreenDialog").style.display = "none";
+            document.getElementById("fullScreenDialog").classList.remove("md-show", "md-show-top");
             setTimeout(function () {
                 // todo: when we exit, device is still in landscape; attempt to restore to portrait if that is
                 // ..how we started:
@@ -202,6 +89,124 @@ function launchFullscreen(element) {
         }
     }
 }
+
+document.querySelector("#noFullScreenButton").onclick = function () {
+    makeClick();
+    document.getElementById("fullScreenDialog").classList.remove("md-show", "md-show-top");
+};
+
+// Full screen prompt:
+document.querySelector("#noFSpromptButton").onclick = function () {
+    makeClick();
+    // Disable full screen prompt:
+    localStorage.showFSprompt = "doNotShow";
+    document.getElementById("fullScreenDialog").classList.remove("md-show", "md-show-top");
+};
+
+// noinspection RedundantIfStatementJS
+if (localStorage.showFSprompt === "Show")
+    document.getElementById("FSPromptCB").checked = true;
+else
+    document.getElementById("FSPromptCB").checked = false;
+
+if (isMobileDevice()) {
+    // This element will be empty unless mobile, so listener is only defined
+    // here, in this conditional:
+    document.querySelector("#FSPromptCB").onchange = function () {
+        if (this.checked)
+            localStorage.showFSprompt = "Show";
+        else
+            localStorage.showFSprompt = "doNotShow";
+    };
+    // Prompt at startup if mobile (FS won't start w/o user interaction):
+    if (localStorage.showFSprompt !== "doNotShow")
+        document.getElementById("fullScreenDialog").classList.add("md-show", "md-show-top");
+}
+else {
+    document.getElementById("fullScreenControls").innerHTML = ""; // Only show opts for mobile
+    // These cause jank with Chrome mobile 64.0.3282,137, 2018, so define for nonmobile only:
+    /*
+        document.getElementById("leftColumnHeader").style.boxShadow = "5px 5px 10px gray";
+        document.getElementById("rightColumnHeader").style.boxShadow = "5px 5px 10px gray";
+        document.getElementById("leftColumn").style.boxShadow = "5px 5px 10px gray";
+        document.getElementById("rightColumn").style.boxShadow = "5px 5px 10px gray";
+    */
+    document.getElementById("leftColumn").style.borderRadius = "0 0 6px 6px";
+    document.getElementById("rightColumn").style.borderRadius = "0 0 6px 6px";
+}
+
+// Splash screen:
+if (localStorage.showSplash !== "doNotShow") {
+    document.getElementById("biReaderSplash").classList.add("md-show");
+    document.getElementById("splashCB").checked = true;
+} else {
+    document.getElementById("biReaderSplash").classList.remove("md-show");
+    document.getElementById("splashCB").checked = false;
+}
+
+document.querySelector("#closeSplash").onclick = function () {
+    makeClick();
+    document.getElementById("biReaderSplash").classList.remove("md-show");
+};
+
+document.querySelector("#noSplashButton").onclick = function () {
+    makeClick();
+    // Disable splash screen:
+    localStorage.showSplash = "doNotShow";
+    document.getElementById("biReaderSplash").classList.remove("md-show");
+};
+
+document.querySelector("#splashCB").onchange = function () {
+    makeClick();
+    if (this.checked)
+        localStorage.showSplash = "Show";
+    else
+        localStorage.showSplash = "doNotShow";
+};
+
+document.getElementById("leftColumn").style.fontWeight = localStorage.fontWeight;
+document.getElementById("rightColumn").style.fontWeight = localStorage.fontWeight;
+
+// Controls:
+let controlsBackground = document.querySelector("#controlsBackground");
+
+document.getElementById("controlsButton").addEventListener("click",
+    function () {
+        makeClick();
+        // controlsBackground.style.display = "block";
+        document.getElementById("controlsBackground").classList.add("md-show");
+        // Clicking anywhere outside the control panel closes it:
+        document.addEventListener("click",
+            function docClick(f) {
+                if (f.target.id === "controlsBackground") {
+                    // controlsBackground.style.display = "none";
+                    document.getElementById("controlsBackground").classList.remove("md-show");
+                    document.removeEventListener("click", docClick);
+                }
+            }
+        );
+    }, false
+);
+
+document.querySelector("#closeControls").onclick = function () {
+    makeClick();
+    if (speechSynthesis.pending || speechSynthesis.speaking)
+        speechSynthesis.cancel();
+    document.getElementById("controlsBackground").classList.remove("md-show");
+    // controlsBackground.style.display = "none";
+};
+
+// Toggle bold/normal font:
+document.querySelector("#boldCB").onchange = function () {
+    makeClick();
+    if (document.querySelector("#boldCB").checked)
+        localStorage.fontWeight = "bold";
+    else
+        localStorage.fontWeight = "normal";
+
+    document.getElementById("leftColumn").style.fontWeight = localStorage.fontWeight;
+    document.getElementById("rightColumn").style.fontWeight = localStorage.fontWeight;
+};
 
 let libFilePaths;
 let libFileURLs;
@@ -306,14 +311,12 @@ document.getElementById("libraryLoadButton").addEventListener("click",
 document.getElementById("helpButton").addEventListener("click",
     function () {
         makeClick();
-        document.getElementById("Help").style.display = "inline-block";
-        // document.getElementById("Help").style.top = "10%";
+        document.getElementById("Help").classList.add("md-show");
         // Click anywhere except Help button turns it off:
         document.addEventListener("click",
             function docClick(f) {
                 if (f.target.id !== "helpButton") {
-                    document.getElementById("Help").style.display = "none";
-                    // document.getElementById("Help").style.top = "-100%";
+                    document.getElementById("Help").classList.remove("md-show");
                     document.removeEventListener("click", docClick);
                 }
             }
@@ -323,39 +326,34 @@ document.getElementById("helpButton").addEventListener("click",
 document.getElementById("helpCloseButton").addEventListener("click",
     function () {
         makeClick();
-        document.getElementById("Help").style.top = "-100%";
-        // document.getElementById("Help").style.display = "none";
+        document.getElementById("Help").classList.remove("md-show");
     });
 
 // Info popup:
 document.getElementById("infoButton").addEventListener("click",
     function () {
         makeClick();
-        // document.getElementById("Info").style.display = "inline-block";
-        // document.getElementById("Info").style.top = "10%";
         document.getElementById("Info").classList.add("md-show");
         // Click anywhere except Info button turns it off:
         document.addEventListener("click",
             function docClick(f) {
                 if (f.target.id !== "infoButton") {
                     document.getElementById("Info").classList.remove("md-show");
-                    // document.getElementById("Info").style.top = "-100%";
                     document.removeEventListener("click", docClick);
                 }
             }
         );
     }, false);
 
-// document.querySelector("#closeInfo").onclick = function () {
 document.getElementById("closeInfo").onclick = function () {
     makeClick();
     document.getElementById("Info").classList.remove("md-show");
 };
 
+// Load a file when a library selection is made.
 let leftSel = null;
 let libFileOK = false; // Global flag for library file load result
 
-// Load a file when a library selection is made.
 document.getElementById("leftFileSelect").addEventListener("change", function () {
     makeClick();
     leftSel = document.getElementById("leftFileSelect");
@@ -503,6 +501,11 @@ function textEval(mutationsList) {
             if (nodeName === "leftPara") leftLanguage = languageInfo[0];
             else if (nodeName === "rightPara") rightLanguage = languageInfo[0];
         }
+
+        // todo: improve to give more exact information whether no language voices, or just this voice:
+        if ((languageInfo[0] !== userLanguage.substr(0, 2)) &&
+            (speechSynthesis.getVoices().length < 2))
+            alert(`Notice: this browser does not have access to a voice for ${languageInfo[2]}.`);
     });
 
     // Configure line spacing so that left and right panels display the same percentage of
@@ -703,7 +706,14 @@ async function lookupWord(ev) { // jshint ignore:line
     let shortUserLanguage = userLanguage.split(/-/)[0];
     let destLangISO6393 = iso2to3[shortUserLanguage];
 
-    getTranslation(`from=${sourceLangISO6393}&dest=${destLangISO6393}&phrase=`, speakStr);
+    getTranslation(`
+        from =
+        ${sourceLangISO6393}
+    &
+        dest =
+        ${destLangISO6393}
+    &
+        phrase = `, speakStr);
 
     let speakMsg = new SpeechSynthesisUtterance(speakStr);
     speakMsg.lang = sourceLang;
@@ -725,7 +735,8 @@ for (let elNum = 0; elNum < clickables.length; elNum++) {
     // noinspection JSUnresolvedFunction
     clickables[elNum].addEventListener("click", readTextAloud, {passive: true});
 
-    // clickables[elNum].addEventListener("mouseup", keepItLocal, false); // else touchscreen browser removes highlighting
+    // Prevent some touchscreen browsers removing highlighting:
+    clickables[elNum].addEventListener("mouseup", keepItLocal, false);
     // clickables[elNum].addEventListener("mouseup", setLookupFlag, false);
 
     // tablet: monitor touch movement to prevent tap handling
@@ -846,7 +857,7 @@ request.onreadystatechange = function () { // Define event listener
 request.send(null); // Send the request now
 
 // https://stackoverflow.com/a/22978802 says,
-// "...the voice list is loaded async to the page. An onvoiceschanged
+// "...the voice list is loaded async to the page. An                  changed
 // event is fired when they are loaded":
 let voiceList = [];
 
@@ -874,12 +885,6 @@ function doVoices() {
 doVoices();
 if ("onvoiceschanged" in speechSynthesis) {     // trigger on event
     speechSynthesis.onvoiceschanged = doVoices;
-}
-
-window.onload = function () {
-    if (voiceList.length < 2)
-    // todo: change to modal with "do not show again" option:
-        alert(`Notice: this browser does not have access to any foreign language voices.  If you wish to have foreign language texts spoken to you, we recommend Google Chrome or Microsoft Edge on desktops or Chrome, Edge, or Firefox on phones and tablets.`);
 }
 
 function getTranslation(prefix, toXlate) {
