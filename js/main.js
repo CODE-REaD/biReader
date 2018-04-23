@@ -21,6 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 "use strict";
 /*jshint -W097 */
 
+// todo: when loading files from library, use two-character extension as language(?)
+// todo: more clickable area around icon buttons
 // todo: store filenames as English and translate to native language for display.
 // todo: web storage for things like show help first time.
 // todo: pinch zoom to resize text
@@ -423,6 +425,9 @@ document.getElementById("rightFileSelect").addEventListener("change", function (
     leftSel.value = "";  // Else we won't trigger again on current choice
 });
 
+let leftLangFromLibrary = false;
+let rightLangFromLibrary = false;
+
 function getFileFromLibrary(contentElement, fileName, titleElement) {
     let request = new XMLHttpRequest(); // Create new request
     request.open("GET", "http://bireader.com/library/" + fileName); // Specify URL to fetch
@@ -430,8 +435,23 @@ function getFileFromLibrary(contentElement, fileName, titleElement) {
         // If the request is complete and was successful
         if (request.readyState === 4 && request.status === 200) {
             document.getElementById(contentElement).textContent = request.responseText;
-            if (titleElement)
+            if (titleElement) {
                 document.getElementById(titleElement).textContent = fileName;
+                let langName = fileName.split(".")[1];
+                if (langName.length === 2)
+                    switch (contentElement) {
+                        case "leftPara":
+                            leftLanguage = langName;
+                            console.log(`setting left language to ${langName}.`);
+                            leftLangFromLibrary = true; // Skip mutation test
+                            break;
+                        case "rightPara":
+                            rightLanguage = langName;
+                            console.log(`setting right language to ${langName}.`);
+                            rightLangFromLibrary = true;
+                            break;
+                    }
+            }
         }
     };
     request.onload = function () {
@@ -488,25 +508,45 @@ function textEval(mutationsList) {
     // console.log(`target: ${mutationsList[0].target.id}`);
 
     let fullText = mutationsList[0].addedNodes[0].wholeText;
-    let textSample = fullText.substr(fullText.length / 4, 100);
+    // let textSample = fullText.substr(fullText.length / 4, 100);
+    let textSample = fullText.substr(fullText.length / 20, 100); // Try to skip initial headings
     let nodeName = mutationsList[0].target.id;
 
-    // Detect and store language of new text:
-    /* global guessLanguage */
-    guessLanguage.info(textSample, function (languageInfo) {
-        if (languageInfo[0] === "unknown") {
-            console.log(`${nodeName} does not contain enough text to determine the source language.`);
-        } else {
-            console.log(`Detected language of ${nodeName} is ${languageInfo[2]} [${languageInfo[0]}].`);
-            if (nodeName === "leftPara") leftLanguage = languageInfo[0];
-            else if (nodeName === "rightPara") rightLanguage = languageInfo[0];
-        }
+    let doLangGuess = true;
+    // todo: If loaded from online library, use file type as language (e.g., myfile.en):
+    switch (nodeName) {
+        case "leftPara":
+            if (leftLangFromLibrary) {
+                doLangGuess = false;
+                leftLangFromLibrary = false;  // first mutation only
+            }
+            break;
+        case "rightPara":
+            if (rightLangFromLibrary) {
+                doLangGuess = false;
+                rightLangFromLibrary = false;
+            }
+            break;
+    }
 
-        // todo: improve to give more exact information whether no language voices, or just this voice:
-        if ((languageInfo[0] !== userLanguage.substr(0, 2)) &&
-            (speechSynthesis.getVoices().length < 2))
-            alert(`Notice: this browser does not have access to a voice for ${languageInfo[2]}.`);
-    });
+    // Detect and store language of new text:
+    if (doLangGuess) {
+        /* global guessLanguage */
+        guessLanguage.info(textSample, function (languageInfo) {
+            if (languageInfo[0] === "unknown") {
+                console.log(`${nodeName} does not contain enough text to determine the source language.`);
+            } else {
+                console.log(`Detected language of ${nodeName} is ${languageInfo[2]} [${languageInfo[0]}].`);
+                if (nodeName === "leftPara") leftLanguage = languageInfo[0];
+                else if (nodeName === "rightPara") rightLanguage = languageInfo[0];
+            }
+
+            // todo: improve to give more exact information whether no language voices, or just this voice:
+            if ((languageInfo[0] !== userLanguage.substr(0, 2)) &&
+                (speechSynthesis.getVoices().length < 2))
+                alert(`Notice: this browser does not have access to a voice for ${languageInfo[2]}.`);
+        });
+    }
 
     // Configure line spacing so that left and right panels display the same percentage of
     // their text (aids in scrolling and synchronization of content:

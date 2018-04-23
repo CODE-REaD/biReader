@@ -475,57 +475,6 @@ select {
     width: 96%
 }
 
-/*********** Modal styles *************/
-/* The Modal (tinted background) */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    /*padding-top: 100px; !* Location of the box *!*/
-    padding-top: 5%; /* Location of the box */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    /*overflow: auto; !* Enable scroll if needed *!*/
-    background-color: rgb(0, 0, 0); /* Fallback color */
-    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-    margin-left: 0;
-}
-
-/* Modal Content */
-.modal-content {
-    background-color: #fefefe;
-    margin: auto;
-    padding: 1%;
-    border: 1px solid #888;
-    border-radius: 5px;
-    box-shadow: 8px 8px 10px gray;
-    width: 90%;
-    font-family: sans-serif;
-}
-
-/* The Close Button */
-.modal-close {
-    /*color: #aaaaaa;*/
-    color: white;
-    float: right;
-    /*line-height: 11px;*/
-    line-height: .8em;
-    font-size: 55px;
-    font-weight: bold;
-    position: fixed;
-    right: 13%;
-    bottom: 13%;
-}
-
-.modal-close:hover,
-.modal-close:focus {
-    color: red;
-    text-decoration: none;
-    cursor: pointer;
-}
-
 /********* Slider (controls) styles ***********/
 
 .lbSlider {
