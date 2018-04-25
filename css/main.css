@@ -575,7 +575,7 @@ select {
     -moz-transition: all 0.5s;
     transition: all 0.5s;
     border-radius: 6px;
-    padding: 1em;
+    padding: 0.6em;
 }
 
 .md-show.md-effect-1 .md-content {

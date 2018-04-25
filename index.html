@@ -54,7 +54,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <div class="md-content">
         <img src="img/bireader2f.png" style="width: 40%;
             max-width: 705px;min-width: 12rem;margin-left: 6%; margin-bottom:10px;">
-        <div style="margin-left: 6%; margin-right: 6%; margin-top: 2%; overflow: auto; height: 60vh">
+
+        <!--todo: fix so that we don't bleed off bottom of landscaped small screen:-->
+        <div style="margin-left: 6%; margin-right: 6%; margin-top: 2%;
+        overflow: auto; height: 60vh; box-shadow: 0px 0px 8px 5px #c7dbef;
+        padding: .9em;">
             Welcome to the <a href="http://bireader.com">biReader</a> parallel reading system.
             <p>
                 Designed to facilitate foreign language learning by comparative reading, biReader
@@ -62,18 +66,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 display. Where supported, biReader will also <b>read texts aloud</b> in different
                 languages and <b>look up meanings of words</b> in your native language.
             <h3>Features:</h3>
-            <li>Synchronized reading of left and right panes</li>
-            <li>Click or tap a sentence to hear it read aloud</li>
-            <li>Long-click or long-tap a word to see its definition</li>
-            <li>Adjustable font size, weight, and speaking speed</li>
-            <li>To load content:
-                <ul>
-                    <li>Download texts from cloud library</li>
-                    <li>Open files from local storage</li>
-                    <li>Drag-and-drop files, or</li>
-                    <li>Paste text to right and/or left pane</li>
-                </ul>
-            </li>
+            <ul>
+                <li>Synchronized reading of left and right panes</li>
+                <li>Automatic vertical scaling of left and right panes</li>
+                <li>Click or tap a sentence to hear it read aloud</li>
+                <li>Click-and-drag over multiple sentences to hear them read aloud</li>
+                <li>Long-click or long-tap a word to hear it and see its definition</li>
+                <li>Adjustable font size, weight, and speaking speed</li>
+            </ul>
+            <h3>To load content:</h3>
+            <ul>
+                <li>Download texts from cloud library</li>
+                <li>Open files from local storage</li>
+                <li>Drag-and-drop files, or</li>
+                <li>Paste text to right and/or left pane</li>
+            </ul>
             <h3>Requirements:</h3>
             A recent release of Chrome or Edge running on:
             <ul>
@@ -85,33 +92,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             biReader was inspired by my experiences of reading of two languages in parallel
             in magazines like <a href="https://france-amerique.com">France-Amerique</a> and
             books like those published by the <a href="http://www.hup.harvard.edu/collection.php?cpk=1031#">
-            Loeb Classical Library</a> in the text of a piece in its original languages is juxtaposed
-            with the same text in your native tongue. I find this the best means of acquiring
-            advanced understanding of foreign language syntax, usage, and vocabulary, while at
-            the same time benefiting from the content of a piece.<br>
-            <br>
-            However, printed text parallel reading always left me wondering how the foreign language
-            I was reading would be pronounced. So I set out to find a tablet-based system that
-            would allow me to read in parallel and also pronounce a sentence on demand. I found a few
-            promising systems, but they all had their shortcomings. Most only included texts from
-            centuries past, and many did not read texts aloud.<br>
-            <br>
-            One major difficulty was that all parallel readers relied on "alignment." The files
-            they handled had to have each passage matched with its corresponding sentence in the
-            other language. This would seem a simple task for automation, but in reality it is
-            not possible because translators (rightly or wrongly) often do not translate a text one sentence at a
-            time.
-            <p>After struggling with this issue for several years, I realized that the printed texts
+            Loeb Classical Library</a>, in which the text of a piece in its original languages
+            is juxtaposed with the same text in your native tongue. Many find this a practical means
+            of acquiring advanced understanding of foreign language syntax, usage, and vocabulary,
+            while at the same time enjoying from the content of a piece.
+            <p>
+                However, when reading a printed parallel text I always wondered how the foreign language
+                would be pronounced. At first I set out to find a tablet-based parallel reader that
+                would pronounce a sentences or words on demand. I found a few promising systems, but they
+                had their shortcomings. Most only included texts from centuries past, and many did not
+                read texts aloud.
+            <p>
+                One major difficulty was that the tablet readers relied on "alignment:" their input
+                had to have each passage prematched with its corresponding sentence in the
+                other language. This would seem a simple task for automation, but in reality automation is
+                not fully possible because translators (rightly or wrongly) often do not translate a text
+                one sentence at a time.
+            <p>
+                Having struggled with this issue for several years, I realized that the printed texts
                 I enjoyed didn't have sentence alignment and I was still able to use them. So in
                 biReader I simply dispense with sentence alignment and rely instead on line spacing to
                 display identical fractions of two texts in parallel.
-            <p>While at first this may seem like
+            <p>
+                While at first this may seem like
                 a step backwards, it actually encourages me to look beyond words to sentences and
                 paragraphs as elements of meaning. I find it gives me a greater grasp of the translation
                 than systems which spoon-feed me a sentence at a time.
-            <p>It also allows much greater flexibility in source material since the material
+            <p>
+                It also allows greater flexibility in source material since the text
                 does not need to be aligned before use. This allows biReader to provide drag-and-drop
-                or pasting of material right into its reading panes.
+                or pasting of material into its reading panes for instant use.
+            <p>
+                If you find biReader enjoyable, or have suggestions for improvement,
+                let me know at <a href="mailto:info@code-read.com">info@code-read.com</a>.
         </div>
         <button id=noSplashButton class="myButton">Do not show this again</button>
         <i id="closeSplash" title="Close Splash Screen" class="closeIcon fas fa-window-close"></i>
@@ -134,7 +147,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         </div>
         <br>
         <!--todo: change landscape button to a toggle here:-->
-        <!--todo: only offer this button on mobile devices:-->
         <div id="fullScreenControls">
             <button class="myButton" onclick="launchFullscreen(document.documentElement);">
                 Go fullscreen landscape
@@ -167,11 +179,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </div>
 </div>
 
-<div id="Help" class="md-modal md-effect-1">
+<div id="Help" class="md-modal md-effect-1" style="overflow: unset">
     <div class="md-content">
         <img src="img/bireader2f.png" style="width: 40%;
             max-width: 705px;min-width: 12rem;margin-left: 6%; margin-bottom:10px;">
-        <div style="margin-left: 6%; margin-right: 6%; margin-top: 2%; overflow: auto; height: 60vh">
+        <!--<div style="margin-left: 6%; margin-right: 6%; margin-top: 2%; overflow: auto; height: 60vh">-->
+        <div style="margin-left: 6%; margin-right: 6%; margin-top: 2%;
+        overflow: auto; height: 60vh; box-shadow: 0px 0px 8px 5px #c7dbef;
+        padding: .9em;">
+
             <h3>Help</h3>
             <table>
                 <tbody>
@@ -197,7 +213,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 </tr>
                 <tr></tr>
                 <tr>
-                    <td align="right">Click on title area</td>
+                    <td style="text-align:left; font-family:sans-serif; font-size:14px; font-weight:bold;">
+                        Click on title area
+                    </td>
                     <td>&nbsp;&nbsp;</td>
                     <td>Load file from local storage (disk or memory)</td>
                 </tr>

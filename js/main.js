@@ -21,15 +21,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 "use strict";
 /*jshint -W097 */
 
-// todo: when loading files from library, use two-character extension as language(?)
+// todo: when loading files from disk, use two-character extension as language(?)
 // todo: more clickable area around icon buttons
 // todo: store filenames as English and translate to native language for display.
 // todo: web storage for things like show help first time.
 // todo: pinch zoom to resize text
 // todo: default to bold font on high density screens only
 // todo: store current font, reading speed between sessions (web storage, same as 'bold' setting)
-// todo: filename.info contains source information, display with "info" control
-// todo: save word definitions locally (web storage) so we don't repeatedly look them up at Glosbe
 
 const release = "0.7";          // "Semantic version" for end users
 
@@ -40,11 +38,15 @@ document.getElementById("brVersion").innerHTML = release;
 document.body.style.lineHeight = defLineHeight;
 
 let userLanguage = window.navigator.language; // Returns value like 'en-US'
+let userLang2char = userLanguage.split("-")[0]; // Change 'en-US' to 'en'
+let userLang3char = iso2to3[userLang2char];
+let lastTransLang = userLang3char;
+
 document.getElementById("userLang").textContent = userLanguage;
 
 // Detected language of l/r frames:
-let leftLanguage = userLanguage;
-let rightLanguage = userLanguage;
+let leftLanguage = userLang2char;
+let rightLanguage = userLang2char;
 
 if (localStorage.fontWeight === null)
     localStorage.fontWeight = "bold"; // default to bold
@@ -513,7 +515,6 @@ function textEval(mutationsList) {
     let nodeName = mutationsList[0].target.id;
 
     let doLangGuess = true;
-    // todo: If loaded from online library, use file type as language (e.g., myfile.en):
     switch (nodeName) {
         case "leftPara":
             if (leftLangFromLibrary) {
@@ -740,20 +741,23 @@ async function lookupWord(ev) { // jshint ignore:line
         sourceLang = leftLanguage;
     else if (this.id.toString() === "rightPara")
         sourceLang = rightLanguage;
+    else if (this.id.toString() === "glosbeBuf")
+        sourceLang = lastTransLang; // User clicked word in vocab panel; try to drill down
 
+    // Glosbe requires 3-char code (and stores it for next time); speechSynthesis requires 2-char:
+    let sourceLang3char = sourceLang;
+    if (sourceLang.length === 2)
     /* global iso2to3 */
-    let sourceLangISO6393 = iso2to3[sourceLang];
-    let shortUserLanguage = userLanguage.split(/-/)[0];
-    let destLangISO6393 = iso2to3[shortUserLanguage];
+        sourceLang3char = iso2to3[sourceLang];
+    else
+        sourceLang = sourceLang.substr(0, 2);
 
-    getTranslation(`
-        from =
-        ${sourceLangISO6393}
-    &
-        dest =
-        ${destLangISO6393}
-    &
-        phrase = `, speakStr);
+    // let shortUserLanguage = userLanguage.split(/-/)[0];
+    // let destLangISO6393 = iso2to3[shortUserLanguage];
+
+    // Not sure why but the following passes only ONE parameter, with speakStr appended:
+    // getTranslation(`from=${sourceLangISO6393}&dest=${destLangISO6393}&phrase=`, speakStr);
+    getTranslation(sourceLang3char, userLang3char, speakStr);
 
     let speakMsg = new SpeechSynthesisUtterance(speakStr);
     speakMsg.lang = sourceLang;
@@ -910,7 +914,7 @@ function doVoices() {
     for (let voiceInd = 0; voiceInd < ssVoices.length; voiceInd++)
         voiceList[voiceInd] = ssVoices[voiceInd].name + " (" + ssVoices[voiceInd].lang + ")";
 
-    let vList = "<ul>"
+    let vList = "<ul>";
     voiceList.forEach(function (listMem) {
         vList += "<li>" + listMem;
     });
@@ -927,20 +931,36 @@ if ("onvoiceschanged" in speechSynthesis) {     // trigger on event
     speechSynthesis.onvoiceschanged = doVoices;
 }
 
-function getTranslation(prefix, toXlate) {
+function getTranslation(fromLang, toLang, toXlate) {
     // JSONP needed because glosbe.com does not provide CORS:
     // $("#glosbeBuf").html("Translations appear here.");
-    $.getJSON("https://glosbe.com/gapi/translate?format=json&" + prefix + toXlate + "&callback=?", function (json) {
+
+    lastTransLang = fromLang;  // Save to allow drill down in vocab. pane
+
+    if (typeof localStorage[`${toXlate}.${fromLang}.${toLang}`] !== 'undefined') {
+        // Return saved definition to increase performance/reduce Glosbe calls:
+        $("#glosbeBuf").html(toXlate + ": " + localStorage[`${toXlate}.${fromLang}.${toLang}`]);
+        return false;
+    }
+
+    // $.getJSON("https://glosbe.com/gapi/translate?format=json&" + prefix + toXlate + "&callback=?", function (json) {
+    $.getJSON("https://glosbe.com/gapi/translate?format=json&from=" + fromLang + "&dest="
+        + toLang + "&phrase=" + toXlate + "&callback=?", function (json) {
+
         if (json !== "Nothing found.") {
             // $("#glosbeBuf").html(JSON.stringify(json));
             if (json.tuc.length)
-            // $("#glosbeBuf").html(JSON.stringify(json.tuc[0].meanings[0].text));
-                if (json.tuc[0].phrase)
+                if (json.tuc[0].phrase) {
                     $("#glosbeBuf").html(toXlate + ": " + JSON.stringify(json.tuc[0].phrase.text));
-                else
+                    localStorage[`${toXlate}.${fromLang}.${toLang}`] = JSON.stringify(json.tuc[0].phrase.text);
+                } else {
                     $("#glosbeBuf").html(toXlate + ": " + JSON.stringify(json.tuc[0].meanings[0].text));
-            else
+                    localStorage[`${toXlate}.${fromLang}.${toLang}`] = JSON.stringify(json.tuc[0].meanings[0].text);
+                }
+            else {
                 $("#glosbeBuf").html(toXlate + ": Not found.");
+                localStorage[`${toXlate}.${fromLang}.${toLang}`] = "Not found.";
+            }
         } else {
             $.getJSON("https://glosbe.com/gapi/translate?format=json&" + toXlate + "&callback=?", function (json) {
                 console.log(json);
