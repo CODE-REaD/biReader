@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 "use strict";
 /*jshint -W097 */
 
+// todo: when loading files from library, reading position of previous files retained; should be reset to start of file
 // todo: when loading files from disk, use two-character extension as language(?)
 // todo: more clickable area around icon buttons
 // todo: store filenames as English and translate to native language for display.
@@ -29,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 // todo: default to bold font on high density screens only
 // todo: store current font, reading speed between sessions (web storage, same as 'bold' setting)
 
-const release = "0.7";          // "Semantic version" for end users
+const release = "0.7a";          // "Semantic version" for end users
 
 const defLineHeight = "1.4";    // Default, baseline line height
 
@@ -42,17 +43,22 @@ let userLang2char = userLanguage.split("-")[0]; // Change 'en-US' to 'en'
 let userLang3char = iso2to3[userLang2char];
 let lastTransLang = userLang3char;
 
+let leftRightHeightFactor = 1;
+
 document.getElementById("userLang").textContent = userLanguage;
 
 // Detected language of l/r frames:
 let leftLanguage = userLang2char;
 let rightLanguage = userLang2char;
 
-if (localStorage.fontWeight === null)
-    localStorage.fontWeight = "bold"; // default to bold
-
-if (localStorage.fontWeight === "bold")
-    document.getElementById("boldCB").checked = true;
+switch (localStorage.fontWeight) {
+    case null:
+        localStorage.fontWeight = "bold"; // default to bold
+        break;
+    case "bold":
+        document.getElementById("boldCB").checked = true;
+        break;
+}
 
 let buttonClickSound = document.getElementById("buttonClick");
 buttonClickSound.volume = 0.6;
@@ -172,18 +178,16 @@ document.getElementById("leftColumn").style.fontWeight = localStorage.fontWeight
 document.getElementById("rightColumn").style.fontWeight = localStorage.fontWeight;
 
 // Controls:
-let controlsBackground = document.querySelector("#controlsBackground");
+// let controlsBackground = document.querySelector("#controlsBackground");
 
 document.getElementById("controlsButton").addEventListener("click",
     function () {
         makeClick();
-        // controlsBackground.style.display = "block";
         document.getElementById("controlsBackground").classList.add("md-show");
         // Clicking anywhere outside the control panel closes it:
         document.addEventListener("click",
             function docClick(f) {
                 if (f.target.id === "controlsBackground") {
-                    // controlsBackground.style.display = "none";
                     document.getElementById("controlsBackground").classList.remove("md-show");
                     document.removeEventListener("click", docClick);
                 }
@@ -197,7 +201,6 @@ document.querySelector("#closeControls").onclick = function () {
     if (speechSynthesis.pending || speechSynthesis.speaking)
         speechSynthesis.cancel();
     document.getElementById("controlsBackground").classList.remove("md-show");
-    // controlsBackground.style.display = "none";
 };
 
 // Toggle bold/normal font:
@@ -210,6 +213,7 @@ document.querySelector("#boldCB").onchange = function () {
 
     document.getElementById("leftColumn").style.fontWeight = localStorage.fontWeight;
     document.getElementById("rightColumn").style.fontWeight = localStorage.fontWeight;
+    setLineSpacing();
 };
 
 let libFilePaths;
@@ -286,13 +290,14 @@ document.getElementById("textSize").addEventListener("input",
         const textSize = document.getElementById("textSize").value;
         document.getElementById("currentTextSize").innerHTML = textSize + "px";
         document.getElementById("textColumns").style.fontSize = textSize + "px";
+        setLineSpacing();
     }
 );
 
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications
 
 // Reveal the <select> node when the button is clicked:
-let fileChooserModal = document.querySelector("#fileChooserModal");
+// let fileChooserModal = document.querySelector("#fileChooserModal");
 document.getElementById("libraryLoadButton").addEventListener("click",
     function () {
         makeClick();
@@ -444,12 +449,12 @@ function getFileFromLibrary(contentElement, fileName, titleElement) {
                     switch (contentElement) {
                         case "leftPara":
                             leftLanguage = langName;
-                            console.log(`setting left language to ${langName}.`);
+                            console.log(`library setting left language to ${langName}.`);
                             leftLangFromLibrary = true; // Skip mutation test
                             break;
                         case "rightPara":
                             rightLanguage = langName;
-                            console.log(`setting right language to ${langName}.`);
+                            console.log(`library setting right language to ${langName}.`);
                             rightLangFromLibrary = true;
                             break;
                     }
@@ -498,6 +503,9 @@ rightFileColumn.addEventListener("dragover", keepItLocal, false);
 rightFileColumn.addEventListener("drop", fileDrop, false);
 rightFileColumn.addEventListener("paste", pasteToCol, false);
 
+
+// "Observe" the text panes and trigger textEval() when content changes:
+//
 let leftParaObserver = new MutationObserver(textEval);
 leftParaObserver.observe(document.getElementById("leftPara"), {childList: true});
 
@@ -548,12 +556,12 @@ function textEval(mutationsList) {
                 alert(`Notice: this browser does not have access to a voice for ${languageInfo[2]}.`);
         });
     }
+    setLineSpacing();
+}
 
+function setLineSpacing() {
     // Configure line spacing so that left and right panels display the same percentage of
     // their text (aids in scrolling and synchronization of content:
-    // todo: this never matches exactly, I think due to browser rounding and/or font rendering vs
-    // todo: dot pitch of screen.  E.g., line-height 1.686 displays same as 1.68.  Possibly add
-    // todo: workaround to onscroll routines to resync when scrolling reaches start/end of article.
 
     // Reformat display to match length of new text:
     // First reset both columns to default line height so we can make our computation:
@@ -563,8 +571,8 @@ function textEval(mutationsList) {
     let leftHeight = document.getElementById("leftPara").scrollHeight;
     let rightHeight = document.getElementById("rightPara").scrollHeight;
     let leftToRightRatio = leftHeight / rightHeight;
-    // console.log("left height: " + leftHeight + " right height: " + rightHeight
-    //     + ", Ratio = " + leftToRightRatio);
+    console.log("left height: " + leftHeight + " right height: " + rightHeight
+        + ", Ratio = " + leftToRightRatio);
 
     //todo: check for "edge" cases here (e.g., less that a screenful of text):
     if (leftToRightRatio < 1)
@@ -573,6 +581,15 @@ function textEval(mutationsList) {
     else if (leftToRightRatio > 1)
     // Stretch right side:
         document.getElementById("rightPara").style.lineHeight = (defLineHeight * leftToRightRatio).toString();
+
+    // Due to browser rounding (a "line height" set to 1.59296523517382412 reads back as
+    // 1.59297), calculate a compensation factor:
+    //
+    leftHeight = document.getElementById("leftPara").scrollHeight;
+    rightHeight = document.getElementById("rightPara").scrollHeight;
+    leftRightHeightFactor = leftHeight / rightHeight;
+    // console.log(`After calibration: left column is ${leftHeight} high, right is ${rightHeight}.`);
+    // console.log(`                   left line height is ${leftLineHeight}, right is ${rightLineHeight}.`);
 }
 
 // Prevent an event from "bubbling" to parent elements:
@@ -752,9 +769,6 @@ async function lookupWord(ev) { // jshint ignore:line
     else
         sourceLang = sourceLang.substr(0, 2);
 
-    // let shortUserLanguage = userLanguage.split(/-/)[0];
-    // let destLangISO6393 = iso2to3[shortUserLanguage];
-
     // Not sure why but the following passes only ONE parameter, with speakStr appended:
     // getTranslation(`from=${sourceLangISO6393}&dest=${destLangISO6393}&phrase=`, speakStr);
     getTranslation(sourceLang3char, userLang3char, speakStr);
@@ -804,7 +818,6 @@ function readTextAloud(ev) {
     // Find and include start of sentence containing clicked region:
     while (speakRange.startOffset !== 0) {                         // start of node
         speakRange.setStart(node, speakRange.startOffset - 1);     // back up 1 char
-        // if (speakRange.toString().search(/[.。!?:\n]\s*/) === 0) { // start of sentence
         if (speakRange.toString().search(/^[.。!?:\n]\s*/) === 0) { // start of sentence
             speakRange.setStart(node, speakRange.startOffset + 1); // move forward char
             break;
@@ -813,12 +826,29 @@ function readTextAloud(ev) {
 
     // Find and include end of sentence containing clicked region:
     let searchStr = "";
-    while (speakRange.endOffset < node.length) {                // end of node
+    let searchRes;
+    findSentEnd: while (speakRange.endOffset < node.length) {                // end of node
         speakRange.setEnd(node, speakRange.endOffset + 1);      // look ahead 1 char
-        searchStr = speakRange.toString().slice(-2);            // Last 2 chars
-        if (searchStr.search(/[.!?:][\r\n\s]|(\r|\n|\r\n){2}|。/) === 0) { // end of sentence
-            speakRange.setEnd(node, speakRange.endOffset - 1); // back 1 char
-            break;
+
+        /*        searchStr = speakRange.toString().slice(-2);            // Last 2 chars
+                // if (searchStr.search(/[.!?:][\r\n\s]|(\r|\n|\r\n){2}|。/) === 0) { // end of sentence
+                if (searchStr.search(/[.!?:][\r\n\s]|\r\r|\n\n|(\r\n){2}|。/) === 0) { // end of sentence
+                    speakRange.setEnd(node, speakRange.endOffset - 1); // back 1 char*/
+
+        searchStr = speakRange.toString().slice(-4);            // Last 4 chars
+        searchRes = searchStr.search(/[.!?:][\r\n\s]|\r\r|\n\n|(\r\n){2}|。/);
+
+        switch (searchRes) {
+            case -1:
+                continue;
+            case 0:
+                // Back up to end of sentence:
+                speakRange.setEnd(node, speakRange.endOffset - 4);
+                break findSentEnd;
+            case 2:
+                // Back up to end of sentence:
+                speakRange.setEnd(node, speakRange.endOffset - 1);
+                break findSentEnd;
         }
     }
 
@@ -828,10 +858,32 @@ function readTextAloud(ev) {
     let speakStr = speakRange.toString().trim();
     let speakMsg = new SpeechSynthesisUtterance(speakStr);
 
-    if (ev.currentTarget.id.toString() === "leftPara")
+    // console.log(`ev.target is ${ev.target}, ev.target.id.toString() is ${ev.target.id.toString()}.`);
+    // let eventTarget = ev.target;
+
+    speakMsg.lang = userLang2char;  // Default to user's native language (and warn, below)
+    // if (ev.currentTarget.id.toString() === "leftPara")
+    if (ev.target.id.toString() === "leftPara")
         speakMsg.lang = leftLanguage;
-    else if (ev.currentTarget.id.toString() === "rightPara")
+    // else if (ev.currentTarget.id.toString() === "rightPara")
+    else if (ev.target.id.toString() === "rightPara")
         speakMsg.lang = rightLanguage;
+
+    // Some browsers don't deduce .voice from .lang:
+    // speakMsg.voice = speechSynthesis.getVoices()[3]; // test
+    // speakMsg.voice =
+
+    let ssVoice =
+        speechSynthesis.getVoices().filter(function (voice) {
+            return voice.lang.split(/[-_]/)[0] == speakMsg.lang;
+        })[0];
+
+    if (ssVoice)
+        speakMsg.voice = ssVoice;
+    else {
+        console.log(`Notice: this browser does not have a voice for: ${speakMsg.lang}`);
+        alert(`Notice: this browser does not have access to a voice for: ${speakMsg.lang}.  See help screen for support.`);
+    }
 
     speakMsg.rate = currentSpeakSpd;    // todo: different languages respond to same rate differently (e.g., en vs fr)
     speechSynthesis.speak(speakMsg);
@@ -908,7 +960,6 @@ let voiceList = [];
 // todo: firefox TTS, see https://hacks.mozilla.org/2016/01/firefox-and-the-web-speech-api/
 
 function doVoices() {
-    // let ssVoices = this.getVoices();
     let ssVoices = speechSynthesis.getVoices();
 
     for (let voiceInd = 0; voiceInd < ssVoices.length; voiceInd++)
@@ -981,9 +1032,8 @@ let rightDiv = document.getElementById("rightColumn");
 leftDiv.onscroll = function () {
     if (!isSyncingLeftScroll) {
         isSyncingRightScroll = true;
-        /*        console.log('rst = ' + rightDiv.scrollTop);
-                console.log('lst = ' + leftDiv.scrollTop)*/
-        rightDiv.scrollTop = this.scrollTop;
+        // console.log(`left onScroll: right top = ${rightDiv.scrollTop}, left top = ${leftDiv.scrollTop}`);
+        rightDiv.scrollTop = this.scrollTop / leftRightHeightFactor;
     }
     isSyncingLeftScroll = false;
 };
@@ -991,7 +1041,8 @@ leftDiv.onscroll = function () {
 rightDiv.onscroll = function () {
     if (!isSyncingRightScroll) {
         isSyncingLeftScroll = true;
-        leftDiv.scrollTop = this.scrollTop;
+        // leftDiv.scrollTop = this.scrollTop;
+        leftDiv.scrollTop = this.scrollTop * leftRightHeightFactor;
     }
     isSyncingRightScroll = false;
 };

@@ -321,6 +321,12 @@ select {
     background: #c5ffff;
 }
 
+.leftBottomButton {
+    position: fixed;
+    left: 2%;
+    bottom:  2%;
+}
+
 .myButton {
     /*position: relative;*/
     font-family: sans-serif;
@@ -518,46 +524,46 @@ select {
 
 /* Modal animations, from https://tympanus.net/codrops/2013/06/25/nifty-modal-window-effects */
 .md-modal {
-	position: fixed;
-	top: 10%;
-	left: 10%;
-	width: 80%;
-	height: 80%;
-	z-index: 20;
-	visibility: hidden;
-	-webkit-backface-visibility: hidden;
-	-moz-backface-visibility: hidden;
-	backface-visibility: hidden;
+    position: fixed;
+    top: 10%;
+    left: 10%;
+    width: 80%;
+    height: 80%;
+    z-index: 20;
+    visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
     overflow: auto;
 }
 
 .md-show {
-	visibility: visible;
+    visibility: visible;
 }
 
 /* Show on top of other modals */
 .md-show-top {
-	z-index: 40;
+    z-index: 40;
 }
 
 .md-overlay {
-	position: fixed;
-	width: 100%;
-	height: 100%;
-	visibility: hidden;
-	top: 0;
-	left: 0;
-	z-index: 10;
-	opacity: 0;
-	background: rgba(0, 0, 0, 0.44);
-	-webkit-transition: all 0.5s;
-	-moz-transition: all 0.5s;
-	transition: all 0.5s;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    visibility: hidden;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    opacity: 0;
+    background: rgba(0, 0, 0, 0.44);
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    transition: all 0.5s;
 }
 
 .md-show ~ .md-overlay {
-	opacity: 1;
-	visibility: visible;
+    opacity: 1;
+    visibility: visible;
 }
 
 .md-show-top ~ .md-overlay {
@@ -585,4 +591,16 @@ select {
     transform: scale(1);
     opacity: 1;
     background-color: white;
+}
+
+/* Scrolling text WITHIN a modal: */
+.md-scroll-box {
+    margin-left: 6%;
+    margin-right: 6%;
+    margin-top: 2%;
+    margin-bottom: 3em;
+    overflow: auto;
+    height: 33vh;
+    box-shadow: 0px 0px 8px 5px #c7dbef;
+    padding: .9em;
 }

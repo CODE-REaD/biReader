@@ -1,4 +1,4 @@
-<!--biReader - your parallel reading resource.
+<!--biReader Parallel Reading System
 Copyright (C) 2018 Carson Wilson
 
 This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>biReader parallel reading system</title>
+    <title>biReader Parallel Reading System</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -50,16 +50,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 </audio>
 
 <!--biReader splash screen-->
-<div id="biReaderSplash" class="md-modal md-effect-1" style="overflow: unset">
+<div id="biReaderSplash" class="md-modal md-effect-1">
     <div class="md-content">
         <img src="img/bireader2f.png" style="width: 40%;
             max-width: 705px;min-width: 12rem;margin-left: 6%; margin-bottom:10px;">
 
-        <!--todo: fix so that we don't bleed off bottom of landscaped small screen:-->
-        <div style="margin-left: 6%; margin-right: 6%; margin-top: 2%;
-        overflow: auto; height: 60vh; box-shadow: 0px 0px 8px 5px #c7dbef;
-        padding: .9em;">
-            Welcome to the <a href="http://bireader.com">biReader</a> parallel reading system.
+        <div class="md-scroll-box">
+            Welcome to the <a href="http://bireader.com">biReader</a> Parallel Reading System.
             <p>
                 Designed to facilitate foreign language learning by comparative reading, biReader
                 also allows you to compare <b>any</b> two texts in its synchronized side-by-side
@@ -126,7 +123,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 If you find biReader enjoyable, or have suggestions for improvement,
                 let me know at <a href="mailto:info@code-read.com">info@code-read.com</a>.
         </div>
-        <button id=noSplashButton class="myButton">Do not show this again</button>
+        <button id=noSplashButton class="myButton leftBottomButton">Do not show this again</button>
         <i id="closeSplash" title="Close Splash Screen" class="closeIcon fas fa-window-close"></i>
     </div>
 </div>
@@ -179,14 +176,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </div>
 </div>
 
-<div id="Help" class="md-modal md-effect-1" style="overflow: unset">
+<div id="Help" class="md-modal md-effect-1">
     <div class="md-content">
         <img src="img/bireader2f.png" style="width: 40%;
             max-width: 705px;min-width: 12rem;margin-left: 6%; margin-bottom:10px;">
         <!--<div style="margin-left: 6%; margin-right: 6%; margin-top: 2%; overflow: auto; height: 60vh">-->
-        <div style="margin-left: 6%; margin-right: 6%; margin-top: 2%;
-        overflow: auto; height: 60vh; box-shadow: 0px 0px 8px 5px #c7dbef;
-        padding: .9em;">
+        <div class="md-scroll-box">
 
             <h3>Help</h3>
             <table>
@@ -213,17 +208,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 </tr>
                 <tr></tr>
                 <tr>
+                    <td align="right"><i title="Help" class="helpIcon fas fa-question"></i></td>
+                    <td>&nbsp;&nbsp;</td>
+                    <td>This help screen.</td>
+                </tr>
+                <tr></tr>
+                <tr>
                     <td style="text-align:left; font-family:sans-serif; font-size:14px; font-weight:bold;">
                         Click on title area
                     </td>
                     <td>&nbsp;&nbsp;</td>
                     <td>Load file from local storage (disk or memory)</td>
-                </tr>
-                <tr></tr>
-                <tr>
-                    <td align="right"><i title="Help" class="helpIcon fas fa-question"></i></td>
-                    <td>&nbsp;&nbsp;</td>
-                    <td>This help screen.</td>
                 </tr>
                 </tbody>
             </table>
@@ -258,6 +253,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                     It will also attempt to show a definition of a word if you long-click (tablet: long-tap)
                     on it.
                 </li>
+                <li>For purposes of clicking on a sentence to have it spoken aloud, a
+                    sentence is any text starting with:
+                    <ul>
+                        <li>The beginning of the text</li>
+                        <!--                        <li>The first alphanumeric character after a newline followed by a space
+                                                    character-->
+                        </li>
+                        <li>The first alphanumeric character following a sentence end (below)</li>
+                    </ul>
+                    And ending with:
+                    <ul>
+                        <li>A sentence ending character like .?! followed by a space character</li>
+                        <li>A double newline</li>
+                        <li>A sentence separator character like 。</li>
+                        <li>The end of the text</li>
+                    </ul>
+                    (You may also click-and-drag over multiple sentences to have them spoken aloud).
+                </li>
+                <li>Note that you may search using the browser's native search function(s)</li>
+            </ul>
+            <h3>Problems</h3>
+            <ul>
+                <li>Missing voices. On some platforms, you may be able to install more voices for
+                    your browser to use.
+                    <ul>
+                        <li>For Microsoft Edge, see
+                            https://www.groovypost.com/howto/install-change-languages-windows-10
+                        </li>
+                        <li>For Android, see
+                            https://www.androidauthority.com/google-text-to-speech-multiple-male-female-voices-673214
+                        </li>
+                    </ul>
+                </li>
+                <li>Long-tapping a word brings up Google Chrome's lookup function. This may be
+                    disabled via settings, or avoided by using Chrome's
+                    "Add to Home screen" option.
+                </li>
             </ul>
             PLEASE NOTE: this program is currently Proof Of Concept ONLY; it easily fails on invalid file
             input as no input validity checks are yet in place.
@@ -266,28 +298,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </div>
 </div>
 
-<div id=Info class="md-modal md-effect-1">
+<div id="Info" class="md-modal md-effect-1">
     <div class="md-content">
-        <!--<div style="margin-left: 6%; margin-right: 6%; margin-top: 2%; overflow: auto; height: 60vh">-->
-        <h2>biReader version&nbsp;<span id="brVersion"></span></h2>
-        <hr>
-        Your language:&nbsp;
-        <span id="userLang"></span>
-        <hr>
-        Voices currently supported by your browser:
-        <span id="vList">
-    </span>
-        <hr>
-        Source URL:
-        <span id="fileURL"></span>
-        <!--<span id=closeInfo class="modal-close">&times;</span>-->
-        <!--<i id="closeInfo" title="Close Info Screen" class="modal-close iconButton fas fa-window-close"></i>-->
-        <!--Keep close button within modal:-->
-        <br><br><br><br>
-        <br>
-        <br>
+        <img src="img/bireader2f.png" style="width: 40%;
+            max-width: 705px;min-width: 12rem;margin-left: 6%; margin-bottom:10px;">
+        <div class="md-scroll-box">
+
+            <!--<div style="margin-left: 6%; margin-right: 6%; margin-top: 2%; overflow: auto; height: 60vh">-->
+            <h2>biReader version&nbsp;<span id="brVersion"></span></h2>
+            <hr>
+            Your language:&nbsp;
+            <span id="userLang"></span>
+            <hr>
+            Voices currently supported by your browser:
+            <span id="vList"></span>
+            <hr>
+            Source URL:
+            <span id="fileURL"></span>
+            <!--<span id=closeInfo class="modal-close">&times;</span>-->
+            <!--<i id="closeInfo" title="Close Info Screen" class="modal-close iconButton fas fa-window-close"></i>-->
+            <!--Keep close button within modal:-->
+            <br><br><br><br>
+            <br>
+            <br>
+        </div>
+        <i id="closeInfo" title="Close Info Screen" class="closeIcon iconButton fas fa-window-close"></i>
     </div>
-    <i id="closeInfo" title="Close Info Screen" class="closeIcon iconButton fas fa-window-close"></i>
 </div>
 
 <input type="file" id="leftFileChoice" style="display: none"/>
