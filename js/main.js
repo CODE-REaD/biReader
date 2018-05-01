@@ -44,6 +44,7 @@ let userLang3char = iso2to3[userLang2char];
 let lastTransLang = userLang3char;
 
 let leftRightHeightFactor = 1;
+let currentSpeakSpd = 1;
 
 document.getElementById("userLang").textContent = userLanguage;
 
@@ -68,6 +69,17 @@ switch (localStorage.textSize) {
         document.getElementById("textSize").value = localStorage.textSize;
         document.getElementById("currentTextSize").innerHTML = localStorage.textSize + "px";
         document.getElementById("textColumns").style.fontSize = localStorage.textSize + "px";
+        break;
+}
+
+switch (localStorage.speakSpeed) {
+    case null:
+        localStorage.speakSpeed = 1; // default
+        break;
+    default:
+        currentSpeakSpd = localStorage.speakSpeed;
+        document.getElementById("currentSpeakSpeed").textContent = currentSpeakSpd;
+        document.getElementById("speakSpeed").value = currentSpeakSpd;
         break;
 }
 
@@ -240,17 +252,14 @@ window.addEventListener("contextmenu", function (e) {
     return true;    // true = propagation continues
 });
 
-///////// Change speech rate:
+////////// Auxiliary functions:
 
-let currentSpeakSpd = 1;
+///////// Change speech rate:
 let lastSpeakSpd = null;
 let sameSpeakSpd = false;
 
 document.getElementById("currentSpeakSpeed").textContent = currentSpeakSpd.toString();
 document.getElementById("speakSpeed").value = currentSpeakSpd;
-
-
-////////// Auxiliary functions:
 
 // (Next several functions) adjust numeric indicator as user moves slider, but only
 // speak a sample when user releases the slider.  Special logic to speak sample if
@@ -263,6 +272,7 @@ document.getElementById("speakSpeed").addEventListener("input",
             speechSynthesis.cancel();
         currentSpeakSpd = document.getElementById("speakSpeed").value;
         document.getElementById("currentSpeakSpeed").textContent = currentSpeakSpd;
+        localStorage.speakSpeed = currentSpeakSpd;
         // noinspection RedundantIfStatementJS
         if (currentSpeakSpd === lastSpeakSpd)
             sameSpeakSpd = true;
