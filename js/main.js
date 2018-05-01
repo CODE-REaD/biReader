@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 "use strict";
 /*jshint -W097 */
 
-// todo: when loading files from library, reading position of previous files retained; should be reset to start of file
 // todo: when loading files from disk, use two-character extension as language(?)
 // todo: more clickable area around icon buttons
 // todo: store filenames as English and translate to native language for display.
@@ -33,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 const release = "0.7a";          // "Semantic version" for end users
 
 const defLineHeight = "1.4";    // Default, baseline line height
+const deftextSize = "17";    // Default text size
 
 document.getElementById("brVersion").innerHTML = release;
 
@@ -57,6 +57,17 @@ switch (localStorage.fontWeight) {
         break;
     case "bold":
         document.getElementById("boldCB").checked = true;
+        break;
+}
+
+switch (localStorage.textSize) {
+    case null:
+        localStorage.textSize = deftextSize; // default to bold
+        break;
+    default:
+        document.getElementById("textSize").value = localStorage.textSize;
+        document.getElementById("currentTextSize").innerHTML = localStorage.textSize + "px";
+        document.getElementById("textColumns").style.fontSize = localStorage.textSize + "px";
         break;
 }
 
@@ -238,6 +249,9 @@ let sameSpeakSpd = false;
 document.getElementById("currentSpeakSpeed").textContent = currentSpeakSpd.toString();
 document.getElementById("speakSpeed").value = currentSpeakSpd;
 
+
+////////// Auxiliary functions:
+
 // (Next several functions) adjust numeric indicator as user moves slider, but only
 // speak a sample when user releases the slider.  Special logic to speak sample if
 // user releases slider at original location (no "change" event fires if so):
@@ -290,6 +304,7 @@ document.getElementById("textSize").addEventListener("input",
         const textSize = document.getElementById("textSize").value;
         document.getElementById("currentTextSize").innerHTML = textSize + "px";
         document.getElementById("textColumns").style.fontSize = textSize + "px";
+        localStorage.textSize = textSize;
         setLineSpacing();
     }
 );
@@ -357,6 +372,33 @@ document.getElementById("infoButton").addEventListener("click",
 document.getElementById("closeInfo").onclick = function () {
     makeClick();
     document.getElementById("Info").classList.remove("md-show");
+};
+
+////////// File i/o functions:
+
+// Column synchronized scroll code adapted from https://stackoverflow.com/a/41998497/5025060:
+//
+let isSyncingLeftScroll = false;
+let isSyncingRightScroll = false;
+let leftDiv = document.getElementById("leftColumn");
+let rightDiv = document.getElementById("rightColumn");
+
+leftDiv.onscroll = function () {
+    if (!isSyncingLeftScroll) {
+        isSyncingRightScroll = true;
+        // console.log(`left onScroll: right top = ${rightDiv.scrollTop}, left top = ${leftDiv.scrollTop}`);
+        rightDiv.scrollTop = this.scrollTop / leftRightHeightFactor;
+    }
+    isSyncingLeftScroll = false;
+};
+
+rightDiv.onscroll = function () {
+    if (!isSyncingRightScroll) {
+        isSyncingLeftScroll = true;
+        // leftDiv.scrollTop = this.scrollTop;
+        leftDiv.scrollTop = this.scrollTop * leftRightHeightFactor;
+    }
+    isSyncingRightScroll = false;
 };
 
 // Load a file when a library selection is made.
@@ -563,6 +605,10 @@ function setLineSpacing() {
     // Configure line spacing so that left and right panels display the same percentage of
     // their text (aids in scrolling and synchronization of content:
 
+    // New content, so display from its top:
+    leftDiv.scrollTop = 0;
+    rightDiv.scrollTop = 0;
+
     // Reformat display to match length of new text:
     // First reset both columns to default line height so we can make our computation:
     document.getElementById("leftPara").style.lineHeight = defLineHeight;
@@ -748,12 +794,16 @@ async function lookupWord(ev) { // jshint ignore:line
         }
     }
 
+    // For Safari and Edge:
+    textSel.removeAllRanges();
+    textSel.addRange(speakRange);
+
     let speakStr = speakRange.toString().trim();
 
     console.log("lookupWord: " + speakStr);
 
     // getTranslation("from=fra&dest=eng&phrase=", speakStr);
-    let sourceLang;
+    let sourceLang = userLang2char;
     if (this.id.toString() === "leftPara")
         sourceLang = leftLanguage;
     else if (this.id.toString() === "rightPara")
@@ -775,8 +825,22 @@ async function lookupWord(ev) { // jshint ignore:line
 
     let speakMsg = new SpeechSynthesisUtterance(speakStr);
     speakMsg.lang = sourceLang;
-    speakMsg.rate = currentSpeakSpd;
 
+    // Some browsers (e.g., Safari) don't deduce .voice from .lang, we must set .voice also:
+    //
+    let ssVoice =
+        speechSynthesis.getVoices().filter(function (voice) {
+            return voice.lang.split(/[-_]/)[0] == speakMsg.lang;
+        })[0];
+
+    if (ssVoice)
+        speakMsg.voice = ssVoice;
+    else {
+        console.log(`Notice: this browser does not have a voice for: ${speakMsg.lang}`);
+        alert(`Notice: this browser does not have access to a voice for: ${speakMsg.lang}.  See help screen for support.`);
+    }
+
+    speakMsg.rate = currentSpeakSpd;
     speechSynthesis.speak(speakMsg);
 }
 
@@ -795,6 +859,7 @@ for (let elNum = 0; elNum < clickables.length; elNum++) {
 
     // Prevent some touchscreen browsers removing highlighting:
     clickables[elNum].addEventListener("mouseup", keepItLocal, false);
+    // clickables[elNum].addEventListener("vmouseup", keepItLocal, false);
     // clickables[elNum].addEventListener("mouseup", setLookupFlag, false);
 
     // tablet: monitor touch movement to prevent tap handling
@@ -840,7 +905,7 @@ function readTextAloud(ev) {
 
         switch (searchRes) {
             case -1:
-                continue;
+                break;
             case 0:
                 // Back up to end of sentence:
                 speakRange.setEnd(node, speakRange.endOffset - 4);
@@ -849,11 +914,14 @@ function readTextAloud(ev) {
                 // Back up to end of sentence:
                 speakRange.setEnd(node, speakRange.endOffset - 1);
                 break findSentEnd;
+            default:
+                break;
         }
     }
 
-    // todo: Safari 11.0.3 correctly speaks the text, but does not highlight the selection.
-    // ..see https://stackoverflow.com/questions/49758168/how-to-highlight-desktop-safari-text-selection-in-div-after-range-setstart-r
+    //See https://stackoverflow.com/questions/49758168/how-to-highlight-desktop-safari-text-selection-in-div-after-range-setstart-r
+    textSel.removeAllRanges();
+    textSel.addRange(speakRange);
 
     let speakStr = speakRange.toString().trim();
     let speakMsg = new SpeechSynthesisUtterance(speakStr);
@@ -869,10 +937,8 @@ function readTextAloud(ev) {
     else if (ev.target.id.toString() === "rightPara")
         speakMsg.lang = rightLanguage;
 
-    // Some browsers don't deduce .voice from .lang:
-    // speakMsg.voice = speechSynthesis.getVoices()[3]; // test
-    // speakMsg.voice =
-
+    // Some browsers (e.g., Safari) don't deduce .voice from .lang, we must set .voice also:
+    //
     let ssVoice =
         speechSynthesis.getVoices().filter(function (voice) {
             return voice.lang.split(/[-_]/)[0] == speakMsg.lang;
@@ -1021,30 +1087,5 @@ function getTranslation(fromLang, toLang, toXlate) {
     });
     return false;
 }
-
-// Column synchronized scroll code adapted from https://stackoverflow.com/a/41998497/5025060:
-//
-let isSyncingLeftScroll = false;
-let isSyncingRightScroll = false;
-let leftDiv = document.getElementById("leftColumn");
-let rightDiv = document.getElementById("rightColumn");
-
-leftDiv.onscroll = function () {
-    if (!isSyncingLeftScroll) {
-        isSyncingRightScroll = true;
-        // console.log(`left onScroll: right top = ${rightDiv.scrollTop}, left top = ${leftDiv.scrollTop}`);
-        rightDiv.scrollTop = this.scrollTop / leftRightHeightFactor;
-    }
-    isSyncingLeftScroll = false;
-};
-
-rightDiv.onscroll = function () {
-    if (!isSyncingRightScroll) {
-        isSyncingLeftScroll = true;
-        // leftDiv.scrollTop = this.scrollTop;
-        leftDiv.scrollTop = this.scrollTop * leftRightHeightFactor;
-    }
-    isSyncingRightScroll = false;
-};
 
 // End of main.js
