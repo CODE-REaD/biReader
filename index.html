@@ -37,6 +37,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <link rel="stylesheet" href="css/andadaFont.css">
     <link rel="stylesheet" href="css/fontawesome-all.css">
 
+    <link rel="stylesheet" href="css/jquery.selectbox.css" type="text/css" />
+
     <!--<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">-->
 
     <!--<script src="js/syncscroll.js"></script>-->
@@ -79,7 +81,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 <li>Paste text to right and/or left pane</li>
             </ul>
             <h3>Requirements:</h3>
-            A recent release of Chrome or Edge running on:
+            A recent release of Chrome, Firefox, Safari, or Edge running on:
             <ul>
                 <li>Desktop (Windows, Mac, Linux)</li>
                 <li>Tablet (Android, iPad)</li>
@@ -89,10 +91,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             biReader was inspired by my experiences of reading of two languages in parallel
             in magazines like <a href="https://france-amerique.com">France-Amerique</a> and
             books like those published by the <a href="http://www.hup.harvard.edu/collection.php?cpk=1031#">
-            Loeb Classical Library</a>, in which the text of a piece in its original languages
+            Loeb Classical Library</a>, in which the text of a piece in its original language
             is juxtaposed with the same text in your native tongue. Many find this a practical means
             of acquiring advanced understanding of foreign language syntax, usage, and vocabulary,
-            while at the same time enjoying from the content of a piece.
+            while at the same time enjoying the content of a piece.
             <p>
                 However, when reading a printed parallel text I always wondered how the foreign language
                 would be pronounced. At first I set out to find a tablet-based parallel reader that
@@ -107,18 +109,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 one sentence at a time.
             <p>
                 Having struggled with this issue for several years, I realized that the printed texts
-                I enjoyed didn't have sentence alignment and I was still able to use them. So in
-                biReader I simply dispense with sentence alignment and rely instead on line spacing to
-                display identical fractions of two texts in parallel.
+                I enjoyed did not have sentence alignment yet I was still able to use them. So in
+                biReader I dispense with sentence alignment and rely instead on line spacing and
+                synchronized scrolling to display corresponding sections of two texts in parallel.
             <p>
-                While at first this may seem like
-                a step backwards, it actually encourages me to look beyond words to sentences and
-                paragraphs as elements of meaning. I find it gives me a greater grasp of the translation
-                than systems which spoon-feed me a sentence at a time.
+                While at first this may seem like a step backwards, it actually encourages me to look
+                beyond words to sentences and paragraphs as elements of meaning. I find it gives me a
+                greater grasp of the translation than systems which spoon-feed me a sentence at a time.
             <p>
-                It also allows greater flexibility in source material since the text
-                does not need to be aligned before use. This allows biReader to provide drag-and-drop
-                or pasting of material into its reading panes for instant use.
+                It also allows a greater range of source material since texts do not need to be aligned
+                before use. Hence biReader allows users to select, drag-and-drop, or paste material of their
+                own choosing into its reading panes for immediate use.
             <p>
                 If you find biReader enjoyable, or have suggestions for improvement,
                 let me know at <a href="mailto:info@code-read.com">info@code-read.com</a>.
@@ -127,7 +128,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <i id="closeSplash" title="Close Splash Screen" class="closeIcon fas fa-window-close"></i>
     </div>
 </div>
-
 <!--Popup control panel:-->
 <div id="controlsBackground" class="md-modal md-effect-1">
     <div class="md-content">
@@ -251,7 +251,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 </li>
                 <li>
                     It will also attempt to show a definition of a word if you long-click (tablet: long-tap)
-                    on it.
+                    on it.  Note that you may also long-click on portions of the resulting
+                    definition to "drill down" further.
                 </li>
                 <li>For purposes of clicking on a sentence to have it spoken aloud, a
                     sentence is any text starting with:
@@ -356,13 +357,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
 
     <div class="horizContainer">
-        <!--        <div id=leftColumnHeader class="myColumnHeader">
-                </div>-->
         <label id=leftColumnHeader class="myColumnHeader" for="leftFileChoice" title="Load left file from disc">
             Load left file from disc
         </label>
-
-        <!--<div id=rightColumnHeader class="myColumnHeader">-->
         <label id=rightColumnHeader class=myColumnHeader for="rightFileChoice" title="Load right file from disc">
             Load right file from disc</label>
     </div>
@@ -405,6 +402,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 <script src="js/guessLang/_languageData.js"></script>
 <script src="js/guessLang/guessLanguage.js"></script>
 <script src="js/ISOmap.js"></script>
+
+<script src="js/jquery.selectbox.js" type="text/javascript"></script>
+
 
 <!--<script src="js/node_modules/google-translate-api"></script>-->
 <!--<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.2.1.min.js"><\/script>')</script>-->

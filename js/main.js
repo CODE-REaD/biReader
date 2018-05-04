@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 "use strict";
 /*jshint -W097 */
 
+// todo: a way to close library file selection w/o selecting 2 files.
 // todo: when loading files from disk, use two-character extension as language(?)
 // todo: more clickable area around icon buttons
 // todo: store filenames as English and translate to native language for display.
@@ -28,6 +29,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 // todo: pinch zoom to resize text
 // todo: default to bold font on high density screens only
 // todo: store current font, reading speed between sessions (web storage, same as 'bold' setting)
+
+// Show end user any errors rather than silently failing:
+window.onerror = function (msg, url, linenumber) {
+    alert('Sorry, biReader has encountered an error.  Please report this to support ASAP:\n\n'
+        + msg + '\nURL: ' + url + '\nLine Number: ' + linenumber);
+    return true;
+};
 
 const release = "0.7a";          // "Semantic version" for end users
 
@@ -53,7 +61,7 @@ let leftLanguage = userLang2char;
 let rightLanguage = userLang2char;
 
 switch (localStorage.fontWeight) {
-    case null:
+    case undefined:
         localStorage.fontWeight = "bold"; // default to bold
         break;
     case "bold":
@@ -62,7 +70,7 @@ switch (localStorage.fontWeight) {
 }
 
 switch (localStorage.textSize) {
-    case null:
+    case undefined:
         localStorage.textSize = deftextSize; // default to bold
         break;
     default:
@@ -73,7 +81,7 @@ switch (localStorage.textSize) {
 }
 
 switch (localStorage.speakSpeed) {
-    case null:
+    case undefined:
         localStorage.speakSpeed = 1; // default
         break;
     default:
@@ -415,7 +423,14 @@ rightDiv.onscroll = function () {
 let leftSel = null;
 let libFileOK = false; // Global flag for library file load result
 
-document.getElementById("leftFileSelect").addEventListener("change", function () {
+// $('select').change(function () {
+/*$('#leftFileSelect').change(function () {
+    console.log("Change on " + $(this).attr('id') + ": " + $(this).val());
+});*/
+
+// todo: convert listener for jquery-selectBox
+// document.getElementById("leftFileSelect").addEventListener("change", function () {
+$('#leftFileSelect').change(function () {
     makeClick();
     leftSel = document.getElementById("leftFileSelect");
     let leftlibFilePath = leftSel.options[leftSel.selectedIndex].text;  // Left-hand file
@@ -424,20 +439,21 @@ document.getElementById("leftFileSelect").addEventListener("change", function ()
     // Select right-hand file:
     // Populate chooser (derived from https://stackoverflow.com/a/17002049/5025060):
     let rightList = document.getElementById("rightFileSelect");
-    rightList.length = 0; // empty it
+    // rightList.length = 0; // empty it
+    rightList.length = 1; // truncate to header
 
-    // NB: set this BEFORE populating selectList, else first is set as default choice:
-    rightList.size = (libFilePaths.length < 12 ? libFilePaths.length : 12);
+    /*    // NB: set this BEFORE populating selectList, else first is set as default choice:
+        rightList.size = (libFilePaths.length < 12 ? libFilePaths.length : 12);
 
-    // Try to deal w/mobile where size attribute doesn't cause dropdown.
-    // Adapted from https://stackoverflow.com/a/18180032/5025060:
-    let RFopt = document.createElement("option");
-    RFopt.disabled = true;
-    RFopt.selected = true;
-    RFopt.value = "";  // prevent rumored autofill of "choose one" by some browsers
-    RFopt.setAttribute("style", "font-weight: bold; font-size: 125%; color: red; background-color: yellow");
-    RFopt.text = "Select right-hand file:";
-    rightList.appendChild(RFopt);
+        // Try to deal w/mobile where size attribute doesn't cause dropdown.
+        // Adapted from https://stackoverflow.com/a/18180032/5025060:
+        let RFopt = document.createElement("option");
+        RFopt.disabled = true;
+        RFopt.selected = true;
+        RFopt.value = "";  // prevent rumored autofill of "choose one" by some browsers
+        RFopt.setAttribute("style", "font-weight: bold; font-size: 125%; color: red; background-color: yellow");
+        RFopt.text = "Select right-hand file:";
+        rightList.appendChild(RFopt);*/
 
     // Create and append the right-file choice options
     // (only show files (translations) whose names match the name of the left hand file).
@@ -453,8 +469,12 @@ document.getElementById("leftFileSelect").addEventListener("change", function ()
         }
     });
 
+    // $('select').selectBox({mobile: true,}); removes entries
+    // $('select').selectBox('settings', {mobile: true});
+    // $('select').selectBox('refresh'); // Reinitialize (show rightList entries)
+    $('#rightFileSelect').selectBox('refresh'); // Reinitialize (show rightList entries)
+
     // Now that user has selected lefthand file, expose righthand file menu:
-    // document.getElementById("rightFilePopup").style.display = "inline-block";
     document.getElementById("rightFilePopup").style.display = "block";
 
     // Load lefthand file to its window:
@@ -470,7 +490,8 @@ document.getElementById("leftFileSelect").addEventListener("change", function ()
     }
 });
 
-document.getElementById("rightFileSelect").addEventListener("change", function () {
+$('#rightFileSelect').change(function () {
+// document.getElementById("rightFileSelect").addEventListener("change", function () {
     makeClick();
     let rightSel = document.getElementById("rightFileSelect");
     let rightlibFilePath = rightSel.options[rightSel.selectedIndex].text;  // Right-hand file
@@ -746,8 +767,6 @@ async function lookupWord(ev) { // jshint ignore:line
     textWasRead = false;    // Set here and recheck after sleep
     wordLookedUp = false;
 
-    // console.log('============ lookupWord: Event is: ' + ev.type);
-
     let textSel = window.getSelection();
     if (!textSel.isCollapsed) {
         speakRange = textSel.getRangeAt(0);
@@ -975,6 +994,8 @@ function readTextAloud(ev) {
     }
 }
 
+// Initialize Online Library selection menu for left hand reading pane:
+
 let request = new XMLHttpRequest(); // Create new request
 const el = document.createElement("html");
 
@@ -1024,6 +1045,37 @@ request.onreadystatechange = function () { // Define event listener
             option.text = libFilePaths[linkNum];
             selectList.appendChild(option);
         }
+
+
+        // Try pre-populating rightFileSelect so that selectBox.js will initialize
+        // properly:
+        let rightList = document.getElementById("rightFileSelect");
+        rightList.length = 0; // empty it
+
+        // NB: set this BEFORE populating selectList, else first is set as default choice:
+        rightList.size = (libFilePaths.length < 12 ? libFilePaths.length : 12);
+
+        // Try to deal w/mobile where size attribute doesn't cause dropdown.
+        // Adapted from https://stackoverflow.com/a/18180032/5025060:
+        let RFopt = document.createElement("option");
+        RFopt.disabled = true;
+        RFopt.selected = true;
+        RFopt.value = "";  // prevent rumored autofill of "choose one" by some browsers
+        RFopt.setAttribute("style", "font-weight: bold; font-size: 125%; color: red; background-color: yellow");
+        RFopt.text = "Select right-hand file:";
+        rightList.appendChild(RFopt);
+
+        /*        // Create and append the right-file choice options
+                for (let linkNum = 0; linkNum < libFilePaths.length; linkNum++) {
+                    let RFopt = document.createElement("option");
+                    RFopt.value = libFilePaths[linkNum];
+                    RFopt.text = libFilePaths[linkNum];
+                    rightList.appendChild(option);
+                }*/
+
+
+        // Initialize selectBox, enabling mobile usage:
+        $('select').selectBox({mobile: true,});
     }
 };
 request.send(null); // Send the request now
@@ -1075,7 +1127,7 @@ function getTranslation(fromLang, toLang, toXlate) {
         + toLang + "&phrase=" + toXlate + "&callback=?", function (json) {
 
         if (json !== "Nothing found.") {
-            // $("#glosbeBuf").html(JSON.stringify(json));
+            // todo: faults if json.tuc.length undefined:
             if (json.tuc.length)
                 if (json.tuc[0].phrase) {
                     $("#glosbeBuf").html(toXlate + ": " + JSON.stringify(json.tuc[0].phrase.text));
