@@ -21,14 +21,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 "use strict";
 /*jshint -W097 */
 
-// todo: a way to close library file selection w/o selecting 2 files.
-// todo: when loading files from disk, use two-character extension as language(?)
+// todo: finish file saving code (https://jsfiddle.net/ourcodeworld/rce6nn3z/2/?utm_source=website&utm_medium=embed&utm_campaign=rce6nn3z)
+// todo: when loading files from computer, use two-character extension as language(?)
 // todo: more clickable area around icon buttons
 // todo: store filenames as English and translate to native language for display.
 // todo: web storage for things like show help first time.
 // todo: pinch zoom to resize text
 // todo: default to bold font on high density screens only
-// todo: store current font, reading speed between sessions (web storage, same as 'bold' setting)
 
 // Show end user any errors rather than silently failing:
 window.onerror = function (msg, url, linenumber) {
@@ -37,7 +36,7 @@ window.onerror = function (msg, url, linenumber) {
     return true;
 };
 
-const release = "0.7a";          // "Semantic version" for end users
+const release = "0.7b";          // "Semantic version" for end users
 
 const defLineHeight = "1.4";    // Default, baseline line height
 const deftextSize = "17";    // Default text size
@@ -334,20 +333,60 @@ document.getElementById("textSize").addEventListener("input",
 document.getElementById("libraryLoadButton").addEventListener("click",
     function () {
         makeClick();
-        document.getElementById("fileChooserModal").style.display = "block";
-        document.getElementById("leftFilePopup").style.display = "block";
+        document.getElementById("fileChooserModal").classList.add("md-show");
+        // document.getElementById("leftFilePopup").style.display = "block";
+        // document.getElementById("leftFilePopup").classList.add("md-show");
 
         // Clicking anywhere outside the file chooser closes it:
         document.addEventListener("click",
             function docClick(f) {
-                if (f.target.getAttribute("id") === "fileChooserModal") {
-                    document.getElementById("fileChooserModal").style.display = "none";
+                let targID = f.target.getAttribute("id");
+                if (targID === "fileChooserModal" || targID === "mdOverlay") {
+                    document.getElementById("fileChooserModal").classList.remove("md-show");
+                    // document.getElementById("leftFilePopup").style.display = "none";
+                    // document.getElementById("leftFilePopup").classList.remove("md-show");
                     document.removeEventListener("click", docClick);
                 }
             }
         );
     }, false
 );
+
+// Save files to computer:
+
+// Derived from https://ourcodeworld.com/articles/read/189/how-to-create-a-file-and-generate-a-download-with-javascript-in-the-browser-without-a-server
+function saveToComputer(saveFileName, saveText) {
+    // console.log(`saveToComputer: ${saveFileName}`);
+    let element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(saveText));
+    element.setAttribute('download', saveFileName);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    return true;
+}
+
+document.getElementById("saveButton").addEventListener("click",
+    function () {
+        makeClick();
+        // Use Promise to ensure file output is sequential, avoid "race":
+        let fileSavePromise = new Promise(function (resolve, reject) {
+            let outfileText = document.getElementById("leftPara").innerText;
+            let outFilename = `biReaderLeft.${leftLanguage}`;
+            saveToComputer(outFilename, outfileText);
+            resolve();
+        });
+
+        fileSavePromise.then(function () {
+                let outfileText = document.getElementById("rightPara").innerText;
+                let outFilename = `biReaderRight.${rightLanguage}`;
+                saveToComputer(outFilename, outfileText);
+            }
+        );
+    }
+);
+
 
 // Help popup:
 document.getElementById("helpButton").addEventListener("click",
@@ -498,9 +537,11 @@ $('#rightFileSelect').change(function () {
     if (rightlibFilePath.length)
         getFileFromLibrary("rightPara", rightlibFilePath, "rightColumnHeader");
 
-    document.getElementById("leftFilePopup").style.display = "none";
+    // document.getElementById("leftFilePopup").style.display = "none";
     document.getElementById("rightFilePopup").style.display = "none";
-    document.getElementById("fileChooserModal").style.display = "none";
+    // document.getElementById("fileChooserModal").style.display = "none";
+    document.getElementById("fileChooserModal").classList.remove("md-show");
+
 
     leftSel.value = "";  // Else we won't trigger again on current choice
 });
@@ -1027,15 +1068,22 @@ request.onreadystatechange = function () { // Define event listener
         // NB: set this BEFORE populating selectList, else first is set as default choice:
         selectList.size = (libFilePaths.length < 12 ? libFilePaths.length : 12);
 
+        // selectBox auto-sizes the <select> element based on .size (above).
+        // todo: how to make this "responsive?"  Code .size based on screen height?
+
+        let optgroup = document.createElement("optgroup");
+        optgroup.label = "Select left-hand file:";
+        selectList.appendChild(optgroup);
+
         // Try to deal w/mobile where size attribute doesn't cause dropdown.
         // Adapted from https://stackoverflow.com/a/18180032/5025060:
-        let option = document.createElement("option");
-        option.disabled = true;
-        option.selected = true;
-        option.value = "";  // prevent rumored autofill of "choose one" by some browsers
-        option.setAttribute("style", "font-weight: bold; font-size: 125%; color: red; background-color: yellow");
-        option.text = "Select left-hand file:";
-        selectList.appendChild(option);
+        /*        let option = document.createElement("option");
+                option.disabled = true;
+                option.selected = true;
+                option.value = "";  // prevent rumored autofill of "choose one" by some browsers
+                option.setAttribute("style", "font-weight: bold; font-size: 125%; color: red; background-color: yellow");
+                option.text = "Select left-hand file:";
+                selectList.appendChild(option);*/
 
         // Create and append the file choice options
         // See also, Option object at http://www.javascriptkit.com/jsref/select.shtml#section2
@@ -1045,7 +1093,6 @@ request.onreadystatechange = function () { // Define event listener
             option.text = libFilePaths[linkNum];
             selectList.appendChild(option);
         }
-
 
         // Try pre-populating rightFileSelect so that selectBox.js will initialize
         // properly:
@@ -1057,13 +1104,13 @@ request.onreadystatechange = function () { // Define event listener
 
         // Try to deal w/mobile where size attribute doesn't cause dropdown.
         // Adapted from https://stackoverflow.com/a/18180032/5025060:
-        let RFopt = document.createElement("option");
-        RFopt.disabled = true;
-        RFopt.selected = true;
-        RFopt.value = "";  // prevent rumored autofill of "choose one" by some browsers
-        RFopt.setAttribute("style", "font-weight: bold; font-size: 125%; color: red; background-color: yellow");
-        RFopt.text = "Select right-hand file:";
-        rightList.appendChild(RFopt);
+        /*        let RFopt = document.createElement("option");
+                RFopt.disabled = true;
+                RFopt.selected = true;
+                RFopt.value = "";  // prevent rumored autofill of "choose one" by some browsers
+                RFopt.setAttribute("style", "font-weight: bold; font-size: 125%; color: red; background-color: yellow");
+                RFopt.text = "Select right-hand file:";
+                rightList.appendChild(RFopt);*/
 
         /*        // Create and append the right-file choice options
                 for (let linkNum = 0; linkNum < libFilePaths.length; linkNum++) {
@@ -1072,6 +1119,10 @@ request.onreadystatechange = function () { // Define event listener
                     RFopt.text = libFilePaths[linkNum];
                     rightList.appendChild(option);
                 }*/
+
+        let RFoptgroup = document.createElement("optgroup");
+        RFoptgroup.label = "Select right-hand file:";
+        rightList.appendChild(RFoptgroup);
 
 
         // Initialize selectBox, enabling mobile usage:

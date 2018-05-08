@@ -431,16 +431,18 @@ select {
 #leftFilePopup, #rightFilePopup {
     z-index: 30;
     position: absolute;
-    display: none;
-    top: 20%;
+    /*display: none;*/
+    /*top: 20%;*/
+    width: 60%;
 }
 
 #leftFilePopup {
-    left: 10%;
+    /*left: 10%;*/
 }
 
 #rightFilePopup {
-    left: 60%;
+    left: 50%;
+    display: none;
 }
 
 #topRowButtons {
@@ -535,7 +537,8 @@ select {
     -webkit-backface-visibility: hidden;
     -moz-backface-visibility: hidden;
     backface-visibility: hidden;
-    overflow: auto;
+    /*overflow: auto;*/
+    overflow: visible; /*crw*/
 }
 
 .md-show {

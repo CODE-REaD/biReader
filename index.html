@@ -37,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <link rel="stylesheet" href="css/andadaFont.css">
     <link rel="stylesheet" href="css/fontawesome-all.css">
 
-    <link rel="stylesheet" href="css/jquery.selectbox.css" type="text/css" />
+    <link rel="stylesheet" href="css/jquery.selectBox.css" type="text/css"/>
 
     <!--<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">-->
 
@@ -70,7 +70,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 <li>Automatic vertical scaling of left and right panes</li>
                 <li>Click or tap a sentence to hear it read aloud</li>
                 <li>Click-and-drag over multiple sentences to hear them read aloud</li>
-                <li>Long-click or long-tap a word to hear it and see its definition</li>
+                <li>Click-and-hold (tablet: long-tap) a word to hear it and see its definition</li>
                 <li>Adjustable font size, weight, and speaking speed</li>
             </ul>
             <h3>To load content:</h3>
@@ -230,8 +230,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 </li>
                 <li>
                     You may provide texts of the same article in different languages by pasting them
-                    to the two panels, or drag-and-drop local files to the panels, or click on the "load"
-                    buttons to select files from your local disc. Or click on "Load Files from Online Library" to
+                    to the two panels, or drag-and-drop files to the panels, or click on the "load"
+                    buttons to select files from your computer. Or click on "Load Files from Online Library" to
                     choose an existing pairing from the online library.
                 </li>
                 <!--
@@ -245,13 +245,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 -->
                 <li>
                     biReader will attempt to present the two texts
-                    as equal height, synchronously scrolling panels, and to pronounce sentences
-                    in their native language
-                    when you click on them or a series of sentences when you click-and-drag over them.
+                    as equal height, synchronously scrolling panels, and to pronounce a sentence
+                    in its native language
+                    when you click on it or a series of sentences when you click-and-drag over them.
                 </li>
                 <li>
-                    It will also attempt to show a definition of a word if you long-click (tablet: long-tap)
-                    on it.  Note that you may also long-click on portions of the resulting
+                    It will also attempt to show a definition of a word if you click-and-hold (tablet: long-tap)
+                    on it. Note that you may also click-and-hold on portions of the resulting
                     definition to "drill down" further.
                 </li>
                 <li>For purposes of clicking on a sentence to have it spoken aloud, a
@@ -287,13 +287,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                         </li>
                     </ul>
                 </li>
-                <li>Long-tapping a word brings up Google Chrome's lookup function. This may be
-                    disabled via settings, or avoided by using Chrome's
+                <li>On tablets and phones, long-tapping a word brings up Google Chrome's lookup
+                    function. This may be disabled via settings, or avoided by using Chrome's
                     "Add to Home screen" option.
                 </li>
             </ul>
             PLEASE NOTE: biReader easily fails on invalid file
-            input as no input validity checks are yet in place.
+            input as no input validity checks are yet in place. Please load only <b>plain text</b>
+            files to the left or right panel.
         </div>
         <i id="helpCloseButton" title="Close Help Screen" class="closeIcon fas fa-window-close"></i>
     </div>
@@ -331,19 +332,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
 <input type="file" id="rightFileChoice" style="display: none"/>
 
-<!--todo: make "responsive" (use CSS formulae?):-->
-<div class="vertContainer">
-
-    <!--todo: if landscape, show buttons on left side of screen rather than top:-->
-    <div id="topRowButtons" class="horizContainer">
-        <i id="libraryLoadButton" title="Load files from online library"
-           class="iconButton fas fa-cloud-download-alt"></i>
-        <i id="controlsButton" title="Settings" class="iconButton fas fa-cogs"></i>
-        <i id="infoButton" title="Information" class="iconButton fas fa-info"></i>
-        <i id="helpButton" title="Help" class="iconButton fas fa-question"></i>
-    </div>
-
-    <div class="horizContainer modal" id="fileChooserModal">
+<div id="fileChooserModal" class="md-modal md-effect-1">
         <!--Filled in at runtime:-->
         <div id="leftFilePopup">
             <select id="leftFileSelect">
@@ -353,15 +342,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             <select id="rightFileSelect">
             </select>
         </div>
-    </div>
+</div>
 
+<!--todo: make "responsive" (use CSS formulae?):-->
+<div class="vertContainer">
+
+    <!--todo: if landscape, show buttons on left side of screen rather than top:-->
+    <div id="topRowButtons" class="horizContainer">
+        <i id="libraryLoadButton" title="Load files from online library"
+           class="iconButton fas fa-cloud-download-alt"></i>
+        <i id="saveButton" title="Save files to computer" class="iconButton fas fa-save"></i>
+        <i id="controlsButton" title="Settings" class="iconButton fas fa-cogs"></i>
+        <i id="infoButton" title="Information" class="iconButton fas fa-info"></i>
+        <i id="helpButton" title="Help" class="iconButton fas fa-question"></i>
+    </div>
 
     <div class="horizContainer">
         <label id=leftColumnHeader class="myColumnHeader" for="leftFileChoice" title="Load left file from disc">
-            Load left file from disc
+            Load left file from computer
         </label>
         <label id=rightColumnHeader class=myColumnHeader for="rightFileChoice" title="Load right file from disc">
-            Load right file from disc</label>
+            Load right file from computer</label>
     </div>
 
     <div class="horizContainer" id="textColumns">
@@ -384,13 +385,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <div id=vocab class="container frame" style="margin: 2%">
         <span id="glosbeBuf" class="clickable" style="height: 10vh; margin: 10px">
-            <span class="colInstructions">Long-click a word for definition here.</span>
+            <span class="colInstructions">Click-and-hold a word for definition here.</span>
         </span>
         <span style="position: absolute; bottom: 0; right: 5px; font-size: x-small">
         Translations provided by <a href="https://glosbe.com/" target="_blank">Glosbe</a>.</span></div>
 </div>
 
-<div class="md-overlay"></div>
+<div id=mdOverlay class="md-overlay"></div>
 
 <!--<script src="js/vendor/modernizr-3.5.0.min.js"></script>-->
 
@@ -403,7 +404,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 <script src="js/guessLang/guessLanguage.js"></script>
 <script src="js/ISOmap.js"></script>
 
-<script src="js/jquery.selectbox.js" type="text/javascript"></script>
+<script src="js/jquery.selectBox.js" type="text/javascript"></script>
 
 
 <!--<script src="js/node_modules/google-translate-api"></script>-->
