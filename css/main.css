@@ -245,7 +245,7 @@ select {
 
 .myColumnHeader {
     float: left;
-    height: 2em;
+    height: 1.7em;
     font-family: sans-serif;
     font-size: .8em;
     font-weight: bold;
@@ -279,11 +279,11 @@ select {
 }
 
 #vocab {
+    margin-left: 2%;
+    width: 96vw;
+    min-height: 10%;
     background-color: white;
     border-radius: 6px;
-}
-
-#vocab {
     font-family: sans-serif;
     font-weight: normal;
     /*box-shadow: 5px 5px 10px gray; !* causes major jank with Chrome mobile 64.0.3282,137, 2018 *!*/
@@ -300,9 +300,10 @@ select {
     white-space: pre-wrap;
     /*padding: 9px; NO GOOD: this gives overlap in highlight bg*/
     margin: .5em;
+    /*margin-right: 1.1em; !* due to scroll bar *!*/
     /*color: transparent;*/
     /*text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);*/
-    height: 80vh;
+    /*height: 80vh;*/
 
     /*display: inline-block; // (not) possible fix for Safari selection highlighting, 4/07/18, after https://stackoverflow.com/a/42663876/5025060*/
 }
@@ -420,12 +421,21 @@ select {
     cursor: pointer;
 }
 
-.colInstructions {
-    color: #e7e7e7;
-    font-size: 2em;
+.colInstructions, .vocabInstructions {
+    color: #dce5dd;
     white-space: pre-line;
     font-family: sans-serif;
     font-weight: bold;
+    display: block;
+    text-align: center;
+}
+
+.colInstructions {
+    font-size: 5vh;
+}
+
+.vocabInstructions {
+    font-size: 3.6vh;
 }
 
 #leftFilePopup, #rightFilePopup {
@@ -448,6 +458,7 @@ select {
 #topRowButtons {
     height: 4em; /* keep text within buttons */
     align-items: center;
+    flex: 1 0 8%;
 }
 
 /*#leftFilePopup *, #rightFilePopup * {
@@ -472,7 +483,7 @@ select {
     height: 100vh;
 }
 
-.horizContainer, #vocab {
+.horizContainer {
     flex-direction: row;
     margin-left: 2%;
     /*width: 96%*/
@@ -482,6 +493,14 @@ select {
 .horizElement {
     margin-left: 2%;
     width: 96%
+}
+
+#textColumns {
+    flex: 1 0 75%;
+}
+
+#columnHeaders {
+    flex: 1 0 1.1em;
 }
 
 /********* Slider (controls) styles ***********/

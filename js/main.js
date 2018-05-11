@@ -21,11 +21,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 "use strict";
 /*jshint -W097 */
 
+// todo: allow user to select TTS language manually (in case of several voices/lang)
 // todo: finish file saving code (https://jsfiddle.net/ourcodeworld/rce6nn3z/2/?utm_source=website&utm_medium=embed&utm_campaign=rce6nn3z)
+//       (sometimes saves only "right" file)
 // todo: when loading files from computer, use two-character extension as language(?)
 // todo: more clickable area around icon buttons
 // todo: store filenames as English and translate to native language for display.
-// todo: web storage for things like show help first time.
 // todo: pinch zoom to resize text
 // todo: default to bold font on high density screens only
 
@@ -36,7 +37,7 @@ window.onerror = function (msg, url, linenumber) {
     return true;
 };
 
-const release = "0.7b";          // "Semantic version" for end users
+const release = "0.7c";          // "Semantic version" for end users
 
 const defLineHeight = "1.4";    // Default, baseline line height
 const deftextSize = "17";    // Default text size
@@ -164,13 +165,6 @@ if (isMobileDevice()) {
 }
 else {
     document.getElementById("fullScreenControls").innerHTML = ""; // Only show opts for mobile
-    // These cause jank with Chrome mobile 64.0.3282,137, 2018, so define for nonmobile only:
-    /*
-        document.getElementById("leftColumnHeader").style.boxShadow = "5px 5px 10px gray";
-        document.getElementById("rightColumnHeader").style.boxShadow = "5px 5px 10px gray";
-        document.getElementById("leftColumn").style.boxShadow = "5px 5px 10px gray";
-        document.getElementById("rightColumn").style.boxShadow = "5px 5px 10px gray";
-    */
     document.getElementById("leftColumn").style.borderRadius = "0 0 6px 6px";
     document.getElementById("rightColumn").style.borderRadius = "0 0 6px 6px";
 }
@@ -179,6 +173,17 @@ else {
 if (localStorage.showSplash !== "doNotShow") {
     document.getElementById("biReaderSplash").classList.add("md-show");
     document.getElementById("splashCB").checked = true;
+    // Close if user clicks outside modal:
+    document.addEventListener("click",
+        function docClick(f) {
+            // todo: our <div> extends over part of mdOverlay,
+            // so our clicks don't always deactivate:
+            if (f.target.id === "mdOverlay") {
+                document.getElementById("biReaderSplash").classList.remove("md-show");
+                document.removeEventListener("click", docClick);
+            }
+        }
+    );
 } else {
     document.getElementById("biReaderSplash").classList.remove("md-show");
     document.getElementById("splashCB").checked = false;
@@ -208,8 +213,6 @@ document.getElementById("leftColumn").style.fontWeight = localStorage.fontWeight
 document.getElementById("rightColumn").style.fontWeight = localStorage.fontWeight;
 
 // Controls:
-// let controlsBackground = document.querySelector("#controlsBackground");
-
 document.getElementById("controlsButton").addEventListener("click",
     function () {
         makeClick();
@@ -334,17 +337,12 @@ document.getElementById("libraryLoadButton").addEventListener("click",
     function () {
         makeClick();
         document.getElementById("fileChooserModal").classList.add("md-show");
-        // document.getElementById("leftFilePopup").style.display = "block";
-        // document.getElementById("leftFilePopup").classList.add("md-show");
-
         // Clicking anywhere outside the file chooser closes it:
         document.addEventListener("click",
             function docClick(f) {
                 let targID = f.target.getAttribute("id");
                 if (targID === "fileChooserModal" || targID === "mdOverlay") {
                     document.getElementById("fileChooserModal").classList.remove("md-show");
-                    // document.getElementById("leftFilePopup").style.display = "none";
-                    // document.getElementById("leftFilePopup").classList.remove("md-show");
                     document.removeEventListener("click", docClick);
                 }
             }
@@ -356,7 +354,7 @@ document.getElementById("libraryLoadButton").addEventListener("click",
 
 // Derived from https://ourcodeworld.com/articles/read/189/how-to-create-a-file-and-generate-a-download-with-javascript-in-the-browser-without-a-server
 function saveToComputer(saveFileName, saveText) {
-    // console.log(`saveToComputer: ${saveFileName}`);
+    console.log(`saveToComputer: ${saveFileName}`);
     let element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(saveText));
     element.setAttribute('download', saveFileName);
@@ -372,6 +370,7 @@ document.getElementById("saveButton").addEventListener("click",
         makeClick();
         // Use Promise to ensure file output is sequential, avoid "race":
         let fileSavePromise = new Promise(function (resolve, reject) {
+            console.log("Saving left file.");
             let outfileText = document.getElementById("leftPara").innerText;
             let outFilename = `biReaderLeft.${leftLanguage}`;
             saveToComputer(outFilename, outfileText);
@@ -379,6 +378,7 @@ document.getElementById("saveButton").addEventListener("click",
         });
 
         fileSavePromise.then(function () {
+                console.log("Saving right file.");
                 let outfileText = document.getElementById("rightPara").innerText;
                 let outFilename = `biReaderRight.${rightLanguage}`;
                 saveToComputer(outFilename, outfileText);
@@ -387,16 +387,17 @@ document.getElementById("saveButton").addEventListener("click",
     }
 );
 
-
 // Help popup:
 document.getElementById("helpButton").addEventListener("click",
     function () {
         makeClick();
         document.getElementById("Help").classList.add("md-show");
-        // Click anywhere except Help button turns it off:
+        // Clicking background turns it off:
         document.addEventListener("click",
             function docClick(f) {
-                if (f.target.id !== "helpButton") {
+                // todo: "help" and "info" <div>s extend over part of mdOverlay,
+                // so our clicks don't always deactivate:
+                if (f.target.id === "mdOverlay") {
                     document.getElementById("Help").classList.remove("md-show");
                     document.removeEventListener("click", docClick);
                 }
@@ -415,10 +416,10 @@ document.getElementById("infoButton").addEventListener("click",
     function () {
         makeClick();
         document.getElementById("Info").classList.add("md-show");
-        // Click anywhere except Info button turns it off:
+        // Clicking background turns it off:
         document.addEventListener("click",
             function docClick(f) {
-                if (f.target.id !== "infoButton") {
+                if (f.target.id === "mdOverlay") {
                     document.getElementById("Info").classList.remove("md-show");
                     document.removeEventListener("click", docClick);
                 }
@@ -462,13 +463,6 @@ rightDiv.onscroll = function () {
 let leftSel = null;
 let libFileOK = false; // Global flag for library file load result
 
-// $('select').change(function () {
-/*$('#leftFileSelect').change(function () {
-    console.log("Change on " + $(this).attr('id') + ": " + $(this).val());
-});*/
-
-// todo: convert listener for jquery-selectBox
-// document.getElementById("leftFileSelect").addEventListener("change", function () {
 $('#leftFileSelect').change(function () {
     makeClick();
     leftSel = document.getElementById("leftFileSelect");
@@ -478,21 +472,7 @@ $('#leftFileSelect').change(function () {
     // Select right-hand file:
     // Populate chooser (derived from https://stackoverflow.com/a/17002049/5025060):
     let rightList = document.getElementById("rightFileSelect");
-    // rightList.length = 0; // empty it
     rightList.length = 1; // truncate to header
-
-    /*    // NB: set this BEFORE populating selectList, else first is set as default choice:
-        rightList.size = (libFilePaths.length < 12 ? libFilePaths.length : 12);
-
-        // Try to deal w/mobile where size attribute doesn't cause dropdown.
-        // Adapted from https://stackoverflow.com/a/18180032/5025060:
-        let RFopt = document.createElement("option");
-        RFopt.disabled = true;
-        RFopt.selected = true;
-        RFopt.value = "";  // prevent rumored autofill of "choose one" by some browsers
-        RFopt.setAttribute("style", "font-weight: bold; font-size: 125%; color: red; background-color: yellow");
-        RFopt.text = "Select right-hand file:";
-        rightList.appendChild(RFopt);*/
 
     // Create and append the right-file choice options
     // (only show files (translations) whose names match the name of the left hand file).
@@ -508,9 +488,6 @@ $('#leftFileSelect').change(function () {
         }
     });
 
-    // $('select').selectBox({mobile: true,}); removes entries
-    // $('select').selectBox('settings', {mobile: true});
-    // $('select').selectBox('refresh'); // Reinitialize (show rightList entries)
     $('#rightFileSelect').selectBox('refresh'); // Reinitialize (show rightList entries)
 
     // Now that user has selected lefthand file, expose righthand file menu:
@@ -870,9 +847,6 @@ async function lookupWord(ev) { // jshint ignore:line
 
     let speakStr = speakRange.toString().trim();
 
-    console.log("lookupWord: " + speakStr);
-
-    // getTranslation("from=fra&dest=eng&phrase=", speakStr);
     let sourceLang = userLang2char;
     if (this.id.toString() === "leftPara")
         sourceLang = leftLanguage;
@@ -891,6 +865,8 @@ async function lookupWord(ev) { // jshint ignore:line
 
     // Not sure why but the following passes only ONE parameter, with speakStr appended:
     // getTranslation(`from=${sourceLangISO6393}&dest=${destLangISO6393}&phrase=`, speakStr);
+
+    lastTransLang = sourceLang;
     getTranslation(sourceLang3char, userLang3char, speakStr);
 
     let speakMsg = new SpeechSynthesisUtterance(speakStr);
@@ -900,7 +876,7 @@ async function lookupWord(ev) { // jshint ignore:line
     //
     let ssVoice =
         speechSynthesis.getVoices().filter(function (voice) {
-            return voice.lang.split(/[-_]/)[0] == speakMsg.lang;
+            return voice.lang.split(/[-_]/)[0] === speakMsg.lang;
         })[0];
 
     if (ssVoice)
@@ -1055,7 +1031,7 @@ request.onreadystatechange = function () { // Define event listener
             libFileName = libraryLinks[linkInd].href.replace(/.*\//g, ""); // Remove all before last "/"
             if (libFileName.length) {
                 if (libFileName.search(/\.url$/i) !== -1) { // A ".url" file is found
-                    console.log("found URL: " + libFileName);
+                    // console.log("found URL: " + libFileName);
                     libFileURLs.push(libFileName);
                 }
                 else libFilePaths.push(libFileName);
@@ -1075,23 +1051,32 @@ request.onreadystatechange = function () { // Define event listener
         optgroup.label = "Select left-hand file:";
         selectList.appendChild(optgroup);
 
-        // Try to deal w/mobile where size attribute doesn't cause dropdown.
-        // Adapted from https://stackoverflow.com/a/18180032/5025060:
-        /*        let option = document.createElement("option");
-                option.disabled = true;
-                option.selected = true;
-                option.value = "";  // prevent rumored autofill of "choose one" by some browsers
-                option.setAttribute("style", "font-weight: bold; font-size: 125%; color: red; background-color: yellow");
-                option.text = "Select left-hand file:";
-                selectList.appendChild(option);*/
+        optgroup = document.createElement("optgroup");
+        optgroup.label = `Language: ${userLanguage}`;
+        selectList.appendChild(optgroup);
 
         // Create and append the file choice options
         // See also, Option object at http://www.javascriptkit.com/jsref/select.shtml#section2
+        let userLangEx = new RegExp(`\.${userLang2char}$`, "i");
         for (let linkNum = 0; linkNum < libFilePaths.length; linkNum++) {
-            let option = document.createElement("option");
-            option.value = libFilePaths[linkNum];
-            option.text = libFilePaths[linkNum];
-            selectList.appendChild(option);
+            if (libFilePaths[linkNum].search(userLangEx) !== -1) { // Show native lang files first
+                let option = document.createElement("option");
+                option.value = libFilePaths[linkNum];
+                option.text = libFilePaths[linkNum];
+                selectList.appendChild(option);
+            }
+        }
+        optgroup = document.createElement("optgroup");
+        optgroup.label = `Other languages:`;
+        selectList.appendChild(optgroup);
+
+        for (let linkNum = 0; linkNum < libFilePaths.length; linkNum++) {
+            if (libFilePaths[linkNum].search(userLangEx) === -1) { // Show non-native lang files
+                let option = document.createElement("option");
+                option.value = libFilePaths[linkNum];
+                option.text = libFilePaths[linkNum];
+                selectList.appendChild(option);
+            }
         }
 
         // Try pre-populating rightFileSelect so that selectBox.js will initialize
@@ -1102,28 +1087,9 @@ request.onreadystatechange = function () { // Define event listener
         // NB: set this BEFORE populating selectList, else first is set as default choice:
         rightList.size = (libFilePaths.length < 12 ? libFilePaths.length : 12);
 
-        // Try to deal w/mobile where size attribute doesn't cause dropdown.
-        // Adapted from https://stackoverflow.com/a/18180032/5025060:
-        /*        let RFopt = document.createElement("option");
-                RFopt.disabled = true;
-                RFopt.selected = true;
-                RFopt.value = "";  // prevent rumored autofill of "choose one" by some browsers
-                RFopt.setAttribute("style", "font-weight: bold; font-size: 125%; color: red; background-color: yellow");
-                RFopt.text = "Select right-hand file:";
-                rightList.appendChild(RFopt);*/
-
-        /*        // Create and append the right-file choice options
-                for (let linkNum = 0; linkNum < libFilePaths.length; linkNum++) {
-                    let RFopt = document.createElement("option");
-                    RFopt.value = libFilePaths[linkNum];
-                    RFopt.text = libFilePaths[linkNum];
-                    rightList.appendChild(option);
-                }*/
-
         let RFoptgroup = document.createElement("optgroup");
         RFoptgroup.label = "Select right-hand file:";
         rightList.appendChild(RFoptgroup);
-
 
         // Initialize selectBox, enabling mobile usage:
         $('select').selectBox({mobile: true,});
@@ -1135,8 +1101,6 @@ request.send(null); // Send the request now
 // "...the voice list is loaded async to the page. An                  changed
 // event is fired when they are loaded":
 let voiceList = [];
-
-// todo: firefox TTS, see https://hacks.mozilla.org/2016/01/firefox-and-the-web-speech-api/
 
 function doVoices() {
     let ssVoices = speechSynthesis.getVoices();
@@ -1165,7 +1129,9 @@ function getTranslation(fromLang, toLang, toXlate) {
     // JSONP needed because glosbe.com does not provide CORS:
     // $("#glosbeBuf").html("Translations appear here.");
 
-    lastTransLang = fromLang;  // Save to allow drill down in vocab. pane
+    // lastTransLang = fromLang;  // Save to allow drill down in vocab. pane
+
+    console.log(`getTranslation of: ${toXlate} from: ${fromLang} to: ${toLang}`);
 
     if (typeof localStorage[`${toXlate}.${fromLang}.${toLang}`] !== 'undefined') {
         // Return saved definition to increase performance/reduce Glosbe calls:

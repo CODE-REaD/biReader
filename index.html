@@ -58,13 +58,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             max-width: 705px;min-width: 12rem;margin-left: 6%; margin-bottom:10px;">
 
         <div class="md-scroll-box">
-            Welcome to the <a href="http://bireader.com">biReader</a> Parallel Reading System.
-            <p>
+            <h3>Welcome to the <a href="http://bireader.com">biReader</a> Parallel Reading System.</h3>
+            <h3><a href="#quickStart">Quick Start</a>&nbsp;
+                <a href="#features">Features</a>&nbsp;
+                <a href="#loading">Loading content</a>&nbsp;
+                <a href="#requirements">Requirements</a>&nbsp;
+                <a href="#inspiration">Inspiration</a>
+            </h3>
                 Designed to facilitate foreign language learning by comparative reading, biReader
-                also allows you to compare <b>any</b> two texts in its synchronized side-by-side
+                allows you to compare <b>any</b> two texts in its synchronized side-by-side
                 display. Where supported, biReader will also <b>read texts aloud</b> in different
                 languages and <b>look up meanings of words</b> in your native language.
-            <h3>Features:</h3>
+
+            <h3><a name="quickStart">Quick Start:</a></h3>
+            Click&nbsp;&nbsp;<i title="Load files from online library"
+                                   class="helpIcon fas fa-cloud-download-alt"></i>&nbsp;&nbsp;&nbsp;and follow the prompts;
+            click&nbsp;&nbsp;<i title="Help"
+                                class="helpIcon fas fa-question"></i>&nbsp;&nbsp;&nbsp;for help.
+            <h3><a name="features">Features:</a></h3>
             <ul>
                 <li>Synchronized reading of left and right panes</li>
                 <li>Automatic vertical scaling of left and right panes</li>
@@ -73,21 +84,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 <li>Click-and-hold (tablet: long-tap) a word to hear it and see its definition</li>
                 <li>Adjustable font size, weight, and speaking speed</li>
             </ul>
-            <h3>To load content:</h3>
+            <h3><a name="loading">Loading content:</a></h3>
             <ul>
                 <li>Download texts from cloud library</li>
                 <li>Open files from local storage</li>
                 <li>Drag-and-drop files, or</li>
                 <li>Paste text to right and/or left pane</li>
             </ul>
-            <h3>Requirements:</h3>
+            <h3><a name="requirements">Requirements:</a></h3>
             A recent release of Chrome, Firefox, Safari, or Edge running on:
             <ul>
                 <li>Desktop (Windows, Mac, Linux)</li>
                 <li>Tablet (Android, iPad)</li>
                 <li>Phone (Android, iPhone)</li>
             </ul>
-            <h3>Inspiration:</h3>
+            <h3><a name="inspiration">Inspiration:</a></h3>
             biReader was inspired by my experiences of reading of two languages in parallel
             in magazines like <a href="https://france-amerique.com">France-Amerique</a> and
             books like those published by the <a href="http://www.hup.harvard.edu/collection.php?cpk=1031#">
@@ -128,7 +139,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <i id="closeSplash" title="Close Splash Screen" class="closeIcon fas fa-window-close"></i>
     </div>
 </div>
-<!--Popup control panel:-->
+
+<!-- CONTROL PANEL: -->
 <div id="controlsBackground" class="md-modal md-effect-1">
     <div class="md-content">
         <div>
@@ -176,14 +188,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </div>
 </div>
 
+<!--HELP SCREEN:-->
 <div id="Help" class="md-modal md-effect-1">
     <div class="md-content">
         <img src="img/bireader2f.png" style="width: 40%;
             max-width: 705px;min-width: 12rem;margin-left: 6%; margin-bottom:10px;">
         <!--<div style="margin-left: 6%; margin-right: 6%; margin-top: 2%; overflow: auto; height: 60vh">-->
         <div class="md-scroll-box">
+            <h3>biReader Help</h3>
+            <h3><a href="#controls">Controls</a>&nbsp;
+                <a href="#hints">Hints</a>&nbsp;
+                <a href="#problems">Problems</a>&nbsp;
+            </h3>
 
-            <h3>Help</h3>
+            <h3><a name="controls">Controls</a></h3>
             <table>
                 <tbody>
                 <tr>
@@ -191,6 +209,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                                          class="helpIcon fas fa-cloud-download-alt"></i></td>
                     <td>&nbsp;&nbsp;</td>
                     <td>Load files from biReader's online library of parallel texts.</td>
+                </tr>
+                <tr></tr>
+                <tr>
+                    <td align="right"><i title="Save files to computer" class="helpIcon fas fa-save"></i></td>
+                    <td>&nbsp;&nbsp;</td>
+                    <td>Save contents of left and right panels to files on your computer.</td>
                 </tr>
                 <tr></tr>
                 <tr>
@@ -214,15 +238,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 </tr>
                 <tr></tr>
                 <tr>
-                    <td style="text-align:left; font-family:sans-serif; font-size:14px; font-weight:bold;">
-                        Click on title area
+                    <td style="color: #428bca; background-color: #9dbfb8; text-align:center;
+                    font-family:sans-serif; font-size:14px; font-weight:bold; text-shadow:none;">
+                        Click on title areas
                     </td>
                     <td>&nbsp;&nbsp;</td>
-                    <td>Load file from local storage (disk or memory)</td>
+                    <td>Load files from your computer</td>
                 </tr>
                 </tbody>
             </table>
-            <h3>Hints</h3>
+            <h3><a name="hints">Hints</a></h3>
             <ul>
                 <li>biReader works best with Google Chrome.
                     Mobile works best with Google Chrome's "Add to Home screen" option.
@@ -274,7 +299,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 </li>
                 <li>Note that you may search using the browser's native search function(s)</li>
             </ul>
-            <h3>Problems</h3>
+            <h3><a name="problems">Problems</a></h3>
             <ul>
                 <li>Missing voices. On some platforms, you may be able to install more voices for
                     your browser to use.
@@ -309,7 +334,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             <!--<div style="margin-left: 6%; margin-right: 6%; margin-top: 2%; overflow: auto; height: 60vh">-->
             <h2>biReader version&nbsp;<span id="brVersion"></span></h2>
             <hr>
-            Your language:&nbsp;
+            Your native language:&nbsp;
             <span id="userLang"></span>
             <hr>
             Voices currently supported by your browser:
@@ -333,15 +358,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 <input type="file" id="rightFileChoice" style="display: none"/>
 
 <div id="fileChooserModal" class="md-modal md-effect-1">
-        <!--Filled in at runtime:-->
-        <div id="leftFilePopup">
-            <select id="leftFileSelect">
-            </select>
-        </div>
-        <div id="rightFilePopup">
-            <select id="rightFileSelect">
-            </select>
-        </div>
+    <!--Filled in at runtime:-->
+    <div id="leftFilePopup">
+        <select id="leftFileSelect">
+        </select>
+    </div>
+    <div id="rightFilePopup">
+        <select id="rightFileSelect">
+        </select>
+    </div>
 </div>
 
 <!--todo: make "responsive" (use CSS formulae?):-->
@@ -357,7 +382,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <i id="helpButton" title="Help" class="iconButton fas fa-question"></i>
     </div>
 
-    <div class="horizContainer">
+    <div id=columnHeaders class="horizContainer">
         <label id=leftColumnHeader class="myColumnHeader" for="leftFileChoice" title="Load left file from disc">
             Load left file from computer
         </label>
@@ -385,7 +410,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <div id=vocab class="container frame" style="margin: 2%">
         <span id="glosbeBuf" class="clickable" style="height: 10vh; margin: 10px">
-            <span class="colInstructions">Click-and-hold a word for definition here.</span>
+            <span class="vocabInstructions">Click-and-hold a word for definition here.</span>
         </span>
         <span style="position: absolute; bottom: 0; right: 5px; font-size: x-small">
         Translations provided by <a href="https://glosbe.com/" target="_blank">Glosbe</a>.</span></div>
