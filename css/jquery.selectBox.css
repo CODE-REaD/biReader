@@ -163,6 +163,11 @@
     white-space: nowrap;
 }
 
+/*crw: highlight synthetic selectbox header: */
+ul.selectBox-options > li.selectBox-optgroup:first-child {
+    background-color: yellow;
+}
+
 /* Disabled state */
 .selectBox.selectBox-disabled {
     color: #888 !important;

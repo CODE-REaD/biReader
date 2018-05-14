@@ -188,7 +188,9 @@ body {
     background-color: #b5c3b7;
     /*font-family: 'PT Sans', sans-serif;*/
     /*font-family: Georgia, serif; */
-    font-family: andadaregular, serif;
+    /*font-family: andada, serif;*/
+    /*font-family: vollkorn, serif;*/
+    font-family: Merriweather, serif;
     font-size: 17px;
     cursor: default;
 }
@@ -281,7 +283,8 @@ select {
 #vocab {
     margin-left: 2%;
     width: 96vw;
-    min-height: 10%;
+    /*min-height: 10%;*/
+    flex: 1 0 4em;
     background-color: white;
     border-radius: 6px;
     font-family: sans-serif;
@@ -431,11 +434,11 @@ select {
 }
 
 .colInstructions {
-    font-size: 5vh;
+    font-size: 5vmax;
 }
 
 .vocabInstructions {
-    font-size: 3.6vh;
+    font-size: 3.6vmax;
 }
 
 #leftFilePopup, #rightFilePopup {
@@ -458,7 +461,7 @@ select {
 #topRowButtons {
     height: 4em; /* keep text within buttons */
     align-items: center;
-    flex: 1 0 8%;
+    flex: 1 0 3em;
 }
 
 /*#leftFilePopup *, #rightFilePopup * {
@@ -496,7 +499,8 @@ select {
 }
 
 #textColumns {
-    flex: 1 0 75%;
+    /*flex: 1 0 87%;*/
+    flex: 60 0 70%;
 }
 
 #columnHeaders {

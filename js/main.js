@@ -37,9 +37,9 @@ window.onerror = function (msg, url, linenumber) {
     return true;
 };
 
-const release = "0.7c";          // "Semantic version" for end users
+const release = "0.7d";          // "Semantic version" for end users
 
-const defLineHeight = "1.4";    // Default, baseline line height
+const defLineHeight = "1.5";    // Default, baseline line height
 const deftextSize = "17";    // Default text size
 
 document.getElementById("brVersion").innerHTML = release;
@@ -777,6 +777,9 @@ let touchMove = false;
 
 // A word was long-clicked, look up definition:
 async function lookupWord(ev) { // jshint ignore:line
+
+    if (isSyncingLeftScroll || isSyncingRightScroll) return; // Prevent spurious lookups
+
     // todo: some languages such as Japanese and Chinese do not use word separation characters
     // todo: ..in sentences, so exclude this function for those languages.
     let speakRange;
@@ -846,6 +849,8 @@ async function lookupWord(ev) { // jshint ignore:line
     textSel.addRange(speakRange);
 
     let speakStr = speakRange.toString().trim();
+
+    if (! speakStr.length) return;
 
     let sourceLang = userLang2char;
     if (this.id.toString() === "leftPara")
@@ -1052,7 +1057,7 @@ request.onreadystatechange = function () { // Define event listener
         selectList.appendChild(optgroup);
 
         optgroup = document.createElement("optgroup");
-        optgroup.label = `Language: ${userLanguage}`;
+        optgroup.label = `Language: ${userLanguage}:`;
         selectList.appendChild(optgroup);
 
         // Create and append the file choice options
@@ -1131,7 +1136,7 @@ function getTranslation(fromLang, toLang, toXlate) {
 
     // lastTransLang = fromLang;  // Save to allow drill down in vocab. pane
 
-    console.log(`getTranslation of: ${toXlate} from: ${fromLang} to: ${toLang}`);
+    console.log(`getTranslation of: "${toXlate}" (length: ${toXlate.length}) from: ${fromLang} to: ${toLang}`);
 
     if (typeof localStorage[`${toXlate}.${fromLang}.${toLang}`] !== 'undefined') {
         // Return saved definition to increase performance/reduce Glosbe calls:
