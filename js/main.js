@@ -18,9 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 /*jslint devel: true */
 /*global speechSynthesis*/
 
-"use strict";
+// "use strict";
+
 /*jshint -W097 */
 
+// todo: Mac mobile devices don't respond to fullscreen/landscape code.  Nothing happens.
+//       Either don't offer or make it work.
 // todo: allow user to select TTS language manually (in case of several voices/lang)
 // todo: finish file saving code (https://jsfiddle.net/ourcodeworld/rce6nn3z/2/?utm_source=website&utm_medium=embed&utm_campaign=rce6nn3z)
 //       (sometimes saves only "right" file)
@@ -63,33 +66,29 @@ let rightLanguage = userLang2char;
 switch (localStorage.fontWeight) {
     case undefined:
         localStorage.fontWeight = "bold"; // default to bold
-        break;
     case "bold":
         document.getElementById("boldCB").checked = true;
         break;
 }
+/*document.getElementById("leftColumn").style.fontWeight = localStorage.fontWeight;
+document.getElementById("rightColumn").style.fontWeight = localStorage.fontWeight;*/
+document.getElementById("textColumns").style.fontWeight = localStorage.fontWeight;
+document.getElementById("sampleText").style.fontWeight = localStorage.fontWeight;
 
-switch (localStorage.textSize) {
-    case undefined:
-        localStorage.textSize = deftextSize; // default to bold
-        break;
-    default:
-        document.getElementById("textSize").value = localStorage.textSize;
-        document.getElementById("currentTextSize").innerHTML = localStorage.textSize + "px";
-        document.getElementById("textColumns").style.fontSize = localStorage.textSize + "px";
-        break;
-}
+if (localStorage.textSize === undefined)
+    localStorage.textSize = deftextSize; // default to bold
 
-switch (localStorage.speakSpeed) {
-    case undefined:
-        localStorage.speakSpeed = 1; // default
-        break;
-    default:
-        currentSpeakSpd = localStorage.speakSpeed;
-        document.getElementById("currentSpeakSpeed").textContent = currentSpeakSpd;
-        document.getElementById("speakSpeed").value = currentSpeakSpd;
-        break;
-}
+document.getElementById("textSize").value = localStorage.textSize;
+document.getElementById("currentTextSize").innerHTML = localStorage.textSize + "px";
+document.getElementById("textColumns").style.fontSize = localStorage.textSize + "px";
+document.getElementById("sampleText").style.fontSize = localStorage.textSize + "px";
+
+if (localStorage.speakSpeed === undefined)
+    localStorage.speakSpeed = 1; // default
+
+currentSpeakSpd = localStorage.speakSpeed;
+document.getElementById("currentSpeakSpeed").textContent = currentSpeakSpd;
+document.getElementById("speakSpeed").value = currentSpeakSpd;
 
 let buttonClickSound = document.getElementById("buttonClick");
 buttonClickSound.volume = 0.6;
@@ -209,9 +208,6 @@ document.querySelector("#splashCB").onchange = function () {
         localStorage.showSplash = "doNotShow";
 };
 
-document.getElementById("leftColumn").style.fontWeight = localStorage.fontWeight;
-document.getElementById("rightColumn").style.fontWeight = localStorage.fontWeight;
-
 // Controls:
 document.getElementById("controlsButton").addEventListener("click",
     function () {
@@ -230,10 +226,25 @@ document.getElementById("controlsButton").addEventListener("click",
 );
 
 document.querySelector("#closeControls").onclick = function () {
+    // $('body').addClass('waiting');
     makeClick();
     if (speechSynthesis.pending || speechSynthesis.speaking)
         speechSynthesis.cancel();
+
+    // Apply settings:
+    document.getElementById("textColumns").style.fontSize = localStorage.textSize + "px";
+    document.getElementById("textColumns").style.fontWeight = localStorage.fontWeight;
+
+    // For performance, set size & weight in single operation but
+    // NB: "sets the complete inline style for the element by overriding the
+    // existing inline styles."
+    /*    document.getElementById("textColumns").style.cssText =
+            `font-size: ${localStorage.textSize}px; font-weight: ${localStorage.fontWeight}`;*/
+    // (The above didn't actually improve performance w/several emulators)
+
+    setLineSpacing();
     document.getElementById("controlsBackground").classList.remove("md-show");
+    // $('body').removeClass('waiting');
 };
 
 // Toggle bold/normal font:
@@ -244,9 +255,11 @@ document.querySelector("#boldCB").onchange = function () {
     else
         localStorage.fontWeight = "normal";
 
-    document.getElementById("leftColumn").style.fontWeight = localStorage.fontWeight;
-    document.getElementById("rightColumn").style.fontWeight = localStorage.fontWeight;
-    setLineSpacing();
+    document.getElementById("sampleText").style.fontWeight = localStorage.fontWeight;
+
+    /*    document.getElementById("leftColumn").style.fontWeight = localStorage.fontWeight;
+        document.getElementById("rightColumn").style.fontWeight = localStorage.fontWeight;
+        setLineSpacing();*/
 };
 
 let libFilePaths;
@@ -318,21 +331,20 @@ function speakSample() {
 document.getElementById("currentTextSize").innerHTML =
     document.getElementById("textSize").value + "px";
 
-// todo: fix slow screen refresh on some tablets while sliding size control:
+// Here we only update the sampleText for performance reasons.  We change
+// ..display text size when user clicks the exit control:
 document.getElementById("textSize").addEventListener("input",
     function () {
         const textSize = document.getElementById("textSize").value;
         document.getElementById("currentTextSize").innerHTML = textSize + "px";
-        document.getElementById("textColumns").style.fontSize = textSize + "px";
+        document.getElementById("sampleText").style.fontSize = textSize + "px";
         localStorage.textSize = textSize;
-        setLineSpacing();
     }
 );
 
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications
 
 // Reveal the <select> node when the button is clicked:
-// let fileChooserModal = document.querySelector("#fileChooserModal");
 document.getElementById("libraryLoadButton").addEventListener("click",
     function () {
         makeClick();
@@ -604,9 +616,10 @@ let rightParaObserver = new MutationObserver(textEval);
 rightParaObserver.observe(document.getElementById("rightPara"), {childList: true});
 
 function textEval(mutationsList) {
-
     // console.log(`wholeText: ${mutationsList[0].addedNodes[0].wholeText}`);
     // console.log(`target: ${mutationsList[0].target.id}`);
+
+    $('body').addClass('waiting');
 
     let fullText = mutationsList[0].addedNodes[0].wholeText;
     // let textSample = fullText.substr(fullText.length / 4, 100);
@@ -648,6 +661,7 @@ function textEval(mutationsList) {
         });
     }
     setLineSpacing();
+    $('body').removeClass('waiting');
 }
 
 function setLineSpacing() {
@@ -657,6 +671,11 @@ function setLineSpacing() {
     // New content, so display from its top:
     leftDiv.scrollTop = 0;
     rightDiv.scrollTop = 0;
+
+    /*    if (document.getElementById("leftPara").scrollHeight > 2000) {
+            console.log(`SLS: left SH is ${document.getElementById("leftPara").scrollHeight}.`);
+            $('body').addClass('waiting');
+        }*/
 
     // Reformat display to match length of new text:
     // First reset both columns to default line height so we can make our computation:
@@ -685,6 +704,8 @@ function setLineSpacing() {
     leftRightHeightFactor = leftHeight / rightHeight;
     // console.log(`After calibration: left column is ${leftHeight} high, right is ${rightHeight}.`);
     // console.log(`                   left line height is ${leftLineHeight}, right is ${rightLineHeight}.`);
+    // $('body').removeClass('waiting');
+    // console.log(`SLS: exit.`)
 }
 
 // Prevent an event from "bubbling" to parent elements:
@@ -850,7 +871,7 @@ async function lookupWord(ev) { // jshint ignore:line
 
     let speakStr = speakRange.toString().trim();
 
-    if (! speakStr.length) return;
+    if (!speakStr.length) return;
 
     let sourceLang = userLang2char;
     if (this.id.toString() === "leftPara")

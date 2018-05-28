@@ -16,6 +16,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
 <!doctype html>
 <html class="no-js" lang="">
+
+<!--Need to put this here because otherwise browser may fail and never reach this test due to CSS or other language exceptions: -->
+<script>
+    var browserOK = true;
+
+    /*    try {
+            new Function("(y => y)");
+        }
+        catch (err) {
+            browserOK = false;
+            console.log("Browser does not support arrows.")
+        }*/
+
+    try {
+        new Function("let y = 1; const m = 5");
+    }
+    catch (err) {
+        browserOK = false;
+        console.log("Browser does not support let and/or const.")
+    }
+
+    var d = document.documentElement.style
+    if (!(('flexWrap' in d) || ('WebkitFlexWrap' in d) || ('msFlexWrap' in d))) {
+        browserOK = false;
+        console.log("Browser does not support FlexBox.")
+    }
+
+    if (!browserOK) {
+        document.querySelector('html').innerHTML =
+            '<body style="margin: 20%; color: red; font-size: 2em; font-weight: bold; font-family: sans-serif">' +
+            'Sorry, biReader is not compatible with your browser.  Please use a recent version of Chrome, Edge, Safari, or Firefox instead.' +
+            '</body>';
+        document.execCommand('Stop');
+    }
+
+</script>
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -34,8 +71,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <!--<link rel="stylesheet" type="text/css" href="css/ss-style.css"/>-->
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/andadaFont.css">
-    <link rel="stylesheet" href="css/VollkornFont.css">
+    <!--<link rel="stylesheet" href="css/andadaFont.css">-->
+    <!--<link rel="stylesheet" href="css/VollkornFont.css">-->
     <link rel="stylesheet" href="css/merriweatherFont.css">
     <link rel="stylesheet" href="css/fontawesome-all.css">
 
@@ -67,14 +104,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 <a href="#requirements">Requirements</a>&nbsp;
                 <a href="#inspiration">Inspiration</a>
             </h3>
-                Designed to facilitate foreign language learning by comparative reading, biReader
-                allows you to compare <b>any</b> two texts in its synchronized side-by-side
-                display. Where supported, biReader will also <b>read texts aloud</b> in different
-                languages and <b>look up meanings of words</b> in your native language.
+            Designed to facilitate foreign language learning by comparative reading, biReader
+            allows you to compare <b>any</b> two texts in its synchronized side-by-side
+            display. Where supported, biReader will also <b>read texts aloud</b> in different
+            languages and <b>look up meanings of words</b> in your native language.
 
             <h3><a name="quickStart">Quick Start:</a></h3>
             Click&nbsp;&nbsp;<i title="Load files from online library"
-                                   class="helpIcon fas fa-cloud-download-alt"></i>&nbsp;&nbsp;&nbsp;and follow the prompts;
+                                class="helpIcon fas fa-cloud-download-alt"></i>&nbsp;&nbsp;&nbsp;and follow the prompts;
             click&nbsp;&nbsp;<i title="Help"
                                 class="helpIcon fas fa-question"></i>&nbsp;&nbsp;&nbsp;for help.
             <h3><a name="features">Features:</a></h3>
@@ -136,6 +173,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             <p>
                 If you find biReader enjoyable, or have suggestions for improvement,
                 let me know at <a href="mailto:info@code-read.com">info@code-read.com</a>.
+            <p>
+                biReader is currently an open source project, found at:
+                https://github.com/code-read/biReader.
         </div>
         <button id=noSplashButton class="myButton leftBottomButton">Do not show this again</button>
         <i id="closeSplash" title="Close Splash Screen" class="closeIcon fas fa-window-close"></i>
@@ -144,7 +184,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
 <!-- CONTROL PANEL: -->
 <div id="controlsBackground" class="md-modal md-effect-1">
-    <div class="md-content">
+    <div class="md-content" style="font-family: sans-serif;">
+        <h3 style="text-align: center; background-color: lightsalmon; margin-top: 0px;
+         margin-bottom: 7px; border-radius: 4px 4px 0px 0px;">Controls</h3>
         <div>
             <label for="speakSpeed">Speaking rate:</label>
             <span id="currentSpeakSpeed" class="rangeLabel"></span>
@@ -156,7 +198,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             <span id="currentTextSize" class="rangeLabel"></span>
             <input id="textSize" class=lbSlider type="range" min="7" max="50" value="17" step="1">
         </div>
-        <br>
+        <p id="sampleText" style="text-align:center; margin-top:0; display:inline-block;
+           background-color:#ffffeb; border:1px dotted lightslategrey;">Sample text</p>
+
         <!--todo: change landscape button to a toggle here:-->
         <div id="fullScreenControls">
             <button class="myButton" onclick="launchFullscreen(document.documentElement);">
@@ -171,7 +215,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         &nbsp;&nbsp;
         <label for="splashCB"><input id="splashCB" type="checkbox" class="lbCheckbox"> Show splash screen at
             startup</label>
-        <i id="closeControls" title="Close Control Screen" class="closeIcon fas fa-window-close"></i>
+        <i id="closeControls" title="Apply Changes & Close Control Screen" class="closeIcon fas fa-window-close"></i>
+
     </div>
 </div>
 
@@ -197,131 +242,160 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             max-width: 705px;min-width: 12rem;margin-left: 6%; margin-bottom:10px;">
         <!--<div style="margin-left: 6%; margin-right: 6%; margin-top: 2%; overflow: auto; height: 60vh">-->
         <div class="md-scroll-box">
-            <h3>biReader Help</h3>
-            <h3><a href="#controls">Controls</a>&nbsp;
+            <h1>biReader Help</h1>
+            <h3><a href="#usage">Usage</a>&nbsp;
+                <a href="#controls">Controls</a>
                 <a href="#hints">Hints</a>&nbsp;
                 <a href="#problems">Problems</a>&nbsp;
             </h3>
 
-            <h3><a name="controls">Controls</a></h3>
-            <table>
-                <tbody>
-                <tr>
-                    <td align="right"><i title="Load files from online library"
-                                         class="helpIcon fas fa-cloud-download-alt"></i></td>
-                    <td>&nbsp;&nbsp;</td>
-                    <td>Load files from biReader's online library of parallel texts.</td>
-                </tr>
-                <tr></tr>
-                <tr>
-                    <td align="right"><i title="Save files to computer" class="helpIcon fas fa-save"></i></td>
-                    <td>&nbsp;&nbsp;</td>
-                    <td>Save contents of left and right panels to files on your computer.</td>
-                </tr>
-                <tr></tr>
-                <tr>
-                    <td align="right"><i title="Settings" class="helpIcon fas fa-cogs"></i></td>
-                    <td>&nbsp;&nbsp;</td>
-                    <td>Alter settings such as font size and text-to-speech speed.</td>
-                </tr>
-                <tr></tr>
-                <tr>
-                    <td align="right"><i title="Information" class="helpIcon fas fa-info"></i></td>
-                    <td>&nbsp;&nbsp;</td>
-                    <td>Show information about current system status such as voices available, files loaded,
-                        your native language.
-                    </td>
-                </tr>
-                <tr></tr>
-                <tr>
-                    <td align="right"><i title="Help" class="helpIcon fas fa-question"></i></td>
-                    <td>&nbsp;&nbsp;</td>
-                    <td>This help screen.</td>
-                </tr>
-                <tr></tr>
-                <tr>
-                    <td style="color: #428bca; background-color: #9dbfb8; text-align:center;
+            <h3><a name="usage">Usage</a></h3>
+            <ul>
+                <li>Load two corresponding texts to the left and right panels by:
+                    <ul>
+                        <li>Using biReader's online library of parallel texts
+                            (<i title="Load files from online library"
+                                class="helpIcon fas fa-cloud-download-alt"></i>)
+                        </li>
+                        <li>Pasting text to either or both panels</li>
+                        <li>Dragging and dropping file(s) to either or both panels</li>
+                        <li>Clicking on
+                            <span style="color: #428bca; background-color: #9dbfb8; text-align:center;
                     font-family:sans-serif; font-size:14px; font-weight:bold; text-shadow:none;">
-                        Click on title areas
-                    </td>
-                    <td>&nbsp;&nbsp;</td>
-                    <td>Load files from your computer</td>
-                </tr>
-                </tbody>
-            </table>
-            <h3><a name="hints">Hints</a></h3>
-            <ul>
-                <li>biReader works best with Google Chrome.
-                    Mobile works best with Google Chrome's "Add to Home screen" option.
-                    Desktop works best with Chrome or Firefox.
-                </li>
-                <li>
-                    You may provide texts of the same article in different languages by pasting them
-                    to the two panels, or drag-and-drop files to the panels, or click on the "load"
-                    buttons to select files from your computer. Or click on "Load Files from Online Library" to
-                    choose an existing pairing from the online library.
-                </li>
-                <!--
-                        todo: update this description and show it when the user opens the file selection dialogue:
-                            The files should contain <strong>plain text,
-                            using UTF-8 encoding</strong>,
-                            of the same article or story
-                            but written in two different languages (e.g., left = English and right = German).
-                            Text should consist of paragraphs separated by double returns (control characters
-                            CR,LF,CR,LF, which is 0D, 0A, 0D, 0A when shown as hexadecimal codes).
-                -->
-                <li>
-                    biReader will attempt to present the two texts
-                    as equal height, synchronously scrolling panels, and to pronounce a sentence
-                    in its native language
-                    when you click on it or a series of sentences when you click-and-drag over them.
-                </li>
-                <li>
-                    It will also attempt to show a definition of a word if you click-and-hold (tablet: long-tap)
-                    on it. Note that you may also click-and-hold on portions of the resulting
-                    definition to "drill down" further.
-                </li>
-                <li>For purposes of clicking on a sentence to have it spoken aloud, a
-                    sentence is any text starting with:
-                    <ul>
-                        <li>The beginning of the text</li>
-                        <!--                        <li>The first alphanumeric character after a newline followed by a space
-                                                    character-->
-                        </li>
-                        <li>The first alphanumeric character following a sentence end (below)</li>
-                    </ul>
-                    And ending with:
-                    <ul>
-                        <li>A sentence ending character like .?! followed by a space character</li>
-                        <li>A double newline</li>
-                        <li>A sentence separator character like 。</li>
-                        <li>The end of the text</li>
-                    </ul>
-                    (You may also click-and-drag over multiple sentences to have them spoken aloud).
-                </li>
-                <li>Note that you may search using the browser's native search function(s)</li>
-            </ul>
-            <h3><a name="problems">Problems</a></h3>
-            <ul>
-                <li>Missing voices. On some platforms, you may be able to install more voices for
-                    your browser to use.
-                    <ul>
-                        <li>For Microsoft Edge, see
-                            https://www.groovypost.com/howto/install-change-languages-windows-10
-                        </li>
-                        <li>For Android, see
-                            https://www.androidauthority.com/google-text-to-speech-multiple-male-female-voices-673214
+                            title areas</span> to load files from your computer.
                         </li>
                     </ul>
                 </li>
-                <li>On tablets and phones, long-tapping a word brings up Google Chrome's lookup
-                    function. This may be disabled via settings, or avoided by using Chrome's
-                    "Add to Home screen" option.
+                <li>Scroll the left or right panel and the other panel
+                    scrolls to its corresponding location. This is designed to facilitate
+                    parallel reading (normally, each panel shows the same text in a different language).
                 </li>
-            </ul>
-            PLEASE NOTE: biReader easily fails on invalid file
-            input as no input validity checks are yet in place. Please load only <b>plain text</b>
-            files to the left or right panel.
+                <li>Click on a sentence to have it read aloud in its native language.
+                    If your browser does not support the language a warning will appear.
+                </li>
+                <li>Click-and-hold on a word to see its definition in the window at the
+                    bottom of the screen.
+                </li>
+
+                <h3><a name="controls">Controls</a></h3>
+                <table>
+                    <tbody>
+                    <tr>
+                        <td align="right"><i title="Load files from online library"
+                                             class="helpIcon fas fa-cloud-download-alt"></i></td>
+                        <td>&nbsp;&nbsp;</td>
+                        <td>Load files from biReader's online library of parallel texts.</td>
+                    </tr>
+                    <tr></tr>
+                    <tr>
+                        <td align="right"><i title="Save files to computer" class="helpIcon fas fa-save"></i></td>
+                        <td>&nbsp;&nbsp;</td>
+                        <td>Save contents of left and right panels to files on your computer.</td>
+                    </tr>
+                    <tr></tr>
+                    <tr>
+                        <td align="right"><i title="Settings" class="helpIcon fas fa-cogs"></i></td>
+                        <td>&nbsp;&nbsp;</td>
+                        <td>Alter settings such as font size and text-to-speech speed.</td>
+                    </tr>
+                    <tr></tr>
+                    <tr>
+                        <td align="right"><i title="Information" class="helpIcon fas fa-info"></i></td>
+                        <td>&nbsp;&nbsp;</td>
+                        <td>Show information about current system status such as voices available, files loaded,
+                            your native language.
+                        </td>
+                    </tr>
+                    <tr></tr>
+                    <tr>
+                        <td align="right"><i title="Help" class="helpIcon fas fa-question"></i></td>
+                        <td>&nbsp;&nbsp;</td>
+                        <td>This help screen.</td>
+                    </tr>
+                    <tr></tr>
+                    <tr>
+                        <td style="color: #428bca; background-color: #9dbfb8; text-align:center;
+                    font-family:sans-serif; font-size:14px; font-weight:bold; text-shadow:none;">
+                            Click on title areas
+                        </td>
+                        <td>&nbsp;&nbsp;</td>
+                        <td>Load files from your computer</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <h3><a name="hints">Hints</a></h3>
+                <ul>
+                    <li>biReader works best with Google Chrome.
+                        Mobile works best with Google Chrome's "Add to Home screen" option.
+                        Desktop works best with Chrome or Firefox.
+                    </li>
+                    <li>
+                        You may provide texts of the same article in different languages by pasting them
+                        to the two panels, or drag-and-drop files to the panels, or click on the "load"
+                        buttons to select files from your computer. Or click on "Load Files from Online Library" to
+                        choose an existing pairing from the online library.
+                    </li>
+                    <!--
+                            todo: update this description and show it when the user opens the file selection dialogue:
+                                The files should contain <strong>plain text,
+                                using UTF-8 encoding</strong>,
+                                of the same article or story
+                                but written in two different languages (e.g., left = English and right = German).
+                                Text should consist of paragraphs separated by double returns (control characters
+                                CR,LF,CR,LF, which is 0D, 0A, 0D, 0A when shown as hexadecimal codes).
+                    -->
+                    <li>
+                        biReader will attempt to present the two texts
+                        as equal height, synchronously scrolling panels, and to pronounce a sentence
+                        in its native language
+                        when you click on it or a series of sentences when you click-and-drag over them.
+                    </li>
+                    <li>
+                        It will also attempt to show a definition of a word if you click-and-hold (tablet: long-tap)
+                        on it. Note that you may also click-and-hold on portions of the resulting
+                        definition to "drill down" further.
+                    </li>
+                    <li>For purposes of clicking on a sentence to have it spoken aloud, a
+                        sentence is any text starting with:
+                        <ul>
+                            <li>The beginning of the text</li>
+                            <!--                        <li>The first alphanumeric character after a newline followed by a space
+                                                        character-->
+                            </li>
+                            <li>The first alphanumeric character following a sentence end (below)</li>
+                        </ul>
+                        And ending with:
+                        <ul>
+                            <li>A sentence ending character like .?! followed by a space character</li>
+                            <li>A double newline</li>
+                            <li>A sentence separator character like 。</li>
+                            <li>The end of the text</li>
+                        </ul>
+                        (You may also click-and-drag over multiple sentences to have them spoken aloud).
+                    </li>
+                    <li>Note that you may search using the browser's native search function(s)</li>
+                </ul>
+                <h3><a name="problems">Problems</a></h3>
+                <ul>
+                    <li>Missing voices. On some platforms, you may be able to install more voices for
+                        your browser to use.
+                        <ul>
+                            <li>For Microsoft Edge, see
+                                https://www.groovypost.com/howto/install-change-languages-windows-10
+                            </li>
+                            <li>For Android, see
+                                https://www.androidauthority.com/google-text-to-speech-multiple-male-female-voices-673214
+                            </li>
+                        </ul>
+                    </li>
+                    <li>On tablets and phones, long-tapping a word brings up Google Chrome's lookup
+                        function. This may be disabled via settings, or avoided by using Chrome's
+                        "Add to Home screen" option.
+                    </li>
+                </ul>
+                PLEASE NOTE: biReader easily fails on invalid file
+                input as no input validity checks are yet in place. Please load only <b>plain text</b>
+                files to the left or right panel.
         </div>
         <i id="helpCloseButton" title="Close Help Screen" class="closeIcon fas fa-window-close"></i>
     </div>
@@ -406,7 +480,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         </div>
     </div>
 
-    <div id=vocab class="container frame" style="margin: 2%">
+    <div id=vocab class="horizContainer frame" style="margin: 2%">
         <span id="glosbeBuf" class="clickable" style="height: 10vh; margin: 10px">
             <span class="vocabInstructions">Click-and-hold a word for definition here.</span>
         </span>
@@ -417,8 +491,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 <div id=mdOverlay class="md-overlay"></div>
 
 <!--<script src="js/vendor/modernizr-3.5.0.min.js"></script>-->
-
-<script src="js/iexplorer-test.js"></script>
+<script src="js/browserTest.js"></script>
 
 <!--<script src="https://code.jquery.com/jquery-3.2.1.min.js"
         integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>-->
